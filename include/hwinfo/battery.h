@@ -1,87 +1,46 @@
-// Copyright Leon Freist
-// Author Leon Freist <freist@informatik.uni-freiburg.de>
+/*
+
+    88        88  I8,        8        ,8I  88                 ad88
+    88        88  `8b       d8b       d8'  88                d8"
+    88        88   "8,     ,8"8,     ,8"   88                88
+    88aaaaaaaa88    Y8     8P Y8     8P    88  8b,dPPYba,  MM88MMM  ,adPPYba,
+    88""""""""88    `8b   d8' `8b   d8'    88  88P'   `"8a   88    a8"     "8a
+    88        88     `8a a8'   `8a a8'     88  88       88   88    8b       d8
+    88        88      `8a8'     `8a8'      88  88       88   88    "8a,   ,a8"
+    88        88       `8'       `8'       88  88       88   88     `"YbbdP"'
+
+    Based on the work of:
+    Leon Freist <freist@informatik.uni-freiburg.de>
+
+    Copyright © 2022 Leon Freist
+    Copyright © 2023 Kenneth Troldal Balslev
+
+    Permission is hereby granted, free of charge, to any person obtaining a copy
+    of this software and associated documentation files (the “Software”), to deal
+    in the Software without restriction, including without limitation the rights
+    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+    copies of the Software, and to permit persons to whom the Software is furnished
+    to do so, subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be included in all
+    copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+    INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+    PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+    HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+    OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+    SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+*/
 
 #pragma once
 
-#include <cstdint>
-#include <string>
-#include <vector>
-
 #include "platform.h"
 
-namespace hwinfo {
-
-class Battery {
-  friend std::vector<Battery> getAllBatteries();
-
- public:
-  explicit Battery(int8_t id = 0) { _id = id; }
-  ~Battery() = default;
-
-  std::string& vendor() {
-    if (_vendor.empty()) {
-      _vendor = getVendor();
-    }
-    return _vendor;
-  }
-
-  std::string& model() {
-    if (_model.empty()) {
-      _model = getModel();
-    }
-    return _model;
-  }
-
-  std::string& serialNumber()  {
-    if (_serialNumber.empty()) {
-      _serialNumber = getSerialNumber();
-    }
-    return _serialNumber;
-  }
-
-  std::string& technology() {
-    if (_technology.empty()) {
-      _technology = getTechnology();
-    }
-    return _technology;
-  }
-
-  uint32_t energyFull() {
-    if (_energyFull == 0) {
-      _energyFull = getEnergyFull();
-    }
-    return _energyFull;
-  }
-
-  double capacity() { return static_cast<double>(energyNow()) / energyFull(); }
-
-  [[nodiscard]] std::string getVendor() const;
-  [[nodiscard]] std::string getModel() const;
-  [[nodiscard]] std::string getSerialNumber() const;
-  [[nodiscard]] std::string getTechnology() const;
-  [[nodiscard]] uint32_t getEnergyFull() const;
-
-  [[nodiscard]] uint32_t energyNow() const;
-  [[nodiscard]] bool charging() const;
-  [[nodiscard]] bool discharging() const;
-
- private:
-  int8_t _id = -1;
-  std::string _vendor;
-  std::string _model;
-  std::string _serialNumber;
-  std::string _technology;
-  uint32_t _energyFull = 0;
-};
-
-std::vector<Battery> getAllBatteries();
-
-}  // namespace hwinfo
-
 #if defined(HWINFO_APPLE)
-#include "apple/battery.h"
+#    include "apple/battery.h"
 #elif defined(HWINFO_UNIX)
-#include "linux/battery.h"
+#    include "linux/battery.h"
 #elif defined(HWINFO_WINDOWS)
-#include "windows/battery.h"
+#    include "windows/battery.h"
 #endif
