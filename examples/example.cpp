@@ -16,7 +16,7 @@ int main(int argc, char** argv) {
             << "Thanks for using hwinfo!" << std::endl;
   std::cout << std::endl << "Hardware Report:" << std::endl << std::endl;
   std::cout << "----------------------------------- CPU -----------------------------------" << std::endl;
-  auto cpus = hwinfo::getAllCPUs();
+  auto cpus = hwinfo::CPU::getAllCPUs();
   for (const auto& cpu : cpus) {
     std::cout << "Socket " << cpu.id() << ":\n";
     std::cout << std::left << std::setw(20) << " vendor:";

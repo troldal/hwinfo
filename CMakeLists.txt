@@ -9,7 +9,7 @@ project(hwinfo VERSION 1.0.0 LANGUAGES CXX)
 if (NOT DEFINED NO_OCL)
     set(CMAKE_CXX_STANDARD 20)
 else ()
-    set(CMAKE_CXX_STANDARD 11)
+    set(CMAKE_CXX_STANDARD 17)
 endif ()
 
 # Ensure that the standard requirement is mandatory.

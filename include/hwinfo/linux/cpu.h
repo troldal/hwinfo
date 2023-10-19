@@ -19,6 +19,7 @@
 #include <string>
 #include <thread>
 #include <vector>
+#include <filesystem>
 
 #include "../cpu.h"
 #include "utils/filesystem.h"

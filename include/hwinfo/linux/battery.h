@@ -38,8 +38,6 @@
 #include <filesystem>
 
 #include "../base/battery.h"
-#include "../utils/filesystem.h"
-
 
 namespace hwinfo {
 
@@ -178,7 +176,7 @@ namespace hwinfo {
         static std::vector<BatteryLinux> getAllBatteries_impl() {
             std::vector<BatteryLinux> batteries;
             int8_t id = 0;
-            while (filesystem::exists(base_path + "BAT" + std::to_string(id))) {
+            while (std::filesystem::exists(base_path + "BAT" + std::to_string(id))) {
                 batteries.emplace_back(id++);
             }
             return batteries;

@@ -166,6 +166,5 @@ namespace hwinfo
         std::string _technology {};       ///< Battery technology type.
         uint32_t    _energyFull { 0 };    ///< Total energy the battery can store when full.
     };
-
 }    // namespace hwinfo
 
