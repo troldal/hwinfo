@@ -1,79 +1,41 @@
-// Copyright Leon Freist
-// Author Leon Freist <freist@informatik.uni-freiburg.de>
+/*
+
+    88        88  I8,        8        ,8I  88                 ad88
+    88        88  `8b       d8b       d8'  88                d8"
+    88        88   "8,     ,8"8,     ,8"   88                88
+    88aaaaaaaa88    Y8     8P Y8     8P    88  8b,dPPYba,  MM88MMM  ,adPPYba,
+    88""""""""88    `8b   d8' `8b   d8'    88  88P'   `"8a   88    a8"     "8a
+    88        88     `8a a8'   `8a a8'     88  88       88   88    8b       d8
+    88        88      `8a8'     `8a8'      88  88       88   88    "8a,   ,a8"
+    88        88       `8'       `8'       88  88       88   88     `"YbbdP"'
+
+    Based on the work of:
+    Leon Freist <freist@informatik.uni-freiburg.de>
+
+    Copyright © 2022 Leon Freist
+    Copyright © 2023 Kenneth Troldal Balslev
+
+    Permission is hereby granted, free of charge, to any person obtaining a copy
+    of this software and associated documentation files (the “Software”), to deal
+    in the Software without restriction, including without limitation the rights
+    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+    copies of the Software, and to permit persons to whom the Software is furnished
+    to do so, subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be included in all
+    copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+    INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+    PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+    HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+    OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+    SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+*/
 
 #pragma once
 
 #include "platform.h"
-
-//#include <memory>
-//#include <string>
-//#include <vector>
-//
-//namespace hwinfo {
-//
-//#ifdef HWINFO_UNIX
-//struct Jiffies {
-//  Jiffies() {
-//    working = -1;
-//    all = -1;
-//  }
-//
-//  Jiffies(const int64_t& _all, const int64_t& _working) {
-//    all = _all;
-//    working = _working;
-//  }
-//
-//  int64_t working{-1};
-//  int64_t all{-1};
-//};
-//#endif
-//
-//class CPU {
-//  friend std::vector<CPU> getAllCPUs();
-//
-// public:
-//  ~CPU() = default;
-//
-//  int id() const { return _id; }
-//  const std::string& modelName() const { return _modelName; }
-//  const std::string& vendor() const { return _vendor; }
-//  int64_t L1CacheSize_Bytes() const { return _L1CacheSize_Bytes; }
-//  int64_t L2CacheSize_Bytes() const { return _L2CacheSize_Bytes; }
-//  int64_t L3CacheSize_Bytes() const { return _L3CacheSize_Bytes; }
-//  int numPhysicalCores() const { return _numPhysicalCores; }
-//  int numLogicalCores() const { return _numLogicalCores; }
-//  int64_t maxClockSpeed_MHz() const { return _maxClockSpeed_MHz; }
-//  int64_t regularClockSpeed_MHz() const { return _regularClockSpeed_MHz; }
-//  int64_t currentClockSpeed_MHz(int thread_id) const;
-//  std::vector<int64_t> currentClockSpeed_MHz() const;
-//  double currentUtilisation() const;
-//  double threadUtilisation(int thread_index) const;
-//  std::vector<double> threadsUtilisation() const;
-//  // double currentTemperature_Celsius() const;
-//  const std::vector<std::string>& flags() const { return _flags; }
-//  void init_jiffies() const;
-//
-// private:
-//  CPU() = default;
-//
-//  int _id{-1};
-//  std::string _modelName;
-//  std::string _vendor;
-//  int _numPhysicalCores{-1};
-//  int _numLogicalCores{-1};
-//  int64_t _maxClockSpeed_MHz{-1};
-//  int64_t _regularClockSpeed_MHz{-1};
-//  int64_t _L1CacheSize_Bytes{-1};
-//  int64_t _L2CacheSize_Bytes{-1};
-//  int64_t _L3CacheSize_Bytes{-1};
-//  std::vector<std::string> _flags{};
-//
-//  mutable bool _jiffies_initialized = false;
-//};
-//
-//std::vector<CPU> getAllCPUs();
-//
-//}  // namespace hwinfo
 
 #if defined(HWINFO_APPLE)
 #include "apple/cpu.h"
