@@ -1,8 +1,8 @@
 // Copyright Leon Freist
 // Author Leon Freist <freist@informatik.uni-freiburg.de>
 
-#include <hwinfo/PCIMapper.h>
-#include <hwinfo/hwinfo.h>
+#include "hwinfo/hwinfo.hpp"
+#include <hwinfo/PCIMapper.hpp>
 
 #include <iomanip>
 #include <iostream>
