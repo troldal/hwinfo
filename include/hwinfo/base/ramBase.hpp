@@ -46,54 +46,54 @@ namespace hwinfo::detail
         friend IMPL;
 
     public:
-        RAMBase() = default;
-
         [[nodiscard]]
         std::string vendor() const
         {
-            return impl().getVendor();
+            return _vendor;
         }
 
         [[nodiscard]]
         std::string name() const
         {
-            return impl().getName();
+            return _name;
         }
 
         [[nodiscard]]
         std::string model() const
         {
-            return impl().getModel();
+            return _model;
         }
 
         [[nodiscard]]
         std::string serialNumber() const
         {
-            return impl().getSerialNumber();
+            return _serialNumber;
         }
 
         [[nodiscard]]
         int64_t total_Bytes() const
         {
-            return impl().getTotalMemory();
+            return _total_Bytes;
         }
 
         [[nodiscard]]
         int64_t free_Bytes() const
         {
-            return impl().getFreeMemory();
+            return _free_Bytes;
         }
 
         [[nodiscard]]
         int64_t available_Bytes() const
         {
-            return impl().getAvailableMemory();
+            return _available_Bytes;
         }
 
     protected:
         ~RAMBase() = default;
 
     private:
+        RAMBase() = default;
+
         /**
          * @brief Provides access to the implementation-specific methods in the derived class.
          *

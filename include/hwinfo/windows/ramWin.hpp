@@ -60,60 +60,18 @@ namespace hwinfo
         public:
             RAMWin()
             {
-                BASE::_name            = getName_s();
-                BASE::_vendor          = getVendor_s();
-                BASE::_serialNumber    = getSerialNumber_s();
-                BASE::_model           = getModel_s();
-                BASE::_total_Bytes     = getTotalSize_Bytes_s();
-                BASE::_free_Bytes      = getFreeMemory_s();
-                BASE::_available_Bytes = getFreeMemory_s();
-            }
-
-            [[nodiscard]]
-            std::string getVendor() const
-            {
-                return BASE::_vendor;
-            }
-
-            [[nodiscard]]
-            std::string getName() const
-            {
-                return BASE::_name;
-            }
-
-            [[nodiscard]]
-            std::string getModel() const
-            {
-                return BASE::_model;
-            }
-
-            [[nodiscard]]
-            std::string getSerialNumber() const
-            {
-                return BASE::_serialNumber;
-            }
-
-            [[nodiscard]]
-            int64_t getTotalMemory() const
-            {
-                return BASE::_total_Bytes;
-            }
-
-            [[nodiscard]]
-            int64_t getFreeMemory() const
-            {
-                return BASE::_free_Bytes;
-            }
-
-            [[nodiscard]]
-            int64_t getAvailableMemory() const
-            {
-                return BASE::_available_Bytes;
+                BASE::_name            = getName();
+                BASE::_vendor          = getVendor();
+                BASE::_serialNumber    = getSerialNumber();
+                BASE::_model           = getModel();
+                BASE::_total_Bytes     = getTotalSize_Bytes();
+                BASE::_free_Bytes      = getFreeMemory();
+                BASE::_available_Bytes = getFreeMemory();
             }
 
         private:
             // _____________________________________________________________________________________________________________________
-            static std::string getVendor_s()
+            static std::string getVendor()
             {
                 std::vector< const wchar_t* > names {};
                 wmi::queryWMI("WIN32_PhysicalMemory", "Manufacturer", names);
@@ -128,7 +86,7 @@ namespace hwinfo
             }
 
             // _____________________________________________________________________________________________________________________
-            static std::string getName_s()
+            static std::string getName()
             {
                 std::vector< const wchar_t* > names {};
                 wmi::queryWMI("WIN32_PhysicalMemory", "Name", names);
@@ -143,7 +101,7 @@ namespace hwinfo
             }
 
             // _____________________________________________________________________________________________________________________
-            static std::string getModel_s()
+            static std::string getModel()
             {
                 std::vector< const wchar_t* > names {};
                 wmi::queryWMI("WIN32_PhysicalMemory", "PartNumber", names);
@@ -158,7 +116,7 @@ namespace hwinfo
             }
 
             // _____________________________________________________________________________________________________________________
-            static std::string getSerialNumber_s()
+            static std::string getSerialNumber()
             {
                 std::vector< const wchar_t* > names {};
                 wmi::queryWMI("WIN32_PhysicalMemory", "SerialNumber", names);
@@ -174,7 +132,7 @@ namespace hwinfo
             }
 
             // _____________________________________________________________________________________________________________________
-            static int64_t getTotalSize_Bytes_s()
+            static int64_t getTotalSize_Bytes()
             {
                 MEMORYSTATUSEX status;
                 status.dwLength = sizeof(status);
@@ -183,7 +141,7 @@ namespace hwinfo
             }
 
             // _____________________________________________________________________________________________________________________
-            static int64_t getFreeMemory_s()
+            static int64_t getFreeMemory()
             {
                 // it will return L"FreePhysicalMemory" Str
                 std::vector< wchar_t* > memories {};
