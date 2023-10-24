@@ -49,16 +49,16 @@ namespace hwinfo::detail
     public:
 
         [[nodiscard]]
-        const std::string vendor() const { return impl().getVendor(); }
+        std::string vendor() const { return impl().getVendor(); }
 
         [[nodiscard]]
-        const std::string model() const { return impl().getModel(); }
+        std::string model() const { return impl().getModel(); }
 
         [[nodiscard]]
-        const std::string serialNumber() const { return impl().getSerialNumber(); }
+        std::string serialNumber() const { return impl().getSerialNumber(); }
 
         [[nodiscard]]
-        int64_t            size_Bytes() const { return impl().getByteSize(); }
+        int64_t            size_Bytes() const { return impl().getSize(); }
 
         [[nodiscard]]
         int                id() const { return impl().getId(); }

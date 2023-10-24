@@ -58,7 +58,7 @@ int main(int argc, char** argv) {
   std::cout << std::left << std::setw(20) << "endianess:";
   std::cout << (os.isLittleEndian() ? "little endian" : "big endian") << std::endl;
 
-  auto gpus = hwinfo::getAllGPUs();
+  auto gpus = hwinfo::GPU::getAllGPUs();
   std::cout << "----------------------------------- GPU -----------------------------------" << std::endl;
   for (auto& gpu : gpus) {
     std::cout << "GPU " << gpu.id() << ":\n";

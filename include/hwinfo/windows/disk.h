@@ -71,7 +71,7 @@ namespace hwinfo
             }
 
             [[nodiscard]]
-            int64_t getByteSize() const
+            int64_t getSize() const
             {
                 return BASE::_size_Bytes;
             }
