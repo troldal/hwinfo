@@ -35,7 +35,7 @@
 
 #pragma once
 
-#include "../base/os.hpp"
+#include "../base/osBase.hpp"
 #include <sys/stat.h>
 #include <sys/utsname.h>
 

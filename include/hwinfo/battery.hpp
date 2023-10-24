@@ -38,9 +38,9 @@
 #include "platform.hpp"
 
 #if defined(HWINFO_APPLE)
-#    include "apple/battery.hpp"
+#    include "apple/batteryApple.hpp"
 #elif defined(HWINFO_UNIX)
-#    include "linux/battery.hpp"
+#    include "linux/batteryLinux.hpp"
 #elif defined(HWINFO_WINDOWS)
-#    include "windows/battery.hpp"
+#    include "windows/batteryWin.hpp"
 #endif

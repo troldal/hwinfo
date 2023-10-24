@@ -38,9 +38,9 @@
 #include "platform.hpp"
 
 #if defined(HWINFO_APPLE)
-#    include "apple/disk.hpp"
+#    include "apple/diskApple.hpp"
 #elif defined(HWINFO_UNIX)
-#    include "linux/disk.hpp"
+#    include "linux/diskLinux.hpp"
 #elif defined(HWINFO_WINDOWS)
-#    include "windows/disk.hpp"
+#    include "windows/diskWin.hpp"
 #endif

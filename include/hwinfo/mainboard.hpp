@@ -38,9 +38,9 @@
 #include "platform.hpp"
 
 #if defined(HWINFO_APPLE)
-#    include "apple/mainboard.hpp"
+#    include "apple/mainboardApple.hpp"
 #elif defined(HWINFO_UNIX)
-#    include "linux/mainboard.hpp"
+#    include "linux/mainboardLinux.hpp"
 #elif defined(HWINFO_WINDOWS)
-#    include "windows/mainboard.hpp"
+#    include "windows/mainboardWin.hpp"
 #endif

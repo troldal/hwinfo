@@ -35,7 +35,7 @@
 
 #pragma once
 
-#include "../base/os.hpp"
+#include "../base/osBase.hpp"
 
 #define STATUS_SUCCESS 0x00000000
 

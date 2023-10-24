@@ -38,9 +38,9 @@
 #include "platform.hpp"
 
 #if defined(HWINFO_APPLE)
-#    include "apple/gpu.hpp"
+#    include "apple/gpuApple.hpp"
 #elif defined(HWINFO_UNIX)
-#    include "linux/gpu.hpp"
+#    include "linux/gpuLinux.hpp"
 #elif defined(HWINFO_WINDOWS)
-#    include "windows/gpu.hpp"
+#    include "windows/gpuWin.hpp"
 #endif

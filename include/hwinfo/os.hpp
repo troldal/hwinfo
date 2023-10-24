@@ -38,10 +38,10 @@
 #include "platform.hpp"
 
 #if defined(HWINFO_APPLE)
-#    include "apple/os.hpp"
+#    include "apple/osWin.hpp"
 #elif defined(HWINFO_UNIX)
-#    include "linux/os.hpp"
+#    include "linux/osLinux.hpp"
 #elif defined(HWINFO_WINDOWS)
-#    include "windows/os.hpp"
+#    include "windows/osWin.hpp"
 #endif
 

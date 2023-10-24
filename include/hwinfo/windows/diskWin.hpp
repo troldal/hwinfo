@@ -35,11 +35,7 @@
 
 #pragma once
 
-#include "../base/gpu.hpp"
-
-#ifdef USE_OCL
-#    include <missocl/opencl.h>
-#endif
+#include "../base/diskBase.hpp"
 
 namespace hwinfo
 {
@@ -47,13 +43,13 @@ namespace hwinfo
     namespace detail
     {
 
-        class GPUWin : public GPUBase< GPUWin >
+        class DiskWin : public DiskBase< DiskWin >
         {
-            using BASE = GPUBase< GPUWin >;
+            using BASE = DiskBase< DiskWin >;
             friend BASE;
 
         public:
-            GPUWin() = default;
+            DiskWin() = default;
 
         private:
             [[nodiscard]]
@@ -63,33 +59,21 @@ namespace hwinfo
             }
 
             [[nodiscard]]
-            std::string getName() const
+            std::string getModel() const
             {
-                return BASE::_name;
+                return BASE::_model;
             }
 
             [[nodiscard]]
-            std::string getDriverVersion() const
+            std::string getSerialNumber() const
             {
-                return BASE::_driverVersion;
+                return BASE::_serialNumber;
             }
 
             [[nodiscard]]
-            int64_t getMemory() const
+            int64_t getSize() const
             {
-                return BASE::_memory_Bytes;
-            }
-
-            [[nodiscard]]
-            int64_t getFrequency() const
-            {
-                return BASE::_frequency_MHz;
-            }
-
-            [[nodiscard]]
-            int getNumCores() const
-            {
-                return BASE::_num_cores;
+                return BASE::_size_Bytes;
             }
 
             [[nodiscard]]
@@ -98,60 +82,46 @@ namespace hwinfo
                 return BASE::_id;
             }
 
-            static std::vector< GPUWin > getAllGPUs_impl()
+            static std::vector< DiskWin > getAllDisks_impl()
             {
                 utils::WMI::_WMI   wmi;
-                const std::wstring query_string(L"SELECT Name, AdapterCompatibility, DriverVersion, AdapterRam "
-                                                L"FROM WIN32_VideoController");
+                const std::wstring query_string(L"SELECT Model, Manufacturer, SerialNumber, Size "
+                                                L"FROM Win32_DiskDrive");
                 bool               success = wmi.execute_query(query_string);
                 if (!success) {
                     return {};
                 }
-                std::vector< GPUWin > gpus;
+                std::vector< DiskWin > disks;
 
                 ULONG             u_return = 0;
                 IWbemClassObject* obj      = nullptr;
-                int               gpu_id   = 0;
+                int               disk_id  = 0;
                 while (wmi.enumerator) {
                     wmi.enumerator->Next(WBEM_INFINITE, 1, &obj, &u_return);
                     if (!u_return) {
                         break;
                     }
-                    GPUWin gpu;
-                    gpu._id = gpu_id++;
+                    DiskWin disk;
+                    disk._id = disk_id++;
                     VARIANT vt_prop;
-                    obj->Get(L"Name", 0, &vt_prop, nullptr, nullptr);
-                    gpu._name = utils::wstring_to_std_string(vt_prop.bstrVal);
-                    obj->Get(L"AdapterCompatibility", 0, &vt_prop, nullptr, nullptr);
-                    gpu._vendor = utils::wstring_to_std_string(vt_prop.bstrVal);
-                    obj->Get(L"DriverVersion", 0, &vt_prop, nullptr, nullptr);
-                    gpu._driverVersion = utils::wstring_to_std_string(vt_prop.bstrVal);
-                    obj->Get(L"AdapterRam", 0, &vt_prop, nullptr, nullptr);
-                    gpu._memory_Bytes = vt_prop.intVal;
+                    obj->Get(L"Model", 0, &vt_prop, nullptr, nullptr);
+                    disk._model = utils::wstring_to_std_string(vt_prop.bstrVal);
+                    obj->Get(L"Manufacturer", 0, &vt_prop, nullptr, nullptr);
+                    disk._vendor = utils::wstring_to_std_string(vt_prop.bstrVal);
+                    obj->Get(L"SerialNumber", 0, &vt_prop, nullptr, nullptr);
+                    disk._serialNumber = utils::wstring_to_std_string(vt_prop.bstrVal);
+                    obj->Get(L"Size", 0, &vt_prop, nullptr, nullptr);
+                    disk._size_Bytes = static_cast< int64_t >(vt_prop.ullVal);
                     VariantClear(&vt_prop);
                     obj->Release();
-                    gpus.push_back(std::move(gpu));
+                    disks.push_back(std::move(disk));
                 }
-#ifdef USE_OCL
-                auto cl_gpus = mcl::DeviceManager::get_list< mcl::Filter::GPU >();
-                for (auto& gpu : gpus) {
-                    for (auto* cl_gpu : cl_gpus) {
-                        if (cl_gpu->name() == gpu.name()) {
-                            gpu._driverVersion = cl_gpu->driver_version();
-                            gpu._frequency_MHz = static_cast< int64_t >(cl_gpu->clock_frequency_MHz());
-                            gpu._num_cores     = static_cast< int >(cl_gpu->cores());
-                            gpu._memory_Bytes  = static_cast< int64_t >(cl_gpu->memory_Bytes());
-                            break;
-                        }
-                    }
-                }
-#endif    // USE_OCL
-                return gpus;
+                return disks;
             }
         };
 
-    }    // namespace detail
+    }
 
-    using GPU = detail::GPUWin;
+    using Disk = detail::DiskWin;
 
 }    // namespace hwinfo

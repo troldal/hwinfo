@@ -35,7 +35,7 @@
 
 #pragma once
 
-#include "../base/mainboard.hpp"
+#include "../base/mainboardBase.hpp"
 
 namespace hwinfo
 {

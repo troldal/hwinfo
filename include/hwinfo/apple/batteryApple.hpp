@@ -35,7 +35,7 @@
 
 #include "hwinfo/platform.hpp"
 
-#include "../base/battery.hpp"
+#include "../base/batteryBase.hpp"
 #include "hwinfo/battery.hpp"
 
 namespace hwinfo {

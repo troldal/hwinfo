@@ -35,7 +35,7 @@
 
 #pragma once
 
-#include "../base/disk.hpp"
+#include "../base/diskBase.hpp"
 
 namespace hwinfo
 {

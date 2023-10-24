@@ -45,10 +45,10 @@ class RAM {
 }  // namespace hwinfo
 
 #if defined(HWINFO_APPLE)
-#    include "apple/ram.hpp"
+#    include "apple/ramApple.hpp"
 #elif defined(HWINFO_UNIX)
-#    include "linux/ram.hpp"
+#    include "linux/ramLinux.hpp"
 #elif defined(HWINFO_WINDOWS)
-#    include "windows/ram.hpp"
+#    include "windows/ramWin.hpp"
 #endif
 

@@ -35,7 +35,7 @@
 
 #pragma once
 
-#include "../base/cpu.hpp"
+#include "../base/cpuBase.hpp"
 #include "../utils/stringutils.hpp"
 #include "utils/filesystem.hpp"
 

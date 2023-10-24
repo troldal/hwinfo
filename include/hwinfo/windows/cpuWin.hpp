@@ -35,7 +35,7 @@
 
 #pragma once
 
-#include "../base/cpu.hpp"
+#include "../base/cpuBase.hpp"
 #include "utils/wmi_wrapper.hpp"
 
 namespace hwinfo

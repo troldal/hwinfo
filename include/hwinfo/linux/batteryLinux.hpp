@@ -36,7 +36,7 @@
 #include <filesystem>
 #include <fstream>
 
-#include "../base/battery.hpp"
+#include "../base/batteryBase.hpp"
 
 namespace hwinfo
 {
