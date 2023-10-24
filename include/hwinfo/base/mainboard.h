@@ -35,12 +35,71 @@
 
 #pragma once
 
-#include "platform.h"
+#include <string>
+#include <vector>
 
-#if defined(HWINFO_APPLE)
-#include "apple/mainboard.h"
-#elif defined(HWINFO_UNIX)
-#include "linux/mainboard.h"
-#elif defined(HWINFO_WINDOWS)
-#include "windows/mainboard.h"
-#endif
+namespace hwinfo
+{
+
+    namespace detail
+    {
+
+        template< typename IMPL >
+        class MainBoardBase
+        {
+            friend IMPL;
+
+        public:
+            MainBoardBase() = default;
+
+            [[nodiscard]]
+            std::string vendor() const
+            {
+                return impl().getVendor();
+            }
+
+            [[nodiscard]]
+            std::string name() const
+            {
+                return impl().getName();
+            }
+
+            [[nodiscard]]
+            std::string version() const
+            {
+                return impl().getVersion();
+            }
+
+            [[nodiscard]]
+            std::string serialNumber() const
+            {
+                return impl().getSerialNumber();
+            }
+
+        protected:
+            ~MainBoardBase() = default;
+
+        private:
+            /**
+             * @brief Provides access to the implementation-specific methods in the derived class.
+             *
+             * @return A reference to the derived class instance.
+             */
+            IMPL& impl() { return static_cast< IMPL& >(*this); }
+
+            /**
+             * @brief Provides const access to the implementation-specific methods in the derived class.
+             *
+             * @return A const reference to the derived class instance.
+             */
+            IMPL const& impl() const { return static_cast< IMPL const& >(*this); }
+
+            std::string _vendor;
+            std::string _name;
+            std::string _version;
+            std::string _serialNumber;
+        };
+
+    }    // namespace detail
+
+}    // namespace hwinfo
