@@ -44,8 +44,67 @@ namespace hwinfo
     class CPUWin : public CPUBase< CPUWin >
     {
         using BASE = CPUBase< CPUWin >;
+        friend BASE;
 
     public:
+
+        CPUWin() = default;
+
+        static std::vector< CPUWin > getAllCPUs_impl()
+        {
+            utils::WMI::_WMI   wmi;
+            const std::wstring query_string(
+                L"SELECT Name, Manufacturer, NumberOfCores, NumberOfLogicalProcessors, MaxClockSpeed, L2CacheSize, L3CacheSize "
+                L"FROM Win32_Processor");
+            bool success = wmi.execute_query(query_string);
+            if (!success) {
+                return {};
+            }
+            std::vector< CPUWin > cpus;
+
+            ULONG             u_return = 0;
+            IWbemClassObject* obj      = nullptr;
+            int               cpu_id   = 0;
+            while (wmi.enumerator) {
+                wmi.enumerator->Next(WBEM_INFINITE, 1, &obj, &u_return);
+                if (!u_return) {
+                    break;
+                }
+                CPUWin cpu;
+                cpu._id = cpu_id++;
+                VARIANT vt_prop;
+
+                obj->Get(L"Name", 0, &vt_prop, nullptr, nullptr);
+                cpu._modelName = utils::wstring_to_std_string(vt_prop.bstrVal);
+
+                obj->Get(L"Manufacturer", 0, &vt_prop, nullptr, nullptr);
+                cpu._vendor = utils::wstring_to_std_string(vt_prop.bstrVal);
+
+                obj->Get(L"NumberOfCores", 0, &vt_prop, nullptr, nullptr);
+                cpu._numPhysicalCores = vt_prop.intVal;
+
+                obj->Get(L"NumberOfLogicalProcessors", 0, &vt_prop, nullptr, nullptr);
+                cpu._numLogicalCores = vt_prop.intVal;
+
+                obj->Get(L"MaxClockSpeed", 0, &vt_prop, nullptr, nullptr);
+                cpu._maxClockSpeed_MHz     = vt_prop.uintVal;
+
+                cpu._regularClockSpeed_MHz = vt_prop.uintVal;
+
+                obj->Get(L"L2CacheSize", 0, &vt_prop, nullptr, nullptr);
+                cpu._L2CacheSize_Bytes = vt_prop.uintVal;
+
+                obj->Get(L"L3CacheSize", 0, &vt_prop, nullptr, nullptr);
+                cpu._L3CacheSize_Bytes = vt_prop.uintVal;
+
+                VariantClear(&vt_prop);
+                obj->Release();
+                cpus.push_back(std::move(cpu));
+            }
+            return cpus;
+        }
+
+    private:
         [[nodiscard]]
         int getId() const
         {
@@ -194,59 +253,6 @@ namespace hwinfo
             return BASE::_flags;
         }
 
-        static std::vector< CPUWin > getAllCPUs_impl()
-        {
-            utils::WMI::_WMI   wmi;
-            const std::wstring query_string(
-                L"SELECT Name, Manufacturer, NumberOfCores, NumberOfLogicalProcessors, MaxClockSpeed, L2CacheSize, L3CacheSize "
-                L"FROM Win32_Processor");
-            bool success = wmi.execute_query(query_string);
-            if (!success) {
-                return {};
-            }
-            std::vector< CPUWin > cpus;
-
-            ULONG             u_return = 0;
-            IWbemClassObject* obj      = nullptr;
-            int               cpu_id   = 0;
-            while (wmi.enumerator) {
-                wmi.enumerator->Next(WBEM_INFINITE, 1, &obj, &u_return);
-                if (!u_return) {
-                    break;
-                }
-                CPUWin cpu;
-                cpu._id = cpu_id++;
-                VARIANT vt_prop;
-
-                obj->Get(L"Name", 0, &vt_prop, nullptr, nullptr);
-                cpu._modelName = utils::wstring_to_std_string(vt_prop.bstrVal);
-
-                obj->Get(L"Manufacturer", 0, &vt_prop, nullptr, nullptr);
-                cpu._vendor = utils::wstring_to_std_string(vt_prop.bstrVal);
-
-                obj->Get(L"NumberOfCores", 0, &vt_prop, nullptr, nullptr);
-                cpu._numPhysicalCores = vt_prop.intVal;
-
-                obj->Get(L"NumberOfLogicalProcessors", 0, &vt_prop, nullptr, nullptr);
-                cpu._numLogicalCores = vt_prop.intVal;
-
-                obj->Get(L"MaxClockSpeed", 0, &vt_prop, nullptr, nullptr);
-                cpu._maxClockSpeed_MHz     = vt_prop.uintVal;
-
-                cpu._regularClockSpeed_MHz = vt_prop.uintVal;
-
-                obj->Get(L"L2CacheSize", 0, &vt_prop, nullptr, nullptr);
-                cpu._L2CacheSize_Bytes = vt_prop.uintVal;
-
-                obj->Get(L"L3CacheSize", 0, &vt_prop, nullptr, nullptr);
-                cpu._L3CacheSize_Bytes = vt_prop.uintVal;
-
-                VariantClear(&vt_prop);
-                obj->Release();
-                cpus.push_back(std::move(cpu));
-            }
-            return cpus;
-        }
     };
 
     using CPU = CPUWin;

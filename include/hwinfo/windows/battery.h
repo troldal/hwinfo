@@ -45,9 +45,30 @@ namespace hwinfo {
 
         using BASE = BatteryBase<BatteryWin>;
 
+        friend BASE;
+
     public:
 
         explicit BatteryWin(int8_t id = 0) : BASE(id) {}
+
+        static std::vector<BatteryWin> getAllBatteries_impl() {
+            std::vector<BatteryWin> batteries;
+            std::vector<const wchar_t*> res{};
+            wmi::queryWMI("Win32_Battery", "Name", res);
+            if (res.empty() || res.front() == nullptr) {
+                return {};
+            }
+            int8_t counter = 0;
+            for (const auto& v : res) {
+                std::wstring tmp(v);
+                batteries.emplace_back(counter++);
+                batteries.back()._model = utils::wstring_to_std_string(tmp);
+            }
+            res.clear();
+            return batteries;
+        }
+
+    private:
 
         [[nodiscard]]
         std::string getVendor() const { return "<unknown>"; }
@@ -73,22 +94,7 @@ namespace hwinfo {
         [[nodiscard]]
         bool getDischarging() const { return false; }
 
-        static std::vector<BatteryWin> getAllBatteries_impl() {
-            std::vector<BatteryWin> batteries;
-            std::vector<const wchar_t*> res{};
-            wmi::queryWMI("Win32_Battery", "Name", res);
-            if (res.empty() || res.front() == nullptr) {
-                return {};
-            }
-            int8_t counter = 0;
-            for (const auto& v : res) {
-                std::wstring tmp(v);
-                batteries.emplace_back(counter++);
-                batteries.back()._model = utils::wstring_to_std_string(tmp);
-            }
-            res.clear();
-            return batteries;
-        }
+
     };
 
 using Battery = BatteryWin;

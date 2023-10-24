@@ -44,6 +44,7 @@ namespace hwinfo {
     class BatteryLinux : public BatteryBase<BatteryLinux>
     {
         using BASE = BatteryBase<BatteryLinux>;
+        friend BASE;
 
         static const std::string base_path;
 
@@ -51,8 +52,17 @@ namespace hwinfo {
 
         explicit BatteryLinux(int8_t id = 0) : BASE(id) {}
 
-        // =====================================================================================================================
-        // _____________________________________________________________________________________________________________________
+        static std::vector<BatteryLinux> getAllBatteries_impl() {
+            std::vector<BatteryLinux> batteries;
+            int8_t id = 0;
+            while (std::filesystem::exists(base_path + "BAT" + std::to_string(id))) {
+                batteries.emplace_back(id++);
+            }
+            return batteries;
+        }
+
+    private:
+
         [[nodiscard]]
         std::string getVendor() const {
             if (_id < 0) {
@@ -67,7 +77,6 @@ namespace hwinfo {
             return "<unknown>";
         }
 
-        // _____________________________________________________________________________________________________________________
         [[nodiscard]]
         std::string getModel() const {
             if (_id < 0) {
@@ -82,7 +91,6 @@ namespace hwinfo {
             return "<unknown>";
         }
 
-        // _____________________________________________________________________________________________________________________
         [[nodiscard]]
         std::string getSerialNumber() const {
             if (_id < 0) {
@@ -97,7 +105,6 @@ namespace hwinfo {
             return "<unknown>";
         }
 
-        // _____________________________________________________________________________________________________________________
         [[nodiscard]]
         std::string getTechnology() const {
             if (_id < 0) {
@@ -112,7 +119,6 @@ namespace hwinfo {
             return "<unknown>";
         }
 
-        // _____________________________________________________________________________________________________________________
         [[nodiscard]]
         uint32_t getEnergyFull() const {
             if (_id < 0) {
@@ -131,7 +137,6 @@ namespace hwinfo {
             return 0;
         }
 
-        // _____________________________________________________________________________________________________________________
         [[nodiscard]]
         uint32_t getEnergyNow() const {
             if (_id < 0) {
@@ -150,7 +155,6 @@ namespace hwinfo {
             return 0;
         }
 
-        // _____________________________________________________________________________________________________________________
         [[nodiscard]]
         bool getCharging() const {
             if (_id < 0) {
@@ -165,22 +169,12 @@ namespace hwinfo {
             return false;
         }
 
-        // _____________________________________________________________________________________________________________________
         [[nodiscard]]
         bool getDischarging() const {
             return !charging();
         }
 
-        // =====================================================================================================================
-        // _____________________________________________________________________________________________________________________
-        static std::vector<BatteryLinux> getAllBatteries_impl() {
-            std::vector<BatteryLinux> batteries;
-            int8_t id = 0;
-            while (std::filesystem::exists(base_path + "BAT" + std::to_string(id))) {
-                batteries.emplace_back(id++);
-            }
-            return batteries;
-        }
+
     };
 
     const std::string BatteryLinux::base_path = "/sys/class/power_supply/";
