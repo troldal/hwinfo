@@ -41,85 +41,88 @@
 namespace hwinfo
 {
 
-    class BatteryWin : public BatteryBase< BatteryWin >
+    namespace detail
     {
-        using BASE = BatteryBase< BatteryWin >;
-
-        friend BASE;
-
-    public:
-        explicit BatteryWin(int8_t id = 0)
-            : BASE(id)
-        {}
-
-    private:
-        [[nodiscard]]
-        std::string getVendor() const
+        class BatteryWin : public BatteryBase< BatteryWin >
         {
-            return "<unknown>";
-        }
+            using BASE = BatteryBase< BatteryWin >;
 
-        [[nodiscard]]
-        std::string getModel() const
-        {
-            return BASE::_model;
-        }
+            friend BASE;
 
-        [[nodiscard]]
-        std::string getSerialNumber() const
-        {
-            return "<unknown>";
-        }
+        public:
+            explicit BatteryWin(int8_t id = 0)
+                : BASE(id)
+            {}
 
-        [[nodiscard]]
-        std::string getTechnology() const
-        {
-            return "<unknown>";
-        }
-
-        [[nodiscard]]
-        uint32_t getEnergyFull() const
-        {
-            return 0;
-        }
-
-        [[nodiscard]]
-        uint32_t getEnergyNow() const
-        {
-            return 0;
-        }
-
-        [[nodiscard]]
-        bool getCharging() const
-        {
-            return false;
-        }
-
-        [[nodiscard]]
-        bool getDischarging() const
-        {
-            return false;
-        }
-
-        static std::vector< BatteryWin > getAllBatteries_impl()
-        {
-            std::vector< BatteryWin >     batteries;
-            std::vector< const wchar_t* > res {};
-            wmi::queryWMI("Win32_Battery", "Name", res);
-            if (res.empty() || res.front() == nullptr) {
-                return {};
+        private:
+            [[nodiscard]]
+            std::string getVendor() const
+            {
+                return "<unknown>";
             }
-            int8_t counter = 0;
-            for (const auto& v : res) {
-                std::wstring tmp(v);
-                batteries.emplace_back(counter++);
-                batteries.back()._model = utils::wstring_to_std_string(tmp);
-            }
-            res.clear();
-            return batteries;
-        }
-    };
 
-    using Battery = BatteryWin;
+            [[nodiscard]]
+            std::string getModel() const
+            {
+                return BASE::_model;
+            }
+
+            [[nodiscard]]
+            std::string getSerialNumber() const
+            {
+                return "<unknown>";
+            }
+
+            [[nodiscard]]
+            std::string getTechnology() const
+            {
+                return "<unknown>";
+            }
+
+            [[nodiscard]]
+            uint32_t getEnergyFull() const
+            {
+                return 0;
+            }
+
+            [[nodiscard]]
+            uint32_t getEnergyNow() const
+            {
+                return 0;
+            }
+
+            [[nodiscard]]
+            bool getCharging() const
+            {
+                return false;
+            }
+
+            [[nodiscard]]
+            bool getDischarging() const
+            {
+                return false;
+            }
+
+            static std::vector< BatteryWin > getAllBatteries_impl()
+            {
+                std::vector< BatteryWin >     batteries;
+                std::vector< const wchar_t* > res {};
+                wmi::queryWMI("Win32_Battery", "Name", res);
+                if (res.empty() || res.front() == nullptr) {
+                    return {};
+                }
+                int8_t counter = 0;
+                for (const auto& v : res) {
+                    std::wstring tmp(v);
+                    batteries.emplace_back(counter++);
+                    batteries.back()._model = utils::wstring_to_std_string(tmp);
+                }
+                res.clear();
+                return batteries;
+            }
+        };
+    }
+
+    using Battery = detail::BatteryWin;
 
 }    // namespace hwinfo

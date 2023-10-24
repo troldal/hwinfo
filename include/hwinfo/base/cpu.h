@@ -39,7 +39,7 @@
 #include <string>
 #include <vector>
 
-namespace hwinfo
+namespace hwinfo::detail
 {
     template< typename IMPL >
     class CPUBase

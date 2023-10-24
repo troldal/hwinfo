@@ -39,7 +39,7 @@
 #include <string>
 #include <vector>
 
-namespace hwinfo
+namespace hwinfo::detail
 {
     template< typename IMPL >
     class DiskBase
@@ -48,10 +48,19 @@ namespace hwinfo
 
     public:
 
+        [[nodiscard]]
         const std::string vendor() const { return impl().getVendor(); }
+
+        [[nodiscard]]
         const std::string model() const { return impl().getModel(); }
+
+        [[nodiscard]]
         const std::string serialNumber() const { return impl().getSerialNumber(); }
+
+        [[nodiscard]]
         int64_t            size_Bytes() const { return impl().getByteSize(); }
+
+        [[nodiscard]]
         int                id() const { return impl().getId(); }
 
         static std::vector< IMPL > getAllDisks() { return IMPL::getAllDisks_impl(); }
