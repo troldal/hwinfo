@@ -35,13 +35,73 @@
 
 #pragma once
 
-#include "platform.h"
+#include <string>
 
-#if defined(HWINFO_APPLE)
-#include "apple/os.h"
-#elif defined(HWINFO_UNIX)
-#include "linux/os.h"
-#elif defined(HWINFO_WINDOWS)
-#include "windows/os.h"
-#endif
+namespace hwinfo::detail
+{
+    template< typename IMPL >
+    class OSBase
+    {
+        friend IMPL;
 
+    public:
+        OSBase() = default;
+
+        std::string fullName() { return IMPL::getFullName(); }
+
+        std::string name() { return IMPL::getName(); }
+
+        std::string version() { return IMPL::getVersion(); }
+
+        std::string kernel() { return IMPL::getKernel(); }
+
+        [[nodiscard]]
+        bool is32bit() const
+        {
+            return _32bit;
+        }
+        [[nodiscard]]
+        bool is64bit() const
+        {
+            return _64bit;
+        }
+        [[nodiscard]]
+        bool isBigEndian() const
+        {
+            return _bigEndian;
+        }
+        [[nodiscard]]
+        bool isLittleEndian() const
+        {
+            return _littleEndian;
+        }
+
+    protected:
+        ~OSBase() = default;
+
+    private:
+        /**
+         * @brief Provides access to the implementation-specific methods in the derived class.
+         *
+         * @return A reference to the derived class instance.
+         */
+        IMPL& impl() { return static_cast< IMPL& >(*this); }
+
+        /**
+         * @brief Provides const access to the implementation-specific methods in the derived class.
+         *
+         * @return A const reference to the derived class instance.
+         */
+        IMPL const& impl() const { return static_cast< IMPL const& >(*this); }
+
+        std::string _fullName;
+        std::string _name;
+        std::string _version;
+        std::string _kernel;
+        bool        _32bit        = false;
+        bool        _64bit        = false;
+        bool        _bigEndian    = false;
+        bool        _littleEndian = false;
+    };
+
+}    // namespace hwinfo::detail

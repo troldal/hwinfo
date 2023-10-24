@@ -38,68 +38,63 @@
 #include <string>
 #include <vector>
 
-namespace hwinfo
+namespace hwinfo::detail
 {
 
-    namespace detail
+    template< typename IMPL >
+    class MainBoardBase
     {
+        friend IMPL;
 
-        template< typename IMPL >
-        class MainBoardBase
+    public:
+        MainBoardBase() = default;
+
+        [[nodiscard]]
+        std::string vendor() const
         {
-            friend IMPL;
+            return impl().getVendor();
+        }
 
-        public:
-            MainBoardBase() = default;
+        [[nodiscard]]
+        std::string name() const
+        {
+            return impl().getName();
+        }
 
-            [[nodiscard]]
-            std::string vendor() const
-            {
-                return impl().getVendor();
-            }
+        [[nodiscard]]
+        std::string version() const
+        {
+            return impl().getVersion();
+        }
 
-            [[nodiscard]]
-            std::string name() const
-            {
-                return impl().getName();
-            }
+        [[nodiscard]]
+        std::string serialNumber() const
+        {
+            return impl().getSerialNumber();
+        }
 
-            [[nodiscard]]
-            std::string version() const
-            {
-                return impl().getVersion();
-            }
+    protected:
+        ~MainBoardBase() = default;
 
-            [[nodiscard]]
-            std::string serialNumber() const
-            {
-                return impl().getSerialNumber();
-            }
+    private:
+        /**
+         * @brief Provides access to the implementation-specific methods in the derived class.
+         *
+         * @return A reference to the derived class instance.
+         */
+        IMPL& impl() { return static_cast< IMPL& >(*this); }
 
-        protected:
-            ~MainBoardBase() = default;
+        /**
+         * @brief Provides const access to the implementation-specific methods in the derived class.
+         *
+         * @return A const reference to the derived class instance.
+         */
+        IMPL const& impl() const { return static_cast< IMPL const& >(*this); }
 
-        private:
-            /**
-             * @brief Provides access to the implementation-specific methods in the derived class.
-             *
-             * @return A reference to the derived class instance.
-             */
-            IMPL& impl() { return static_cast< IMPL& >(*this); }
+        std::string _vendor;
+        std::string _name;
+        std::string _version;
+        std::string _serialNumber;
+    };
 
-            /**
-             * @brief Provides const access to the implementation-specific methods in the derived class.
-             *
-             * @return A const reference to the derived class instance.
-             */
-            IMPL const& impl() const { return static_cast< IMPL const& >(*this); }
-
-            std::string _vendor;
-            std::string _name;
-            std::string _version;
-            std::string _serialNumber;
-        };
-
-    }    // namespace detail
-
-}    // namespace hwinfo
+}    // namespace hwinfo::detail

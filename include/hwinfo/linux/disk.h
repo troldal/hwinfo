@@ -33,6 +33,8 @@
     SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
+#pragma once
+
 #include "../base/disk.h"
 
 namespace hwinfo
