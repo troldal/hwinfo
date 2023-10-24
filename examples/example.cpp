@@ -126,7 +126,7 @@ int main(int argc, char** argv) {
     std::cout << "No Batteries installed or detected" << std::endl;
   }
 
-  std::vector<hwinfo::Disk> disks = hwinfo::getAllDisks();
+  std::vector<hwinfo::Disk> disks = hwinfo::Disk::getAllDisks();
   std::cout << "--------------------------------- Disks -----------------------------------" << std::endl;
   if (!disks.empty()) {
     int disk_counter = 0;

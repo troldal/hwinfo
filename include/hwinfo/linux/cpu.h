@@ -70,70 +70,6 @@ namespace hwinfo
     public:
         CPULinux() = default;
 
-        static std::vector< CPULinux > getAllCPUs_impl()
-        {
-            std::vector< CPULinux > cpus;
-
-            std::ifstream cpuinfo("/proc/cpuinfo");
-            if (!cpuinfo.is_open()) {
-                return {};
-            }
-            std::string file((std::istreambuf_iterator< char >(cpuinfo)), (std::istreambuf_iterator< char >()));
-            cpuinfo.close();
-            auto                                             cpu_blocks_string = utils::split(file, "\n\n");
-            std::map< const std::string, const std::string > cpu_block;
-            int                                              physical_id = -1;
-            bool                                             next_add    = false;
-            for (const auto& block : cpu_blocks_string) {
-                CPULinux cpu;
-                auto     lines = utils::split(block, '\n');
-                for (auto& line : lines) {
-                    auto line_pairs = utils::split(line, ":");
-                    if (line_pairs.size() < 2) {
-                        continue;
-                    }
-                    auto name  = line_pairs[0];
-                    auto value = line_pairs[1];
-                    utils::strip(name);
-                    utils::strip(value);
-                    if (name == "vendor_id") {
-                        cpu._vendor = value;
-                    }
-                    else if (name == "model name") {
-                        cpu._modelName = value;
-                    }
-                    else if (name == "cache size") {
-                        cpu._L3CacheSize_Bytes = std::stoi(utils::split(value, " ")[0]) * 1024;
-                    }
-                    else if (name == "siblings") {
-                        cpu._numLogicalCores = std::stoi(value);
-                    }
-                    else if (name == "cpu cores") {
-                        cpu._numPhysicalCores = std::stoi(value);
-                    }
-                    else if (name == "flags") {
-                        cpu._flags = utils::split(value, " ");
-                    }
-                    else if (name == "physical id") {
-                        int tmp_phys_id = std::stoi(value);
-                        if (physical_id == tmp_phys_id) {
-                            continue;
-                        }
-                        cpu._id  = tmp_phys_id;
-                        next_add = true;
-                    }
-                }
-                if (next_add) {
-                    cpu._maxClockSpeed_MHz     = getMaxClockSpeed_MHz(cpu._id);
-                    cpu._regularClockSpeed_MHz = getRegularClockSpeed_MHz(cpu._id);
-                    next_add                   = false;
-                    physical_id++;
-                    cpus.push_back(std::move(cpu));
-                }
-            }
-            return cpus;
-        }
-
     private:
         [[nodiscard]]
         int getId() const
@@ -375,6 +311,70 @@ namespace hwinfo
                 std::this_thread::sleep_for(std::chrono::duration< double >(1));
                 _jiffies_initialized = true;
             }
+        }
+
+        static std::vector< CPULinux > getAllCPUs_impl()
+        {
+            std::vector< CPULinux > cpus;
+
+            std::ifstream cpuinfo("/proc/cpuinfo");
+            if (!cpuinfo.is_open()) {
+                return {};
+            }
+            std::string file((std::istreambuf_iterator< char >(cpuinfo)), (std::istreambuf_iterator< char >()));
+            cpuinfo.close();
+            auto                                             cpu_blocks_string = utils::split(file, "\n\n");
+            std::map< const std::string, const std::string > cpu_block;
+            int                                              physical_id = -1;
+            bool                                             next_add    = false;
+            for (const auto& block : cpu_blocks_string) {
+                CPULinux cpu;
+                auto     lines = utils::split(block, '\n');
+                for (auto& line : lines) {
+                    auto line_pairs = utils::split(line, ":");
+                    if (line_pairs.size() < 2) {
+                        continue;
+                    }
+                    auto name  = line_pairs[0];
+                    auto value = line_pairs[1];
+                    utils::strip(name);
+                    utils::strip(value);
+                    if (name == "vendor_id") {
+                        cpu._vendor = value;
+                    }
+                    else if (name == "model name") {
+                        cpu._modelName = value;
+                    }
+                    else if (name == "cache size") {
+                        cpu._L3CacheSize_Bytes = std::stoi(utils::split(value, " ")[0]) * 1024;
+                    }
+                    else if (name == "siblings") {
+                        cpu._numLogicalCores = std::stoi(value);
+                    }
+                    else if (name == "cpu cores") {
+                        cpu._numPhysicalCores = std::stoi(value);
+                    }
+                    else if (name == "flags") {
+                        cpu._flags = utils::split(value, " ");
+                    }
+                    else if (name == "physical id") {
+                        int tmp_phys_id = std::stoi(value);
+                        if (physical_id == tmp_phys_id) {
+                            continue;
+                        }
+                        cpu._id  = tmp_phys_id;
+                        next_add = true;
+                    }
+                }
+                if (next_add) {
+                    cpu._maxClockSpeed_MHz     = getMaxClockSpeed_MHz(cpu._id);
+                    cpu._regularClockSpeed_MHz = getRegularClockSpeed_MHz(cpu._id);
+                    next_add                   = false;
+                    physical_id++;
+                    cpus.push_back(std::move(cpu));
+                }
+            }
+            return cpus;
         }
     };
 

@@ -16,7 +16,7 @@
 #include <vector>
 
 //#include "../cpu.h"
-#include "../cpuid.h"
+#include "cpuid.h"
 #include "../utils/stringutils.h"
 
 namespace hwinfo {

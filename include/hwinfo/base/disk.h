@@ -35,91 +35,55 @@
 
 #pragma once
 
-#include "../base/battery.h"
-#include "utils/wmi_wrapper.h"
+#include <cstdint>
+#include <string>
+#include <vector>
 
 namespace hwinfo
 {
-
-    class BatteryWin : public BatteryBase< BatteryWin >
+    template< typename IMPL >
+    class DiskBase
     {
-        using BASE = BatteryBase< BatteryWin >;
-
-        friend BASE;
+        friend IMPL;
 
     public:
-        explicit BatteryWin(int8_t id = 0)
-            : BASE(id)
-        {}
+
+        const std::string vendor() const { return impl().getVendor(); }
+        const std::string model() const { return impl().getModel(); }
+        const std::string serialNumber() const { return impl().getSerialNumber(); }
+        int64_t            size_Bytes() const { return impl().getByteSize(); }
+        int                id() const { return impl().getId(); }
+
+        static std::vector< IMPL > getAllDisks() { return IMPL::getAllDisks_impl(); }
+
+    protected:
+        ~DiskBase() = default;
 
     private:
-        [[nodiscard]]
-        std::string getVendor() const
-        {
-            return "<unknown>";
-        }
 
-        [[nodiscard]]
-        std::string getModel() const
-        {
-            return BASE::_model;
-        }
+        /**
+         * @brief Provides access to the implementation-specific methods in the derived class.
+         *
+         * @return A reference to the derived class instance.
+         */
+        IMPL& impl() { return static_cast< IMPL& >(*this); }
 
-        [[nodiscard]]
-        std::string getSerialNumber() const
-        {
-            return "<unknown>";
-        }
+        /**
+         * @brief Provides const access to the implementation-specific methods in the derived class.
+         *
+         * @return A const reference to the derived class instance.
+         */
+        IMPL const& impl() const { return static_cast< IMPL const& >(*this); }
 
-        [[nodiscard]]
-        std::string getTechnology() const
-        {
-            return "<unknown>";
-        }
-
-        [[nodiscard]]
-        uint32_t getEnergyFull() const
-        {
-            return 0;
-        }
-
-        [[nodiscard]]
-        uint32_t getEnergyNow() const
-        {
-            return 0;
-        }
-
-        [[nodiscard]]
-        bool getCharging() const
-        {
-            return false;
-        }
-
-        [[nodiscard]]
-        bool getDischarging() const
-        {
-            return false;
-        }
-
-        static std::vector< BatteryWin > getAllBatteries_impl()
-        {
-            std::vector< BatteryWin >     batteries;
-            std::vector< const wchar_t* > res {};
-            wmi::queryWMI("Win32_Battery", "Name", res);
-            if (res.empty() || res.front() == nullptr) {
-                return {};
-            }
-            int8_t counter = 0;
-            for (const auto& v : res) {
-                std::wstring tmp(v);
-                batteries.emplace_back(counter++);
-                batteries.back()._model = utils::wstring_to_std_string(tmp);
-            }
-            res.clear();
-            return batteries;
-        }
+        DiskBase() = default;
+        std::string _vendor;
+        std::string _model;
+        std::string _serialNumber;
+        int64_t     _size_Bytes { -1 };
+        int         _id { -1 };
     };
 
-    using Battery = BatteryWin;
+
 
 }    // namespace hwinfo
+

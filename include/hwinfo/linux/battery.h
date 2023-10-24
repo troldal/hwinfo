@@ -33,43 +33,35 @@
     SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-
-#include <fstream>
 #include <filesystem>
+#include <fstream>
 
 #include "../base/battery.h"
 
-namespace hwinfo {
+namespace hwinfo
+{
 
-    class BatteryLinux : public BatteryBase<BatteryLinux>
+    class BatteryLinux : public BatteryBase< BatteryLinux >
     {
-        using BASE = BatteryBase<BatteryLinux>;
+        using BASE = BatteryBase< BatteryLinux >;
         friend BASE;
 
         static const std::string base_path;
 
     public:
-
-        explicit BatteryLinux(int8_t id = 0) : BASE(id) {}
-
-        static std::vector<BatteryLinux> getAllBatteries_impl() {
-            std::vector<BatteryLinux> batteries;
-            int8_t id = 0;
-            while (std::filesystem::exists(base_path + "BAT" + std::to_string(id))) {
-                batteries.emplace_back(id++);
-            }
-            return batteries;
-        }
+        explicit BatteryLinux(int8_t id = 0)
+            : BASE(id)
+        {}
 
     private:
-
         [[nodiscard]]
-        std::string getVendor() const {
+        std::string getVendor() const
+        {
             if (_id < 0) {
                 return "<unknown>";
             }
             std::ifstream vendor_file(base_path + "BAT" + std::to_string(_id) + "/" + "manufacturer");
-            std::string vendor;
+            std::string   vendor;
             if (vendor_file.is_open()) {
                 getline(vendor_file, vendor);
                 return vendor;
@@ -78,12 +70,13 @@ namespace hwinfo {
         }
 
         [[nodiscard]]
-        std::string getModel() const {
+        std::string getModel() const
+        {
             if (_id < 0) {
                 return "<unknown>";
             }
             std::ifstream vendor_file(base_path + "BAT" + std::to_string(_id) + "/" + "model_name");
-            std::string value;
+            std::string   value;
             if (vendor_file.is_open()) {
                 getline(vendor_file, value);
                 return value;
@@ -92,12 +85,13 @@ namespace hwinfo {
         }
 
         [[nodiscard]]
-        std::string getSerialNumber() const {
+        std::string getSerialNumber() const
+        {
             if (_id < 0) {
                 return "<unknown>";
             }
             std::ifstream vendor_file(base_path + "BAT" + std::to_string(_id) + "/" + "serial_number");
-            std::string value;
+            std::string   value;
             if (vendor_file.is_open()) {
                 getline(vendor_file, value);
                 return value;
@@ -106,12 +100,13 @@ namespace hwinfo {
         }
 
         [[nodiscard]]
-        std::string getTechnology() const {
+        std::string getTechnology() const
+        {
             if (_id < 0) {
                 return "<unknown>";
             }
             std::ifstream vendor_file(base_path + "BAT" + std::to_string(_id) + "/" + "technology");
-            std::string value;
+            std::string   value;
             if (vendor_file.is_open()) {
                 getline(vendor_file, value);
                 return value;
@@ -120,17 +115,19 @@ namespace hwinfo {
         }
 
         [[nodiscard]]
-        uint32_t getEnergyFull() const {
+        uint32_t getEnergyFull() const
+        {
             if (_id < 0) {
                 return 0;
             }
             std::ifstream vendor_file(base_path + "BAT" + std::to_string(_id) + "/" + "energy_full");
-            std::string value;
+            std::string   value;
             if (vendor_file.is_open()) {
                 getline(vendor_file, value);
                 try {
                     return std::stoi(value);
-                } catch (const std::invalid_argument& e) {
+                }
+                catch (const std::invalid_argument& e) {
                     return 0;
                 }
             }
@@ -138,17 +135,19 @@ namespace hwinfo {
         }
 
         [[nodiscard]]
-        uint32_t getEnergyNow() const {
+        uint32_t getEnergyNow() const
+        {
             if (_id < 0) {
                 return 0;
             }
             std::ifstream vendor_file(base_path + "BAT" + std::to_string(_id) + "/" + "energy_now");
-            std::string value;
+            std::string   value;
             if (vendor_file.is_open()) {
                 getline(vendor_file, value);
                 try {
                     return std::stoi(value);
-                } catch (const std::invalid_argument& e) {
+                }
+                catch (const std::invalid_argument& e) {
                     return 0;
                 }
             }
@@ -156,12 +155,13 @@ namespace hwinfo {
         }
 
         [[nodiscard]]
-        bool getCharging() const {
+        bool getCharging() const
+        {
             if (_id < 0) {
                 return false;
             }
             std::ifstream vendor_file(base_path + "BAT" + std::to_string(_id) + "/" + "status");
-            std::string value;
+            std::string   value;
             if (vendor_file.is_open()) {
                 getline(vendor_file, value);
                 return value == "Charging";
@@ -170,15 +170,24 @@ namespace hwinfo {
         }
 
         [[nodiscard]]
-        bool getDischarging() const {
+        bool getDischarging() const
+        {
             return !charging();
         }
 
-
+        static std::vector< BatteryLinux > getAllBatteries_impl()
+        {
+            std::vector< BatteryLinux > batteries;
+            int8_t                      id = 0;
+            while (std::filesystem::exists(base_path + "BAT" + std::to_string(id))) {
+                batteries.emplace_back(id++);
+            }
+            return batteries;
+        }
     };
 
     const std::string BatteryLinux::base_path = "/sys/class/power_supply/";
 
     using Battery = BatteryLinux;
 
-}  // namespace hwinfo
+}    // namespace hwinfo
