@@ -36,7 +36,7 @@
 #pragma once
 
 #include "../base/ramBase.hpp"
-#include "utils/wmi_wrapper_2.hpp"
+#include "utils/WMIWrapper.hpp"
 
 #include <numeric>
 #include <string>
@@ -68,7 +68,8 @@ namespace hwinfo
             // _____________________________________________________________________________________________________________________
             static std::string getVendor()
             {
-                auto result = utils::WMI::query< std::string >(L"Win32_PhysicalMemory", L"Manufacturer");
+                auto wmi    = utils::WMI::WMIWrapper();
+                auto result = wmi.query< std::string >(L"Win32_PhysicalMemory", L"Manufacturer");
                 if (result.empty()) {
                     return "<unknown>";
                 }
@@ -78,7 +79,8 @@ namespace hwinfo
             // _____________________________________________________________________________________________________________________
             static std::string getName()
             {
-                auto result = utils::WMI::query< std::string >(L"Win32_PhysicalMemory", L"Name");
+                auto wmi    = utils::WMI::WMIWrapper();
+                auto result = wmi.query< std::string >(L"Win32_PhysicalMemory", L"Name");
                 if (result.empty()) {
                     return "<unknown>";
                 }
@@ -88,7 +90,8 @@ namespace hwinfo
             // _____________________________________________________________________________________________________________________
             static std::string getModel()
             {
-                auto result = utils::WMI::query< std::string >(L"Win32_PhysicalMemory", L"PartNumber");
+                auto wmi    = utils::WMI::WMIWrapper();
+                auto result = wmi.query< std::string >(L"Win32_PhysicalMemory", L"PartNumber");
                 if (result.empty()) {
                     return "<unknown>";
                 }
@@ -98,7 +101,8 @@ namespace hwinfo
             // _____________________________________________________________________________________________________________________
             static std::string getSerialNumber()
             {
-                auto result = utils::WMI::query< std::string >(L"Win32_PhysicalMemory", L"SerialNumber");
+                auto wmi    = utils::WMI::WMIWrapper();
+                auto result = wmi.query< std::string >(L"Win32_PhysicalMemory", L"SerialNumber");
                 if (result.empty()) {
                     return "<unknown>";
                 }
@@ -108,7 +112,8 @@ namespace hwinfo
             // _____________________________________________________________________________________________________________________
             static int64_t getTotalSize_Bytes()
             {
-                auto result = utils::WMI::query< std::string >(L"Win32_PhysicalMemory", L"Capacity");
+                auto wmi    = utils::WMI::WMIWrapper();
+                auto result = wmi.query< std::string >(L"Win32_PhysicalMemory", L"Capacity");
                 if (result.empty()) {
                     return -1;
                 }
@@ -121,7 +126,8 @@ namespace hwinfo
             // _____________________________________________________________________________________________________________________
             static int64_t getFreeMemory()
             {
-                auto result = utils::WMI::query< std::string >(L"CIM_OperatingSystem", L"FreePhysicalMemory");
+                auto wmi    = utils::WMI::WMIWrapper();
+                auto result = wmi.query< std::string >(L"CIM_OperatingSystem", L"FreePhysicalMemory");
                 if (result.empty()) {
                     return -1;
                 }

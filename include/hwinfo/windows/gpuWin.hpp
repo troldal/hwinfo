@@ -36,6 +36,7 @@
 #pragma once
 
 #include "../base/gpuBase.hpp"
+#include "utils/WMIWrapper.hpp"
 
 #ifdef USE_OCL
 #    include <missocl/opencl.h>
@@ -100,7 +101,7 @@ namespace hwinfo
 
             static std::vector< GPUWin > getAllGPUs_impl()
             {
-                utils::WMI::_WMI   wmi;
+                utils::WMI::WMIWrapper wmi {};
                 const std::wstring query_string(L"SELECT Name, AdapterCompatibility, DriverVersion, AdapterRam "
                                                 L"FROM WIN32_VideoController");
                 bool               success = wmi.execute_query(query_string);
@@ -112,8 +113,8 @@ namespace hwinfo
                 ULONG             u_return = 0;
                 IWbemClassObject* obj      = nullptr;
                 int               gpu_id   = 0;
-                while (wmi.enumerator) {
-                    wmi.enumerator->Next(WBEM_INFINITE, 1, &obj, &u_return);
+                while (wmi.m_enumerator) {
+                    wmi.m_enumerator->Next(WBEM_INFINITE, 1, &obj, &u_return);
                     if (!u_return) {
                         break;
                     }

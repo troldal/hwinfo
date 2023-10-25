@@ -32,8 +32,6 @@ namespace hwinfo
             public:
                 WMIWrapper()
                 {
-                    auto locator = m_locator.get();
-                    auto service = m_service.get();
 
                     auto res = CoInitializeSecurity(nullptr,    // Security descriptor for the app (default if nullptr)
                                                     -1,         // Count of entries in asAuthSvc
@@ -55,7 +53,7 @@ namespace hwinfo
                         nullptr,                 // Pointer to the aggregate (usually NULL).
                         CLSCTX_INPROC_SERVER,    // The context (in this case, DLL runs in the same process).
                         IID_IWbemLocator,        // Reference to the identifier of the interface.
-                        (LPVOID*)&locator        // Address of pointer variable that receives the interface pointer requested.
+                        (LPVOID*)&m_locator      // Address of pointer variable that receives the interface pointer requested.
                     );
 
                     res &= m_locator->ConnectServer(_bstr_t("ROOT\\CIMV2"),    // The path of the namespace for the connection.
@@ -65,10 +63,10 @@ namespace hwinfo
                                                     0,                         // Security flags.
                                                     nullptr,                   // The authority (for example, Kerberos).
                                                     nullptr,                   // The context object.
-                                                    &service    // A pointer to a pointer to the destination IWbemServices interface.
+                                                    &m_service    // A pointer to a pointer to the destination IWbemServices interface.
                     );
 
-                    res &= CoSetProxyBlanket(service,                        // Pointer to the object to be set
+                    res &= CoSetProxyBlanket(m_service,                      // Pointer to the object to be set
                                              RPC_C_AUTHN_WINNT,              // The authentication service to be used
                                              RPC_C_AUTHZ_NONE,               // The authorization service to be used
                                              nullptr,                        // The server principal name
@@ -83,19 +81,18 @@ namespace hwinfo
 
                 ~WMIWrapper()
                 {
-                    if (m_locator) m_locator.reset(nullptr);
-                    if (m_service) m_service.reset(nullptr);
+                    if (m_locator) m_locator->Release();
+                    if (m_service) m_service->Release();
                     CoUninitialize();
                 }
 
                 bool execute_query(const std::wstring& query)
                 {
-                    auto enumerator = m_enumerator.get();
                     return SUCCEEDED(m_service->ExecQuery(bstr_t(L"WQL"),
                                                           bstr_t(std::wstring(query.begin(), query.end()).c_str()),
                                                           WBEM_FLAG_FORWARD_ONLY | WBEM_FLAG_RETURN_IMMEDIATELY,
                                                           nullptr,
-                                                          &enumerator));
+                                                          &m_enumerator));
                 }
 
                 template< typename T >
@@ -329,10 +326,14 @@ namespace hwinfo
                     return result;
                 }
 
-            private:
-                std::unique_ptr< IWbemLocator, decltype([](IWbemLocator* p) { p->Release(); }) >                 m_locator {};
-                std::unique_ptr< IWbemServices, decltype([](IWbemServices* p) { p->Release(); }) >               m_service {};
-                std::unique_ptr< IEnumWbemClassObject, decltype([](IEnumWbemClassObject* p) { p->Release(); }) > m_enumerator {};
+                //            private:
+                //                std::unique_ptr< IWbemLocator, decltype([](IWbemLocator* p) { p->Release(); }) >                 m_locator
+                //                {}; std::unique_ptr< IWbemServices, decltype([](IWbemServices* p) { p->Release(); }) > m_service {};
+                //                std::unique_ptr< IEnumWbemClassObject, decltype([](IEnumWbemClassObject* p) { p->Release(); }) >
+                //                m_enumerator {};
+                IWbemLocator*         m_locator {};
+                IWbemServices*        m_service {};
+                IEnumWbemClassObject* m_enumerator {};
             };
 
         }    // namespace WMI

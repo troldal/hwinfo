@@ -36,6 +36,7 @@
 #pragma once
 
 #include "../base/diskBase.hpp"
+#include "utils/WMIWrapper.hpp"
 
 namespace hwinfo
 {
@@ -84,7 +85,7 @@ namespace hwinfo
 
             static std::vector< DiskWin > getAllDisks_impl()
             {
-                utils::WMI::_WMI   wmi;
+                auto               wmi = utils::WMI::WMIWrapper();
                 const std::wstring query_string(L"SELECT Model, Manufacturer, SerialNumber, Size "
                                                 L"FROM Win32_DiskDrive");
                 bool               success = wmi.execute_query(query_string);
@@ -96,8 +97,8 @@ namespace hwinfo
                 ULONG             u_return = 0;
                 IWbemClassObject* obj      = nullptr;
                 int               disk_id  = 0;
-                while (wmi.enumerator) {
-                    wmi.enumerator->Next(WBEM_INFINITE, 1, &obj, &u_return);
+                while (wmi.m_enumerator) {
+                    wmi.m_enumerator->Next(WBEM_INFINITE, 1, &obj, &u_return);
                     if (!u_return) {
                         break;
                     }

@@ -36,7 +36,7 @@
 #pragma once
 
 #include "../base/batteryBase.hpp"
-#include "utils/wmi_wrapper.hpp"
+#include "utils/WMIWrapper.hpp"
 
 namespace hwinfo
 {
@@ -106,16 +106,18 @@ namespace hwinfo
             static std::vector< BatteryWin > getAllBatteries_impl()
             {
                 std::vector< BatteryWin >     batteries;
-                std::vector< const wchar_t* > res {};
-                wmi::queryWMI("Win32_Battery", "Name", res);
-                if (res.empty() || res.front() == nullptr) {
+                // std::vector< const wchar_t* > res {};
+                auto wmi = utils::WMI::WMIWrapper();
+                auto res = wmi.query< std::string >(L"Win32_Battery", L"Name");
+                // wmi::queryWMI("Win32_Battery", "Name", res);
+                if (res.empty() || res.front().empty()) {
                     return {};
                 }
                 int8_t counter = 0;
                 for (const auto& v : res) {
-                    std::wstring tmp(v);
+                    // std::wstring tmp(v);
                     batteries.emplace_back(counter++);
-                    batteries.back()._model = utils::wstring_to_std_string(tmp);
+                    batteries.back()._model = v;    // utils::wstring_to_std_string(tmp);
                 }
                 res.clear();
                 return batteries;

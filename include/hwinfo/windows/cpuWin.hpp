@@ -36,7 +36,7 @@
 #pragma once
 
 #include "../base/cpuBase.hpp"
-#include "utils/wmi_wrapper.hpp"
+#include "utils/WMIWrapper.hpp"
 
 namespace hwinfo
 {
@@ -115,8 +115,9 @@ namespace hwinfo
             [[nodiscard]]
             int64_t getCurrentClockSpeed(int thread_id) const
             {
-                auto data = utils::WMI::query< std::string >(L"Win32_PerfFormattedData_Counters_ProcessorInformation",
-                                                             L"PercentProcessorPerformance");
+                auto wmi = utils::WMI::WMIWrapper();
+                auto data =
+                    wmi.query< std::string >(L"Win32_PerfFormattedData_Counters_ProcessorInformation", L"PercentProcessorPerformance");
                 if (data.empty()) {
                     return -1;
                 }
@@ -129,8 +130,9 @@ namespace hwinfo
             {
                 std::vector< int64_t > result;
                 result.reserve(_numLogicalCores);
-                auto data = utils::WMI::query< std::string >(L"Win32_PerfFormattedData_Counters_ProcessorInformation",
-                                                             L"PercentProcessorPerformance");
+                auto wmi = utils::WMI::WMIWrapper();
+                auto data =
+                    wmi.query< std::string >(L"Win32_PerfFormattedData_Counters_ProcessorInformation", L"PercentProcessorPerformance");
                 if (data.empty()) {
                     result.resize(_numLogicalCores, -1);
                     return result;
@@ -145,31 +147,55 @@ namespace hwinfo
             [[nodiscard]]
             double getCurrentUtilisation() const
             {
-                std::vector< bstr_t > percentage {};
-                const std::string&    query =
-                    "Win32_PerfFormattedData_Counters_ProcessorInformation WHERE Name='" + std::to_string(0) + ",_Total'";
-                wmi::queryWMI(query, "PercentProcessorUtility", percentage);
-                if (percentage.empty()) {
+                //                std::vector< bstr_t > percentage {};
+                //                const std::string&    query =
+                //                    "Win32_PerfFormattedData_Counters_ProcessorInformation WHERE Name='" + std::to_string(0) + ",_Total'";
+                //                wmi::queryWMI(query, "PercentProcessorUtility", percentage);
+                //                if (percentage.empty()) {
+                //                    return -1.0;
+                //                }
+                //
+                //                const char* strValue = static_cast< const char* >(percentage[0]);
+                //                return std::stod(strValue);
+
+                std::wstring filter = L"Name='" + std::to_wstring(0) + L",_Total'";
+
+                auto wmi = utils::WMI::WMIWrapper();
+                auto data =
+                    wmi.query< std::string >(L"Win32_PerfFormattedData_Counters_ProcessorInformation", L"PercentProcessorUtility", filter);
+
+                if (data.empty()) {
                     return -1.0;
                 }
-
-                const char* strValue = static_cast< const char* >(percentage[0]);
-                return std::stod(strValue);
+                else {
+                    return std::stod(data.front());
+                }
             }
 
             [[nodiscard]]
             double getThreadUtilisation(int thread_id) const
             {
-                auto data =
-                    utils::WMI::query< std::string >(L"Win32_PerfFormattedData_Counters_ProcessorInformation", L"PercentProcessorUtility");
+                //                auto data =
+                //                    utils::WMI::query< std::string >(L"Win32_PerfFormattedData_Counters_ProcessorInformation",
+                //                    L"PercentProcessorUtility");
+                //                if (data.empty()) {
+                //                    return -1.f;
+                //                }
+                //                std::string thread_value = data[thread_id];
+                //                if (thread_value.empty()) {
+                //                    return -1.f;
+                //                }
+                //                return std::stod(thread_value);
+
+                auto wmi  = utils::WMI::WMIWrapper();
+                auto data = wmi.query< std::string >(L"Win32_PerfFormattedData_Counters_ProcessorInformation", L"PercentProcessorUtility");
+
                 if (data.empty()) {
                     return -1.f;
                 }
-                std::string thread_value = data[thread_id];
-                if (thread_value.empty()) {
-                    return -1.f;
+                else {
+                    return std::stod(data[thread_id]);    // / 100.f;
                 }
-                return std::stod(thread_value);
             }
 
             [[nodiscard]]
@@ -177,8 +203,9 @@ namespace hwinfo
             {
                 std::vector< double > thread_utility;
                 thread_utility.reserve(_numLogicalCores);
-                auto data =
-                    utils::WMI::query< std::string >(L"Win32_PerfFormattedData_Counters_ProcessorInformation", L"PercentProcessorUtility");
+
+                auto wmi  = utils::WMI::WMIWrapper();
+                auto data = wmi.query< std::string >(L"Win32_PerfFormattedData_Counters_ProcessorInformation", L"PercentProcessorUtility");
                 if (data.empty()) {
                     thread_utility.resize(_numLogicalCores, -1.f);
                     return thread_utility;
@@ -202,7 +229,7 @@ namespace hwinfo
 
             static std::vector< CPUWin > getAllCPUs_impl()
             {
-                utils::WMI::_WMI   wmi;
+                auto               wmi = utils::WMI::WMIWrapper();
                 const std::wstring query_string(
                     L"SELECT Name, Manufacturer, NumberOfCores, NumberOfLogicalProcessors, MaxClockSpeed, L2CacheSize, L3CacheSize "
                     L"FROM Win32_Processor");
@@ -215,8 +242,8 @@ namespace hwinfo
                 ULONG             u_return = 0;
                 IWbemClassObject* obj      = nullptr;
                 int               cpu_id   = 0;
-                while (wmi.enumerator) {
-                    wmi.enumerator->Next(WBEM_INFINITE, 1, &obj, &u_return);
+                while (wmi.m_enumerator) {
+                    wmi.m_enumerator->Next(WBEM_INFINITE, 1, &obj, &u_return);
                     if (!u_return) {
                         break;
                     }
