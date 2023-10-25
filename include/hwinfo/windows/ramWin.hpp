@@ -36,16 +36,11 @@
 #pragma once
 
 #include "../base/ramBase.hpp"
+#include "utils/wmi_wrapper_2.hpp"
 
-// #include <windows.h>
-//
-// #include "hwinfo/windows/utils/WMIwrapper.hpp"
-//
-// #include <string>
-// #include <vector>
-//
-// #include "../utils/stringutils.hpp"
-// #include "utils/wmi_wrapper.hpp"
+#include <numeric>
+#include <string>
+#include <vector>
 
 namespace hwinfo
 {
@@ -73,88 +68,64 @@ namespace hwinfo
             // _____________________________________________________________________________________________________________________
             static std::string getVendor()
             {
-                std::vector< const wchar_t* > names {};
-                wmi::queryWMI("WIN32_PhysicalMemory", "Manufacturer", names);
-                if (names.empty()) {
+                auto result = utils::WMI::query< std::string >(L"Win32_PhysicalMemory", L"Manufacturer");
+                if (result.empty()) {
                     return "<unknown>";
                 }
-                auto ret = names[0];
-                if (!ret) {
-                    return "<unknown>";
-                }
-                return utils::wstring_to_std_string(ret);
+                return result.front();
             }
 
             // _____________________________________________________________________________________________________________________
             static std::string getName()
             {
-                std::vector< const wchar_t* > names {};
-                wmi::queryWMI("WIN32_PhysicalMemory", "Name", names);
-                if (names.empty()) {
+                auto result = utils::WMI::query< std::string >(L"Win32_PhysicalMemory", L"Name");
+                if (result.empty()) {
                     return "<unknown>";
                 }
-                auto ret = names[0];
-                if (!ret) {
-                    return "<unknown>";
-                }
-                return utils::wstring_to_std_string(ret);
+                return result.front();
             }
 
             // _____________________________________________________________________________________________________________________
             static std::string getModel()
             {
-                std::vector< const wchar_t* > names {};
-                wmi::queryWMI("WIN32_PhysicalMemory", "PartNumber", names);
-                if (names.empty()) {
+                auto result = utils::WMI::query< std::string >(L"Win32_PhysicalMemory", L"PartNumber");
+                if (result.empty()) {
                     return "<unknown>";
                 }
-                auto ret = names[0];
-                if (!ret) {
-                    return "<unknown>";
-                }
-                return utils::wstring_to_std_string(ret);
+                return result.front();
             }
 
             // _____________________________________________________________________________________________________________________
             static std::string getSerialNumber()
             {
-                std::vector< const wchar_t* > names {};
-                wmi::queryWMI("WIN32_PhysicalMemory", "SerialNumber", names);
-                if (names.empty()) {
+                auto result = utils::WMI::query< std::string >(L"Win32_PhysicalMemory", L"SerialNumber");
+                if (result.empty()) {
                     return "<unknown>";
                 }
-                auto ret = names[0];
-                if (!ret) {
-                    return "<unknown>";
-                }
-                std::wstring tmp(ret);
-                return utils::wstring_to_std_string(ret);
+                return result.front();
             }
 
             // _____________________________________________________________________________________________________________________
             static int64_t getTotalSize_Bytes()
             {
-                MEMORYSTATUSEX status;
-                status.dwLength = sizeof(status);
-                GlobalMemoryStatusEx(&status);
-                return static_cast< int64_t >(status.ullTotalPhys);
+                auto result = utils::WMI::query< std::string >(L"Win32_PhysicalMemory", L"Capacity");
+                if (result.empty()) {
+                    return -1;
+                }
+
+                return std::accumulate(result.begin(), result.end(), int64_t(0), [](int64_t sum, const std::string& val) {
+                    return sum + std::stoll(val);
+                });
             }
 
             // _____________________________________________________________________________________________________________________
             static int64_t getFreeMemory()
             {
-                // it will return L"FreePhysicalMemory" Str
-                std::vector< wchar_t* > memories {};
-                // Number of kilobytes of physical memory currently unused and available.
-                wmi::queryWMI("CIM_OperatingSystem", "FreePhysicalMemory", memories);
-                if (!memories.empty()) {
-                    if (memories.front() == nullptr) {
-                        return -1;
-                    }
-                    // keep it as totalSize_Bytes
-                    return std::stoll(utils::wstring_to_std_string(memories[0])) * 1024;
+                auto result = utils::WMI::query< std::string >(L"CIM_OperatingSystem", L"FreePhysicalMemory");
+                if (result.empty()) {
+                    return -1;
                 }
-                return -1;
+                return std::stoll(result.front()) * 1024;
             }
         };
 
