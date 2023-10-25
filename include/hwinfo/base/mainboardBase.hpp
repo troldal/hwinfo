@@ -52,25 +52,25 @@ namespace hwinfo::detail
         [[nodiscard]]
         std::string vendor() const
         {
-            return impl().getVendor();
+            return _vendor;
         }
 
         [[nodiscard]]
         std::string name() const
         {
-            return impl().getName();
+            return _name;
         }
 
         [[nodiscard]]
         std::string version() const
         {
-            return impl().getVersion();
+            return _version;
         }
 
         [[nodiscard]]
         std::string serialNumber() const
         {
-            return impl().getSerialNumber();
+            return _serialNumber;
         }
 
     protected:

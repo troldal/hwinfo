@@ -36,6 +36,7 @@
 #pragma once
 
 #include "../base/mainboardBase.hpp"
+#include "utils/wmi_wrapper_2.hpp."
 
 namespace hwinfo
 {
@@ -58,67 +59,43 @@ namespace hwinfo
 
         private:
             [[nodiscard]]
-            std::string getVendor() const
+            static std::string getVendor()
             {
-                std::vector< const wchar_t* > manufacturer {};
-                wmi::queryWMI("Win32_BaseBoard", "Manufacturer", manufacturer);
-                if (manufacturer.empty()) {
+                auto result = utils::WMI::query< std::string >(L"Win32_BaseBoard", L"Manufacturer");
+                if (result.empty()) {
                     return "<unknown>";
                 }
-                auto ret = manufacturer[0];
-                if (!ret) {
-                    return "<unknown>";
-                }
-                std::wstring tmp(ret);
-                return utils::wstring_to_std_string(tmp);
+                return result.front();
             }
 
             [[nodiscard]]
-            std::string getName() const
+            static std::string getName()
             {
-                std::vector< const wchar_t* > name {};
-                wmi::queryWMI("Win32_BaseBoard", "Product", name);
-                if (name.empty()) {
+                auto result = utils::WMI::query< std::string >(L"Win32_BaseBoard", L"Product");
+                if (result.empty()) {
                     return "<unknown>";
                 }
-                auto ret = name[0];
-                if (!ret) {
-                    return "<unknown>";
-                }
-                std::wstring tmp(ret);
-                return utils::wstring_to_std_string(tmp);
+                return result.front();
             }
 
             [[nodiscard]]
-            std::string getVersion() const
+            static std::string getVersion()
             {
-                std::vector< const wchar_t* > version {};
-                wmi::queryWMI("Win32_BaseBoard", "Version", version);
-                if (version.empty()) {
+                auto result = utils::WMI::query< std::string >(L"Win32_BaseBoard", L"Version");
+                if (result.empty()) {
                     return "<unknown>";
                 }
-                auto ret = version[0];
-                if (!ret) {
-                    return "<unknown>";
-                }
-                std::wstring tmp(ret);
-                return utils::wstring_to_std_string(tmp);
+                return result.front();
             }
 
             [[nodiscard]]
-            std::string getSerialNumber() const
+            static std::string getSerialNumber()
             {
-                std::vector< const wchar_t* > serialNumber {};
-                wmi::queryWMI("Win32_BaseBoard", "SerialNumber", serialNumber);
-                if (serialNumber.empty()) {
+                auto result = utils::WMI::query< std::string >(L"Win32_BaseBoard", L"SerialNumber");
+                if (result.empty()) {
                     return "<unknown>";
                 }
-                auto ret = serialNumber[0];
-                if (!ret) {
-                    return "<unknown>";
-                }
-                std::wstring tmp(ret);
-                return utils::wstring_to_std_string(tmp);
+                return result.front();
             }
         };
 

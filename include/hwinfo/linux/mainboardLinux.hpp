@@ -58,29 +58,6 @@ namespace hwinfo
             }
 
         private:
-            [[nodiscard]]
-            std::string getVendor() const
-            {
-                return BASE::_vendor;
-            }
-
-            [[nodiscard]]
-            std::string getName() const
-            {
-                return BASE::_name;
-            }
-
-            [[nodiscard]]
-            std::string getVersion() const
-            {
-                return BASE::_version;
-            }
-
-            [[nodiscard]]
-            std::string getSerialNumber() const
-            {
-                return BASE::_serialNumber;
-            }
 
             static std::string get_dmi_by_name(const std::string& name)
             {
