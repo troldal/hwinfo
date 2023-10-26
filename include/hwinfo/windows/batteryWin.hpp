@@ -107,7 +107,7 @@ namespace hwinfo
             {
                 std::vector< BatteryWin >     batteries;
                 // std::vector< const wchar_t* > res {};
-                auto wmi = utils::WMI::WMIWrapper();
+                auto wmi = utils::WMIWrapper();
                 auto res = wmi.query< std::string >(L"Win32_Battery", L"Name");
                 // wmi::queryWMI("Win32_Battery", "Name", res);
                 if (res.empty() || res.front().empty()) {

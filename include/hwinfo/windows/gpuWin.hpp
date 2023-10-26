@@ -101,7 +101,7 @@ namespace hwinfo
 
             static std::vector< GPUWin > getAllGPUs_impl()
             {
-                utils::WMI::WMIWrapper wmi {};
+                utils::WMIWrapper  wmi {};
                 const std::wstring query_string(L"SELECT Name, AdapterCompatibility, DriverVersion, AdapterRam "
                                                 L"FROM WIN32_VideoController");
                 bool               success = wmi.execute_query(query_string);

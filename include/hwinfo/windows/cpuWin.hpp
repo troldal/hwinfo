@@ -115,7 +115,7 @@ namespace hwinfo
             [[nodiscard]]
             int64_t getCurrentClockSpeed(int thread_id) const
             {
-                auto wmi = utils::WMI::WMIWrapper();
+                auto wmi = utils::WMIWrapper();
                 auto data =
                     wmi.query< std::string >(L"Win32_PerfFormattedData_Counters_ProcessorInformation", L"PercentProcessorPerformance");
                 if (data.empty()) {
@@ -130,7 +130,7 @@ namespace hwinfo
             {
                 std::vector< int64_t > result;
                 result.reserve(_numLogicalCores);
-                auto wmi = utils::WMI::WMIWrapper();
+                auto wmi = utils::WMIWrapper();
                 auto data =
                     wmi.query< std::string >(L"Win32_PerfFormattedData_Counters_ProcessorInformation", L"PercentProcessorPerformance");
                 if (data.empty()) {
@@ -160,7 +160,7 @@ namespace hwinfo
 
                 std::wstring filter = L"Name='" + std::to_wstring(0) + L",_Total'";
 
-                auto wmi = utils::WMI::WMIWrapper();
+                auto wmi = utils::WMIWrapper();
                 auto data =
                     wmi.query< std::string >(L"Win32_PerfFormattedData_Counters_ProcessorInformation", L"PercentProcessorUtility", filter);
 
@@ -187,7 +187,7 @@ namespace hwinfo
                 //                }
                 //                return std::stod(thread_value);
 
-                auto wmi  = utils::WMI::WMIWrapper();
+                auto wmi  = utils::WMIWrapper();
                 auto data = wmi.query< std::string >(L"Win32_PerfFormattedData_Counters_ProcessorInformation", L"PercentProcessorUtility");
 
                 if (data.empty()) {
@@ -204,7 +204,7 @@ namespace hwinfo
                 std::vector< double > thread_utility;
                 thread_utility.reserve(_numLogicalCores);
 
-                auto wmi  = utils::WMI::WMIWrapper();
+                auto wmi  = utils::WMIWrapper();
                 auto data = wmi.query< std::string >(L"Win32_PerfFormattedData_Counters_ProcessorInformation", L"PercentProcessorUtility");
                 if (data.empty()) {
                     thread_utility.resize(_numLogicalCores, -1.f);
@@ -229,7 +229,7 @@ namespace hwinfo
 
             static std::vector< CPUWin > getAllCPUs_impl()
             {
-                auto               wmi = utils::WMI::WMIWrapper();
+                auto               wmi = utils::WMIWrapper();
                 const std::wstring query_string(
                     L"SELECT Name, Manufacturer, NumberOfCores, NumberOfLogicalProcessors, MaxClockSpeed, L2CacheSize, L3CacheSize "
                     L"FROM Win32_Processor");

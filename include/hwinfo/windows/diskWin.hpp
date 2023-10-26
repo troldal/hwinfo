@@ -85,7 +85,7 @@ namespace hwinfo
 
             static std::vector< DiskWin > getAllDisks_impl()
             {
-                auto               wmi = utils::WMI::WMIWrapper();
+                auto               wmi = utils::WMIWrapper();
                 const std::wstring query_string(L"SELECT Model, Manufacturer, SerialNumber, Size "
                                                 L"FROM Win32_DiskDrive");
                 bool               success = wmi.execute_query(query_string);

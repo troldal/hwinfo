@@ -36,6 +36,7 @@
 #pragma once
 
 #include "../base/osBase.hpp"
+#include <sstream>
 
 #define STATUS_SUCCESS 0x00000000
 

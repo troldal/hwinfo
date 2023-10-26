@@ -61,7 +61,7 @@ namespace hwinfo
             [[nodiscard]]
             static std::string getVendor()
             {
-                auto wmi    = utils::WMI::WMIWrapper();
+                auto wmi    = utils::WMIWrapper();
                 auto result = wmi.query< std::string >(L"Win32_BaseBoard", L"Manufacturer");
                 if (result.empty()) {
                     return "<unknown>";
@@ -72,7 +72,7 @@ namespace hwinfo
             [[nodiscard]]
             static std::string getName()
             {
-                auto wmi    = utils::WMI::WMIWrapper();
+                auto wmi    = utils::WMIWrapper();
                 auto result = wmi.query< std::string >(L"Win32_BaseBoard", L"Product");
                 if (result.empty()) {
                     return "<unknown>";
@@ -83,7 +83,7 @@ namespace hwinfo
             [[nodiscard]]
             static std::string getVersion()
             {
-                auto wmi    = utils::WMI::WMIWrapper();
+                auto wmi    = utils::WMIWrapper();
                 auto result = wmi.query< std::string >(L"Win32_BaseBoard", L"Version");
                 if (result.empty()) {
                     return "<unknown>";
@@ -94,7 +94,7 @@ namespace hwinfo
             [[nodiscard]]
             static std::string getSerialNumber()
             {
-                auto wmi    = utils::WMI::WMIWrapper();
+                auto wmi    = utils::WMIWrapper();
                 auto result = wmi.query< std::string >(L"Win32_BaseBoard", L"SerialNumber");
                 if (result.empty()) {
                     return "<unknown>";
