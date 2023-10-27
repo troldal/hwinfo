@@ -101,23 +101,20 @@ namespace hwinfo
 
             static std::vector< GPUWin > getAllGPUs_impl()
             {
-                utils::WMIWrapper  wmi {};
                 const std::wstring query_string(L"SELECT Name, AdapterCompatibility, DriverVersion, AdapterRam "
                                                 L"FROM WIN32_VideoController");
-                bool               success = wmi.execute_query(query_string);
-                if (!success) {
-                    return {};
-                }
+                bool               success = s_wmi.execute_query(query_string);
+                if (!success) return {};
+
                 std::vector< GPUWin > gpus;
 
                 ULONG             u_return = 0;
                 IWbemClassObject* obj      = nullptr;
                 int               gpu_id   = 0;
-                while (wmi.m_enumerator) {
-                    wmi.m_enumerator->Next(WBEM_INFINITE, 1, &obj, &u_return);
-                    if (!u_return) {
-                        break;
-                    }
+                while (s_wmi.m_enumerator) {
+                    s_wmi.m_enumerator->Next(WBEM_INFINITE, 1, &obj, &u_return);
+                    if (!u_return) break;
+
                     GPUWin gpu;
                     gpu._id = gpu_id++;
                     VARIANT vt_prop;
@@ -149,7 +146,11 @@ namespace hwinfo
 #endif    // USE_OCL
                 return gpus;
             }
+
+            static utils::WMIWrapper s_wmi;
         };
+
+        utils::WMIWrapper GPUWin::s_wmi {};
 
     }    // namespace detail
 
