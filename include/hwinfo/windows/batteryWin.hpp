@@ -105,25 +105,24 @@ namespace hwinfo
 
             static std::vector< BatteryWin > getAllBatteries_impl()
             {
-                std::vector< BatteryWin >     batteries;
-                // std::vector< const wchar_t* > res {};
-                auto wmi = utils::WMIWrapper();
-                auto res = wmi.query< std::string >(L"Win32_Battery", L"Name");
-                // wmi::queryWMI("Win32_Battery", "Name", res);
-                if (res.empty() || res.front().empty()) {
-                    return {};
-                }
+                std::vector< BatteryWin > batteries;
+                auto                      res = s_wmi.query< std::string >(L"Win32_Battery", L"Name");
+                if (res.empty() || res.front().empty()) return {};
+
                 int8_t counter = 0;
                 for (const auto& v : res) {
-                    // std::wstring tmp(v);
                     batteries.emplace_back(counter++);
-                    batteries.back()._model = v;    // utils::wstring_to_std_string(tmp);
+                    batteries.back()._model = v;
                 }
                 res.clear();
                 return batteries;
             }
+
+            static utils::WMIWrapper s_wmi;
         };
-    }
+
+        utils::WMIWrapper BatteryWin::s_wmi {};
+    }    // namespace detail
 
     using Battery = detail::BatteryWin;
 
