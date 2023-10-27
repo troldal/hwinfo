@@ -85,23 +85,20 @@ namespace hwinfo
 
             static std::vector< DiskWin > getAllDisks_impl()
             {
-                auto               wmi = utils::WMIWrapper();
                 const std::wstring query_string(L"SELECT Model, Manufacturer, SerialNumber, Size "
                                                 L"FROM Win32_DiskDrive");
-                bool               success = wmi.execute_query(query_string);
-                if (!success) {
-                    return {};
-                }
+                bool               success = s_wmi.execute_query(query_string);
+                if (!success) return {};
+
                 std::vector< DiskWin > disks;
 
                 ULONG             u_return = 0;
                 IWbemClassObject* obj      = nullptr;
                 int               disk_id  = 0;
-                while (wmi.m_enumerator) {
-                    wmi.m_enumerator->Next(WBEM_INFINITE, 1, &obj, &u_return);
-                    if (!u_return) {
-                        break;
-                    }
+                while (s_wmi.m_enumerator) {
+                    s_wmi.m_enumerator->Next(WBEM_INFINITE, 1, &obj, &u_return);
+                    if (!u_return) break;
+
                     DiskWin disk;
                     disk._id = disk_id++;
                     VARIANT vt_prop;
@@ -119,9 +116,13 @@ namespace hwinfo
                 }
                 return disks;
             }
+
+            static utils::WMIWrapper s_wmi;
         };
 
-    }
+        utils::WMIWrapper DiskWin::s_wmi {};
+
+    }    // namespace detail
 
     using Disk = detail::DiskWin;
 
