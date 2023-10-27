@@ -87,13 +87,17 @@ namespace hwinfo::utils
         }
 
         template< typename T, typename = std::enable_if_t< std::is_integral< T >::value || std::is_same< T, std::string >::value > >
-        std::vector< T > query(const std::wstring& wmi_class, const std::wstring& field, const std::wstring& filter = L"")
+        std::vector< T > query(const std::string& cls, const std::string& fields, const std::string& filter = "")
         {
+            std::wstring wmi_class  = utils::NarrowStringToWideString(cls);
+            std::wstring field      = utils::NarrowStringToWideString(fields);
+            std::wstring wmi_filter = utils::NarrowStringToWideString(filter);
+
             std::vector< T > result;
 
             std::wstring filter_string;
-            if (!filter.empty()) {
-                filter_string.append(L" WHERE " + filter);
+            if (!wmi_filter.empty()) {
+                filter_string.append(L" WHERE " + wmi_filter);
             }
             std::wstring query_string(L"SELECT " + field + L" FROM " + wmi_class + filter_string);
             bool         success = execute_query(query_string);
@@ -112,17 +116,17 @@ namespace hwinfo::utils
                 obj->Get(field.c_str(), 0, &vt_prop, nullptr, nullptr);
 
                 if constexpr (std::is_same_v< T, long >) result.push_back(vt_prop.intVal);
-                else if constexpr (std::is_same_v< T, int >)
+                else if constexpr (std::is_same_v< T, int > || std::is_same_v< T, int32_t >)
                     result.push_back(static_cast< int >(vt_prop.intVal));
                 else if constexpr (std::is_same_v< T, bool >)
                     result.push_back(vt_prop.boolVal);
-                else if constexpr (std::is_same_v< T, unsigned >)
+                else if constexpr (std::is_same_v< T, unsigned > || std::is_same_v< T, uint32_t >)
                     result.push_back(vt_prop.uintVal);
-                else if constexpr (std::is_same_v< T, unsigned short >)
+                else if constexpr (std::is_same_v< T, unsigned short > || std::is_same_v< T, uint16_t >)
                     result.push_back(vt_prop.uiVal);
-                else if constexpr (std::is_same_v< T, long long >)
+                else if constexpr (std::is_same_v< T, long long > || std::is_same_v< T, int64_t >)
                     result.push_back(vt_prop.llVal);
-                else if constexpr (std::is_same_v< T, unsigned long long >)
+                else if constexpr (std::is_same_v< T, unsigned long long > || std::is_same_v< T, uint64_t >)
                     result.push_back(vt_prop.ullVal);
                 else if constexpr (std::is_same_v< T, std::string >)
                     result.push_back(wstring_to_std_string(vt_prop.bstrVal));

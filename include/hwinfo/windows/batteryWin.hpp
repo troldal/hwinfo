@@ -43,6 +43,64 @@ namespace hwinfo
 
     namespace detail
     {
+
+        struct BatteryData
+        {
+            std::string name {};
+            std::string type {};
+            std::string technology {};
+            std::string status {};
+            std::string health {};
+            uint32_t    capacity { 0 };
+        };
+
+        std::vector< BatteryData > loadBatteryData()
+        {
+            utils::WMIWrapper wmi {};
+
+            const std::wstring query_string(
+                L"SELECT Name, Description, Chemistry, BatteryStatus, Status, FullChargeCapacity FROM Win32_Battery");
+            bool success = wmi.execute_query(query_string);
+            if (!success) return {};
+
+            std::vector< BatteryData > batteries;
+
+            ULONG             u_return = 0;
+            IWbemClassObject* obj      = nullptr;
+            int               cpu_id   = 0;
+            while (wmi.m_enumerator) {
+                wmi.m_enumerator->Next(WBEM_INFINITE, 1, &obj, &u_return);
+                if (!u_return) break;
+
+                BatteryData battery;
+                //                battery._id = cpu_id++;
+                VARIANT vt_prop;
+
+                obj->Get(L"Name", 0, &vt_prop, nullptr, nullptr);
+                battery.name = utils::wstring_to_std_string(vt_prop.bstrVal);
+
+                obj->Get(L"Description", 0, &vt_prop, nullptr, nullptr);
+                battery.type = utils::wstring_to_std_string(vt_prop.bstrVal);
+
+                obj->Get(L"Chemistry", 0, &vt_prop, nullptr, nullptr);
+                battery.technology = std::to_string(vt_prop.iVal);
+
+                obj->Get(L"BatteryStatus", 0, &vt_prop, nullptr, nullptr);
+                battery.status = std::to_string(vt_prop.iVal);
+
+                obj->Get(L"Status", 0, &vt_prop, nullptr, nullptr);
+                battery.health = utils::wstring_to_std_string(vt_prop.bstrVal);
+
+                obj->Get(L"FullChargeCapacity", 0, &vt_prop, nullptr, nullptr);
+                battery.capacity = vt_prop.uintVal;
+
+                VariantClear(&vt_prop);
+                obj->Release();
+                batteries.push_back(std::move(battery));
+            }
+            return batteries;
+        }
+
         class BatteryWin : public BatteryBase< BatteryWin >
         {
             using BASE = BatteryBase< BatteryWin >;
@@ -106,7 +164,7 @@ namespace hwinfo
             static std::vector< BatteryWin > getAllBatteries_impl()
             {
                 std::vector< BatteryWin > batteries;
-                auto                      res = s_wmi.query< std::string >(L"Win32_Battery", L"Name");
+                auto                      res = s_wmi.query< std::string >("Win32_Battery", "Name");
                 if (res.empty() || res.front().empty()) return {};
 
                 int8_t counter = 0;
@@ -115,6 +173,9 @@ namespace hwinfo
                     batteries.back()._model = v;
                 }
                 res.clear();
+
+                auto temp = loadBatteryData();
+
                 return batteries;
             }
 
@@ -125,5 +186,7 @@ namespace hwinfo
     }    // namespace detail
 
     using Battery = detail::BatteryWin;
+
+    std::vector< Battery > getBatteries() { return Battery::getAllBatteries(); }
 
 }    // namespace hwinfo

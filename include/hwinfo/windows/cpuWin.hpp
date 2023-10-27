@@ -116,7 +116,7 @@ namespace hwinfo
             int64_t getCurrentClockSpeed(int thread_id) const
             {
                 auto data =
-                    s_wmi.query< std::string >(L"Win32_PerfFormattedData_Counters_ProcessorInformation", L"PercentProcessorPerformance");
+                    s_wmi.query< std::string >("Win32_PerfFormattedData_Counters_ProcessorInformation", "PercentProcessorPerformance");
                 if (data.empty()) return -1;
 
                 double performance = std::stod(data[thread_id]) / 100;
@@ -129,7 +129,7 @@ namespace hwinfo
                 std::vector< int64_t > result;
                 result.reserve(_numLogicalCores);
                 auto data =
-                    s_wmi.query< std::string >(L"Win32_PerfFormattedData_Counters_ProcessorInformation", L"PercentProcessorPerformance");
+                    s_wmi.query< std::string >("Win32_PerfFormattedData_Counters_ProcessorInformation", "PercentProcessorPerformance");
                 if (data.empty()) {
                     result.resize(_numLogicalCores, -1);
                     return result;
@@ -155,11 +155,10 @@ namespace hwinfo
                 //                const char* strValue = static_cast< const char* >(percentage[0]);
                 //                return std::stod(strValue);
 
-                std::wstring filter = L"Name='" + std::to_wstring(0) + L",_Total'";
+                std::string filter = "Name='" + std::to_string(0) + ",_Total'";
 
-                auto data = s_wmi.query< std::string >(L"Win32_PerfFormattedData_Counters_ProcessorInformation",
-                                                       L"PercentProcessorUtility",
-                                                       filter);
+                auto data =
+                    s_wmi.query< std::string >("Win32_PerfFormattedData_Counters_ProcessorInformation", "PercentProcessorUtility", filter);
 
                 if (data.empty()) return -1.0;
                 else
@@ -181,8 +180,7 @@ namespace hwinfo
                 //                }
                 //                return std::stod(thread_value);
 
-                auto data =
-                    s_wmi.query< std::string >(L"Win32_PerfFormattedData_Counters_ProcessorInformation", L"PercentProcessorUtility");
+                auto data = s_wmi.query< std::string >("Win32_PerfFormattedData_Counters_ProcessorInformation", "PercentProcessorUtility");
 
                 if (data.empty()) return -1.f;
                 else
@@ -195,8 +193,7 @@ namespace hwinfo
                 std::vector< double > thread_utility;
                 thread_utility.reserve(_numLogicalCores);
 
-                auto data =
-                    s_wmi.query< std::string >(L"Win32_PerfFormattedData_Counters_ProcessorInformation", L"PercentProcessorUtility");
+                auto data = s_wmi.query< std::string >("Win32_PerfFormattedData_Counters_ProcessorInformation", "PercentProcessorUtility");
                 if (data.empty()) {
                     thread_utility.resize(_numLogicalCores, -1.f);
                     return thread_utility;

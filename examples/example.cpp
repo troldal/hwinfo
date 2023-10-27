@@ -104,7 +104,7 @@ int main(int argc, char** argv)
     std::cout << std::left << std::setw(20) << "serial-number:";
     std::cout << ram.serialNumber() << std::endl;
 
-    std::vector< hwinfo::Battery > batteries = hwinfo::Battery::getAllBatteries();
+    std::vector< hwinfo::Battery > batteries = hwinfo::getBatteries();
     std::cout << "------------------------------- Batteries ---------------------------------" << std::endl;
     if (!batteries.empty()) {
         int battery_counter = 0;

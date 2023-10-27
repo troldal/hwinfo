@@ -6,9 +6,11 @@
 #include <codecvt>
 #include <cstdint>
 #include <cstring>
+#include <iostream>
 #include <locale>
 #include <string>
 #include <vector>
+#include <windows.h>
 
 namespace hwinfo {
 namespace utils {
@@ -179,6 +181,35 @@ inline std::string wstring_to_std_string(const std::wstring& ws) {
 
   setlocale(LC_ALL, str_locale.c_str());
   return result_text;
+}
+
+std::wstring NarrowStringToWideString(const std::string& narrowString)
+{
+  // First, find the length of the result string.
+  int len = MultiByteToWideChar(CP_UTF8, 0, narrowString.c_str(), -1, nullptr, 0);
+  if (len == 0) {
+    // Handle the error if necessary
+    throw std::runtime_error("Failed to convert narrow string to wide string");
+  }
+
+  // Allocate a buffer to store the result
+  std::wstring wideString(len - 1, L'\0');
+
+  // Now, perform the actual conversion
+  if (MultiByteToWideChar(CP_UTF8, 0, narrowString.c_str(), -1, &wideString[0], len) == 0) {
+    // Handle the error if necessary
+    throw std::runtime_error("Failed to convert narrow string to wide string");
+  }
+
+  return wideString;
+}
+
+int main()
+{
+  std::string  narrowString = "Hello, World!";
+  std::wstring wideString   = NarrowStringToWideString(narrowString);
+  std::wcout << wideString << std::endl;    // Output: Hello, World!
+  return 0;
 }
 
 /**
