@@ -68,55 +68,44 @@ namespace hwinfo
             // _____________________________________________________________________________________________________________________
             static std::string getVendor()
             {
-                auto wmi    = utils::WMIWrapper();
-                auto result = wmi.query< std::string >(L"Win32_PhysicalMemory", L"Manufacturer");
-                if (result.empty()) {
-                    return "<unknown>";
-                }
+                auto result = s_wmi.query< std::string >(L"Win32_PhysicalMemory", L"Manufacturer");
+                if (result.empty()) return "<unknown>";
+
                 return result.front();
             }
 
             // _____________________________________________________________________________________________________________________
             static std::string getName()
             {
-                auto wmi    = utils::WMIWrapper();
-                auto result = wmi.query< std::string >(L"Win32_PhysicalMemory", L"Name");
-                if (result.empty()) {
-                    return "<unknown>";
-                }
+                auto result = s_wmi.query< std::string >(L"Win32_PhysicalMemory", L"Name");
+                if (result.empty()) return "<unknown>";
+
                 return result.front();
             }
 
             // _____________________________________________________________________________________________________________________
             static std::string getModel()
             {
-                auto wmi    = utils::WMIWrapper();
-                auto result = wmi.query< std::string >(L"Win32_PhysicalMemory", L"PartNumber");
-                if (result.empty()) {
-                    return "<unknown>";
-                }
+                auto result = s_wmi.query< std::string >(L"Win32_PhysicalMemory", L"PartNumber");
+                if (result.empty()) return "<unknown>";
+
                 return result.front();
             }
 
             // _____________________________________________________________________________________________________________________
             static std::string getSerialNumber()
             {
-                auto wmi    = utils::WMIWrapper();
-                auto result = wmi.query< std::string >(L"Win32_PhysicalMemory", L"SerialNumber");
-                if (result.empty()) {
-                    return "<unknown>";
-                }
+                auto result = s_wmi.query< std::string >(L"Win32_PhysicalMemory", L"SerialNumber");
+                if (result.empty()) return "<unknown>";
+
                 return result.front();
             }
 
             // _____________________________________________________________________________________________________________________
             static int64_t getTotalSize_Bytes()
             {
-                auto wmi    = utils::WMIWrapper();
-                auto result = wmi.query< std::string >(L"Win32_PhysicalMemory", L"Capacity");
-                if (result.empty()) {
-                    return -1;
-                }
+                auto result = s_wmi.query< std::string >(L"Win32_PhysicalMemory", L"Capacity");
+                if (result.empty()) return -1;
 
                 return std::accumulate(result.begin(), result.end(), int64_t(0), [](int64_t sum, const std::string& val) {
                     return sum + std::stoll(val);
@@ -126,14 +115,15 @@ namespace hwinfo
             // _____________________________________________________________________________________________________________________
             static int64_t getFreeMemory()
             {
-                auto wmi    = utils::WMIWrapper();
-                auto result = wmi.query< std::string >(L"CIM_OperatingSystem", L"FreePhysicalMemory");
-                if (result.empty()) {
-                    return -1;
-                }
+                auto result = s_wmi.query< std::string >(L"CIM_OperatingSystem", L"FreePhysicalMemory");
+                if (result.empty()) return -1;
                 return std::stoll(result.front()) * 1024;
             }
+
+            static utils::WMIWrapper s_wmi;
         };
+
+        utils::WMIWrapper RAMWin::s_wmi {};
 
     }    // namespace detail
 
