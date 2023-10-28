@@ -9,26 +9,42 @@
 
 namespace hwinfo::WMI
 {
+    /**
+     * @struct BatteryInfo
+     * @brief Represents battery information obtained from WMI.
+     */
     struct BatteryInfo
     {
+        /**
+         * @struct NAME
+         * @brief Encapsulates the Name property of Win32_Battery.
+         */
         struct NAME
         {
-            using value_type  = std::string;
-            using result_type = std::string;
+            using value_type  = std::string;    ///< Type of the value being used.
+            using result_type = std::string;    ///< Resultant type after conversion.
 
-            static const inline std::wstring wmi_class = L"Win32_Battery";
-            static const inline std::wstring wmi_field = L"Name";
+            static const inline std::wstring wmi_class = L"Win32_Battery";    ///< WMI class name.
+            static const inline std::wstring wmi_field = L"Name";             ///< WMI field for the battery name.
         };
 
+        /**
+         * @struct DESCRIPTION
+         * @brief Encapsulates the Description property of Win32_Battery.
+         */
         struct DESCRIPTION
         {
-            using value_type  = std::string;
-            using result_type = std::string;
+            using value_type  = std::string;    ///< Type of the value being used.
+            using result_type = std::string;    ///< Resultant type after conversion.
 
-            static const inline std::wstring wmi_class = L"Win32_Battery";
-            static const inline std::wstring wmi_field = L"Description";
+            static const inline std::wstring wmi_class = L"Win32_Battery";    ///< WMI class name.
+            static const inline std::wstring wmi_field = L"Description";      ///< WMI field for the battery description.
         };
 
+        /**
+         * @enum Chemistry
+         * @brief Enumerates the types of battery chemistries.
+         */
         enum class Chemistry : uint16_t {
             Other              = 1,
             Unknown            = 2,
@@ -38,17 +54,26 @@ namespace hwinfo::WMI
             LithiumIon         = 6,
             ZincAir            = 7,
             LithiumPolymer     = 8
+            // Add other battery chemistries as needed
         };
 
+        /**
+         * @struct CHEMISTRY
+         * @brief Encapsulates the Chemistry property of Win32_Battery.
+         */
         struct CHEMISTRY
         {
-            using value_type  = uint16_t;
-            using result_type = Chemistry;
+            using value_type  = uint16_t;     ///< Type of the value being used.
+            using result_type = Chemistry;    ///< Resultant type after conversion.
 
-            static const inline std::wstring wmi_class = L"Win32_Battery";
-            static const inline std::wstring wmi_field = L"Chemistry";
+            static const inline std::wstring wmi_class = L"Win32_Battery";    ///< WMI class name.
+            static const inline std::wstring wmi_field = L"Chemistry";        ///< WMI field for the battery chemistry.
         };
 
+        /**
+         * @enum Status
+         * @brief Enumerates the possible statuses of a battery.
+         */
         enum class Status : uint16_t {
             Discharging         = 1,
             OnPower             = 2,
@@ -62,34 +87,51 @@ namespace hwinfo::WMI
             PartiallyCharged    = 10
         };
 
+        /**
+         * @struct STATUS
+         * @brief Encapsulates the Status property of Win32_Battery.
+         */
         struct STATUS
         {
-            using value_type  = uint16_t;
-            using result_type = Status;
+            using value_type  = uint16_t;    ///< Type of the value being used.
+            using result_type = Status;      ///< Resultant type after conversion.
 
-            static const inline std::wstring wmi_class = L"Win32_Battery";
-            static const inline std::wstring wmi_field = L"BatteryStatus";
+            static const inline std::wstring wmi_class = L"Win32_Battery";    ///< WMI class name.
+            static const inline std::wstring wmi_field = L"BatteryStatus";    ///< WMI field for the battery status.
         };
 
+        /**
+         * @struct HEALTH
+         * @brief Encapsulates the Health property of Win32_Battery.
+         */
         struct HEALTH
         {
-            using value_type  = std::string;
-            using result_type = std::string;
+            using value_type  = std::string;    ///< Type of the value being used.
+            using result_type = std::string;    ///< Resultant type after conversion.
 
-            static const inline std::wstring wmi_class = L"Win32_Battery";
-            static const inline std::wstring wmi_field = L"Status";
+            static const inline std::wstring wmi_class = L"Win32_Battery";    ///< WMI class name.
+            static const inline std::wstring wmi_field = L"Status";           ///< WMI field for the battery health.
         };
 
+        /**
+         * @struct CAPACITY
+         * @brief Encapsulates the Capacity property of Win32_Battery.
+         */
         struct CAPACITY
         {
-            using value_type  = uint16_t;
-            using result_type = uint16_t;
+            using value_type  = uint16_t;    ///< Type of the value being used.
+            using result_type = uint16_t;    ///< Resultant type after conversion.
 
-            static const inline std::wstring wmi_class = L"Win32_Battery";
-            static const inline std::wstring wmi_field = L"EstimatedChargeRemaining";
+            static const inline std::wstring wmi_class = L"Win32_Battery";               ///< WMI class name.
+            static const inline std::wstring wmi_field = L"EstimatedChargeRemaining";    ///< WMI field for the battery capacity.
         };
     };
 
+    /**
+     * @brief Converts a battery chemistry enum value to its string representation.
+     * @param chemistry The battery chemistry.
+     * @return A string representation of the battery chemistry.
+     */
     std::string to_string(const BatteryInfo::Chemistry& chemistry)
     {
         switch (chemistry) {
@@ -114,6 +156,11 @@ namespace hwinfo::WMI
         }
     }
 
+    /**
+     * @brief Converts a battery status enum value to its string representation.
+     * @param status The battery status.
+     * @return A string representation of the battery status.
+     */
     std::string to_string(const BatteryInfo::Status& status)
     {
         switch (status) {
