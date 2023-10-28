@@ -53,19 +53,6 @@ namespace hwinfo::detail
         friend IMPL;
 
     public:
-        /**
-         * @brief Constructor.
-         *
-         * @param id Identifier for the battery.
-         */
-        explicit BatteryBase(int8_t id = 0) : _id(id) {}
-
-        /**
-         * @brief Retrieves the current battery capacity.
-         *
-         * @return The current capacity as a ratio of energyNow to energyFull.
-         */
-        double capacity() { return static_cast< double >(energyNow()) / energyFull(); }
 
         /**
          * @brief Gets the battery vendor.
@@ -73,7 +60,10 @@ namespace hwinfo::detail
          * @return Vendor name as a string.
          */
         [[nodiscard]]
-        std::string vendor() const { return impl().getVendor();}
+        std::string vendor() const
+        {
+            return _vendor;
+        }
 
         /**
          * @brief Gets the battery model.
@@ -81,7 +71,10 @@ namespace hwinfo::detail
          * @return Model name as a string.
          */
         [[nodiscard]]
-        std::string model() const { return impl().getModel();}
+        std::string model() const
+        {
+            return _model;
+        }
 
         /**
          * @brief Gets the battery serial number.
@@ -89,7 +82,10 @@ namespace hwinfo::detail
          * @return Serial number as a string.
          */
         [[nodiscard]]
-        std::string serialNumber() const { return impl().getSerialNumber();}
+        std::string serialNumber() const
+        {
+            return _serialNumber;
+        }
 
         /**
          * @brief Gets the battery technology.
@@ -97,39 +93,43 @@ namespace hwinfo::detail
          * @return Technology as a string.
          */
         [[nodiscard]]
-        std::string technology() const { return impl().getTechnology();}
+        std::string technology() const
+        {
+            return _technology;
+        }
 
         /**
-         * @brief Gets the total energy (in some unit) the battery can store when full.
+         * @brief Gets the battery health.
+         *
+         * @return Health as a string.
+         */
+        [[nodiscard]]
+        std::string health() const
+        {
+            return _health;
+        }
+
+        /**
+         * @brief Gets the current energy (in percent) the battery has.
          *
          * @return Energy value.
          */
         [[nodiscard]]
-        uint32_t energyFull() const { return impl().getEnergyFull();}
+        uint32_t capacity() const
+        {
+            return impl().getCapacity();
+        }
 
         /**
-         * @brief Gets the current energy (in some unit) the battery has.
+         * @brief Gets the battery status.
          *
-         * @return Energy value.
+         * @return Status as a string.
          */
         [[nodiscard]]
-        uint32_t energyNow() const { return impl().getEnergyNow();}
-
-        /**
-         * @brief Checks if the battery is charging.
-         *
-         * @return True if charging, otherwise false.
-         */
-        [[nodiscard]]
-        bool charging() const { return impl().getCharging();}
-
-        /**
-         * @brief Checks if the battery is discharging.
-         *
-         * @return True if discharging, otherwise false.
-         */
-        [[nodiscard]]
-        bool discharging() const { return impl().getDischarging();}
+        std::string status() const
+        {
+            return impl().getStatus();
+        }
 
         /**
          * @brief Retrieves all batteries.
@@ -146,6 +146,13 @@ namespace hwinfo::detail
 
     private:
         /**
+         * @brief Constructor.
+         *
+         * @param id Identifier for the battery.
+         */
+        BatteryBase() = default;
+
+        /**
          * @brief Provides access to the implementation-specific methods in the derived class.
          *
          * @return A reference to the derived class instance.
@@ -159,13 +166,11 @@ namespace hwinfo::detail
          */
         IMPL const& impl() const { return static_cast<IMPL const&>( *this ); }
 
-        int8_t      _id {};               ///< Battery identifier.
         std::string _vendor {};           ///< Battery vendor.
         std::string _model {};            ///< Battery model.
         std::string _serialNumber {};     ///< Battery serial number.
         std::string _technology {};       ///< Battery technology type.
-        uint32_t    _energyFull { 0 };    ///< Total energy the battery can store when full.
+        std::string _health {};           ///< Battery health.
     };
-
 }    // namespace hwinfo
 

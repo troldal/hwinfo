@@ -36,7 +36,7 @@
 #pragma once
 
 #include "../base/diskBase.hpp"
-#include "utils/WMIWrapper.hpp"
+#include "utils/WMIInterface.hpp"
 
 namespace hwinfo
 {
@@ -117,10 +117,10 @@ namespace hwinfo
                 return disks;
             }
 
-            static utils::WMIWrapper s_wmi;
+            static WMI::WMIInterface s_wmi;
         };
 
-        utils::WMIWrapper DiskWin::s_wmi {};
+        WMI::WMIInterface DiskWin::s_wmi {};
 
     }    // namespace detail
 

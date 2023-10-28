@@ -36,7 +36,7 @@
 #pragma once
 
 #include "../base/cpuBase.hpp"
-#include "utils/WMIWrapper.hpp"
+#include "utils/WMIInterface.hpp"
 
 namespace hwinfo
 {
@@ -263,10 +263,10 @@ namespace hwinfo
                 return cpus;
             }
 
-            static utils::WMIWrapper s_wmi;
+            static WMI::WMIInterface s_wmi;
         };
 
-        utils::WMIWrapper CPUWin::s_wmi {};
+        WMI::WMIInterface CPUWin::s_wmi {};
 
     }    // namespace detail
 

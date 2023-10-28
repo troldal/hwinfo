@@ -36,7 +36,7 @@
 #pragma once
 
 #include "../base/ramBase.hpp"
-#include "utils/WMIWrapper.hpp"
+#include "utils/WMIInterface.hpp"
 
 #include <numeric>
 #include <string>
@@ -120,10 +120,10 @@ namespace hwinfo
                 return std::stoll(result.front()) * 1024;
             }
 
-            static utils::WMIWrapper s_wmi;
+            static WMI::WMIInterface s_wmi;
         };
 
-        utils::WMIWrapper RAMWin::s_wmi {};
+        WMI::WMIInterface RAMWin::s_wmi {};
 
     }    // namespace detail
 

@@ -44,3 +44,8 @@
 #elif defined(HWINFO_WINDOWS)
 #    include "windows/batteryWin.hpp"
 #endif
+
+namespace hwinfo
+{
+    std::vector< Battery > getBatteries() { return Battery::getAllBatteries(); }
+}    // namespace hwinfo

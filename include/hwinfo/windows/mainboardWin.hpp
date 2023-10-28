@@ -36,7 +36,7 @@
 #pragma once
 
 #include "../base/mainboardBase.hpp"
-#include "utils/WMIWrapper.hpp"
+#include "utils/WMIInterface.hpp"
 
 namespace hwinfo
 {
@@ -94,10 +94,10 @@ namespace hwinfo
                 return result.front();
             }
 
-            static utils::WMIWrapper s_wmi;
+            static WMI::WMIInterface s_wmi;
         };
 
-        utils::WMIWrapper MainBoardWin::s_wmi {};
+        WMI::WMIInterface MainBoardWin::s_wmi {};
 
     }    // namespace detail
 

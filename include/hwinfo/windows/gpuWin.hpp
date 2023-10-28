@@ -36,7 +36,7 @@
 #pragma once
 
 #include "../base/gpuBase.hpp"
-#include "utils/WMIWrapper.hpp"
+#include "utils/WMIInterface.hpp"
 
 #ifdef USE_OCL
 #    include <missocl/opencl.h>
@@ -147,10 +147,10 @@ namespace hwinfo
                 return gpus;
             }
 
-            static utils::WMIWrapper s_wmi;
+            static WMI::WMIInterface s_wmi;
         };
 
-        utils::WMIWrapper GPUWin::s_wmi {};
+        WMI::WMIInterface GPUWin::s_wmi {};
 
     }    // namespace detail
 

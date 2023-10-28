@@ -116,8 +116,12 @@ int main(int argc, char** argv)
             std::cout << battery.model() << std::endl;
             std::cout << std::left << std::setw(20) << "  serial-number:";
             std::cout << battery.serialNumber() << std::endl;
-            std::cout << std::left << std::setw(20) << "  charging:";
-            std::cout << (battery.charging() ? "yes" : "no") << std::endl;
+            std::cout << std::left << std::setw(20) << "  technology:";
+            std::cout << battery.technology() << std::endl;
+            std::cout << std::left << std::setw(20) << "  status:";
+            std::cout << battery.status() << std::endl;
+            std::cout << std::left << std::setw(20) << "  health:";
+            std::cout << battery.health() << std::endl;
             std::cout << std::left << std::setw(20) << "  capacity:";
             std::cout << battery.capacity() << std::endl;
         }

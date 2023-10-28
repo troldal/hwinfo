@@ -2,8 +2,12 @@
 
 #pragma once
 
+#include "../../base/batteryBase.hpp"
+#include "WMIBatteryInfo.hpp"
+
 #include <algorithm>
 #include <memory>
+#include <variant>
 #include <vector>
 
 #include "../../utils/stringutils.hpp"
@@ -17,12 +21,12 @@
 #include <vector>
 #pragma comment(lib, "wbemuuid.lib")
 
-namespace hwinfo::utils
+namespace hwinfo::WMI
 {
-    class WMIWrapper
+    class WMIInterface
     {
     public:
-        WMIWrapper()
+        WMIInterface()
         {
             auto res = CoInitializeSecurity(nullptr,                        // Security descriptor for the app (default if nullptr)
                                             -1,                             // Count of entries in asAuthSvc
@@ -70,7 +74,7 @@ namespace hwinfo::utils
             if (!SUCCEEDED(res)) throw std::runtime_error("error initializing WMI");
         }
 
-        ~WMIWrapper()
+        ~WMIInterface()
         {
             if (m_locator) m_locator->Release();
             if (m_service) m_service->Release();
@@ -129,7 +133,7 @@ namespace hwinfo::utils
                 else if constexpr (std::is_same_v< T, unsigned long long > || std::is_same_v< T, uint64_t >)
                     result.push_back(vt_prop.ullVal);
                 else if constexpr (std::is_same_v< T, std::string >)
-                    result.push_back(wstring_to_std_string(vt_prop.bstrVal));
+                    result.push_back(utils::wstring_to_std_string(vt_prop.bstrVal));
                 else
                     std::invoke([]< bool flag = false >() { static_assert(flag, "unsupported type"); });
 
@@ -137,6 +141,74 @@ namespace hwinfo::utils
                 obj->Release();
             }
             return result;
+        }
+
+        template< typename T >
+        std::vector< typename T::result_type > queryValue()
+        {
+            std::wstring wmi_class = T::wmi_class;
+            std::wstring field     = T::wmi_field;
+
+            std::vector< typename T::result_type > result;
+
+            std::wstring query_string(L"SELECT " + field + L" FROM " + wmi_class);
+            if (!execute_query(query_string)) return {};
+
+            ULONG             u_return = 0;
+            IWbemClassObject* obj      = nullptr;
+            while (m_enumerator) {
+                m_enumerator->Next(WBEM_INFINITE, 1, &obj, &u_return);
+                if (!u_return) break;
+
+                VARIANT vt_prop;
+                obj->Get(field.c_str(), 0, &vt_prop, nullptr, nullptr);
+
+                if constexpr (std::is_same_v< typename T::value_type, long >) result.push_back(vt_prop.intVal);
+                else if constexpr (std::is_same_v< typename T::value_type, int > || std::is_same_v< typename T::value_type, int32_t >)
+                    result.push_back(static_cast< typename T::result_type >(vt_prop.intVal));
+                else if constexpr (std::is_same_v< typename T::value_type, bool >)
+                    result.push_back(vt_prop.boolVal);
+                else if constexpr (std::is_same_v< typename T::value_type, unsigned > || std::is_same_v< typename T::value_type, uint32_t >)
+                    result.push_back(static_cast< typename T::result_type >(vt_prop.uintVal));
+                else if constexpr (std::is_same_v< typename T::value_type, unsigned short > ||
+                                   std::is_same_v< typename T::value_type, uint16_t >)
+                    result.push_back(static_cast< typename T::result_type >(vt_prop.uiVal));
+                else if constexpr (std::is_same_v< typename T::value_type, long long > || std::is_same_v< typename T::value_type, int64_t >)
+                    result.push_back(static_cast< typename T::result_type >(vt_prop.llVal));
+                else if constexpr (std::is_same_v< typename T::value_type, unsigned long long > ||
+                                   std::is_same_v< typename T::value_type, uint64_t >)
+                    result.push_back(static_cast< typename T::result_type >(vt_prop.ullVal));
+                else if constexpr (std::is_same_v< typename T::value_type, std::string >)
+                    result.push_back(utils::wstring_to_std_string(vt_prop.bstrVal));
+                else
+                    std::invoke([]< bool flag = false >() { static_assert(flag, "unsupported type"); });
+
+                VariantClear(&vt_prop);
+                obj->Release();
+            }
+            return result;
+        }
+
+        template< typename... Types >
+        struct MakeResultTuple
+        {
+            using type = std::tuple< std::vector< typename Types::result_type >... >;
+        };
+
+        template< typename... Types >
+        using ResultTuple = typename MakeResultTuple< Types... >::type;
+
+        template< typename... Types >
+        auto queryRecord()
+        {
+            using inpTuple = std::tuple< Types... >;
+            ResultTuple< Types... > myTuple;
+
+            [&]< std::size_t... Indices >(std::index_sequence< Indices... >) {
+                ((std::get< Indices >(myTuple) = queryValue< std::tuple_element_t< Indices, inpTuple > >()), ...);
+            }(std::index_sequence_for< Types... > {});
+
+            return myTuple;
         }
 
         //            private:
@@ -148,4 +220,77 @@ namespace hwinfo::utils
         IWbemServices*        m_service {};
         IEnumWbemClassObject* m_enumerator {};
     };
-}    // namespace hwinfo::utils
+
+    //
+    //    template< BatteryQuery Q >
+    //    auto batteryQuery(IWbemClassObject* WMIObject)
+    //    {
+    //        VARIANT vt_prop;
+    //
+    //        if constexpr (Q == BatteryQuery::Name) {
+    //            WMIObject->Get(L"Name", 0, &vt_prop, nullptr, nullptr);
+    //            VariantClear(&vt_prop);
+    //            return utils::wstring_to_std_string(vt_prop.bstrVal);
+    //        }
+    //
+    //        if constexpr (Q == BatteryQuery::Description) {
+    //            WMIObject->Get(L"Description", 0, &vt_prop, nullptr, nullptr);
+    //            VariantClear(&vt_prop);
+    //            return utils::wstring_to_std_string(vt_prop.bstrVal);
+    //        }
+    //        if constexpr (Q == BatteryQuery::Chemistry) {
+    //            WMIObject->Get(L"Chemistry", 0, &vt_prop, nullptr, nullptr);
+    //            VariantClear(&vt_prop);
+    //            return vt_prop.iVal;
+    //        }
+    //        if constexpr (Q == BatteryQuery::BatteryStatus) {
+    //            WMIObject->Get(L"BatteryStatus", 0, &vt_prop, nullptr, nullptr);
+    //            VariantClear(&vt_prop);
+    //            return vt_prop.iVal;
+    //        }
+    //        if constexpr (Q == BatteryQuery::Status) {
+    //            WMIObject->Get(L"Status", 0, &vt_prop, nullptr, nullptr);
+    //            VariantClear(&vt_prop);
+    //            return utils::wstring_to_std_string(vt_prop.bstrVal);
+    //        }
+    //        if constexpr (Q == BatteryQuery::FullChargeCapacity) {
+    //            WMIObject->Get(L"FullChargeCapacity", 0, &vt_prop, nullptr, nullptr);
+    //            VariantClear(&vt_prop);
+    //            return vt_prop.uintVal;
+    //        }
+    //    }
+    //
+    //    std::vector< detail::BatteryData > loadBatteryData()
+    //    {
+    //        utils::WMIWrapper wmi {};
+    //
+    //        const std::wstring query_string(
+    //            L"SELECT Name, Description, Chemistry, BatteryStatus, Status, FullChargeCapacity FROM Win32_Battery");
+    //        bool success = wmi.execute_query(query_string);
+    //        if (!success) return {};
+    //
+    //        std::vector< detail::BatteryData > batteries;
+    //
+    //        ULONG             u_return  = 0;
+    //        IWbemClassObject* WMIObject = nullptr;
+    //
+    //        while (wmi.m_enumerator) {
+    //            wmi.m_enumerator->Next(WBEM_INFINITE, 1, &WMIObject, &u_return);
+    //            if (!u_return) break;
+    //
+    //            detail::BatteryData battery;
+    //
+    //            battery.name        = batteryQuery< BatteryQuery::Name >(WMIObject);
+    //            battery.description = batteryQuery< BatteryQuery::Description >(WMIObject);
+    //            battery.technology  = static_cast< detail::BatteryTechnology >(batteryQuery< BatteryQuery::Chemistry >(WMIObject));
+    //            battery.status      = static_cast< detail::BatteryStatus >(batteryQuery< BatteryQuery::BatteryStatus >(WMIObject));
+    //            battery.health      = batteryQuery< BatteryQuery::Status >(WMIObject);
+    //            battery.capacity    = batteryQuery< BatteryQuery::FullChargeCapacity >(WMIObject);
+    //
+    //            WMIObject->Release();
+    //            batteries.push_back(std::move(battery));
+    //        }
+    //        return batteries;
+    //    }
+
+}    // namespace hwinfo::WMI
