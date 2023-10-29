@@ -97,10 +97,10 @@ The following methods are available for `CPU`:
 - `int64_t CPU::cacheSize_Bytes() const` 16384000
 - `int CPU::numPhysicalCores() const` 8
 - `int CPU::numLogicalCores() const` 16
-- `int64_t CPU::maxClockSpeed_MHz() const` 5100000
-- `int64_t CPU::regularClockSpeed_MHz() const` 3800000
+- `int64_t CPU::maxClockSpeed() const` 5100000
+- `int64_t CPU::regularClockSpeed() const` 3800000
 - `int64_t CPU::minClockSpeed_MHz() const` 1800000
-- `int64_t CPU::currentClockSpeed_MHz() const` 4700189
+- `int64_t CPU::currentClockSpeed() const` 4700189
 - `const std::vector<std::string>& CPU::flags() cosnt` {"SSE", "AVX", ...}
 
 ### GPU

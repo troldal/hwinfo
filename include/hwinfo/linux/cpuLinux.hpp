@@ -79,61 +79,61 @@ namespace hwinfo
             [[nodiscard]]
             int getId() const
             {
-                return BASE::_id;
+                return BASE::m_id;
             }
 
             [[nodiscard]]
             const std::string& getModelName() const
             {
-                return BASE::_modelName;
+                return BASE::m_modelName;
             }
 
             [[nodiscard]]
             const std::string& getVendor() const
             {
-                return BASE::_vendor;
+                return BASE::m_vendor;
             }
 
             [[nodiscard]]
             int64_t getL1CacheSize() const
             {
-                return BASE::_L1CacheSize_Bytes;
+                return BASE::m_L1CacheSize;
             }
 
             [[nodiscard]]
             int64_t getL2CacheSize() const
             {
-                return BASE::_L2CacheSize_Bytes;
+                return BASE::m_L2CacheSize;
             }
 
             [[nodiscard]]
             int64_t getL3CacheSize() const
             {
-                return BASE::_L3CacheSize_Bytes;
+                return BASE::m_L3CacheSize;
             }
 
             [[nodiscard]]
             int getNumPhysicalCores() const
             {
-                return BASE::_numPhysicalCores;
+                return BASE::m_numPhysicalCores;
             }
 
             [[nodiscard]]
             int getNumLogicalCores() const
             {
-                return BASE::_numLogicalCores;
+                return BASE::m_numLogicalCores;
             }
 
             [[nodiscard]]
             int64_t getMaxClockSpeed() const
             {
-                return BASE::_maxClockSpeed_MHz;
+                return BASE::m_maxClockSpeed;
             }
 
             [[nodiscard]]
             int64_t getRegularClockSpeed() const
             {
-                return BASE::_regularClockSpeed_MHz;
+                return BASE::m_regularClockSpeed;
             }
 
             [[nodiscard]]
@@ -210,7 +210,7 @@ namespace hwinfo
                 //       I will not support it because I only have a 1 socket target device
                 static std::vector< Jiffies > last(0);
                 if (last.empty()) {
-                    last.resize(_numLogicalCores);
+                    last.resize(m_numLogicalCores);
                 }
 
                 Jiffies current = get_jiffies(thread_id + 1);    // thread_index works only with 1 socket right now
@@ -230,8 +230,8 @@ namespace hwinfo
             [[nodiscard]]
             std::vector< double > getThreadsUtilisation() const
             {
-                std::vector< double > thread_utility(BASE::_numLogicalCores);
-                for (int thread_idx = 0; thread_idx < BASE::_numLogicalCores; ++thread_idx) {
+                std::vector< double > thread_utility(BASE::m_numLogicalCores);
+                for (int thread_idx = 0; thread_idx < BASE::m_numLogicalCores; ++thread_idx) {
                     thread_utility[thread_idx] = threadUtilisation(thread_idx);
                 }
                 return thread_utility;
@@ -240,7 +240,7 @@ namespace hwinfo
             [[nodiscard]]
             const std::vector< std::string >& getFlags() const
             {
-                return BASE::_flags;
+                return BASE::m_flags;
             }
 
         private:
@@ -345,35 +345,35 @@ namespace hwinfo
                         utils::strip(name);
                         utils::strip(value);
                         if (name == "vendor_id") {
-                            cpu._vendor = value;
+                            cpu.m_vendor = value;
                         }
                         else if (name == "model name") {
-                            cpu._modelName = value;
+                            cpu.m_modelName = value;
                         }
                         else if (name == "cache size") {
-                            cpu._L3CacheSize_Bytes = std::stoi(utils::split(value, " ")[0]) * 1024;
+                            cpu.m_L3CacheSize = std::stoi(utils::split(value, " ")[0]) * 1024;
                         }
                         else if (name == "siblings") {
-                            cpu._numLogicalCores = std::stoi(value);
+                            cpu.m_numLogicalCores = std::stoi(value);
                         }
                         else if (name == "cpu cores") {
-                            cpu._numPhysicalCores = std::stoi(value);
+                            cpu.m_numPhysicalCores = std::stoi(value);
                         }
                         else if (name == "flags") {
-                            cpu._flags = utils::split(value, " ");
+                            cpu.m_flags = utils::split(value, " ");
                         }
                         else if (name == "physical id") {
                             int tmp_phys_id = std::stoi(value);
                             if (physical_id == tmp_phys_id) {
                                 continue;
                             }
-                            cpu._id  = tmp_phys_id;
+                            cpu.m_id = tmp_phys_id;
                             next_add = true;
                         }
                     }
                     if (next_add) {
-                        cpu._maxClockSpeed_MHz     = getMaxClockSpeed_MHz(cpu._id);
-                        cpu._regularClockSpeed_MHz = getRegularClockSpeed_MHz(cpu._id);
+                        cpu.m_maxClockSpeed     = getMaxClockSpeed_MHz(cpu.m_id);
+                        cpu.m_regularClockSpeed = getRegularClockSpeed_MHz(cpu.m_id);
                         next_add                   = false;
                         physical_id++;
                         cpus.push_back(std::move(cpu));

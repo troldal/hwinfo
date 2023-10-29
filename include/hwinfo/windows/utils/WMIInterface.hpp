@@ -4,6 +4,7 @@
 
 #include "../../base/batteryBase.hpp"
 #include "WMIBatteryInfo.hpp"
+#include "WMICpuInfo.hpp"
 
 #include <algorithm>
 #include <memory>
@@ -189,27 +190,53 @@ namespace hwinfo::WMI
             return result;
         }
 
+        /**
+         * @brief A metafunction to create a tuple type where each element is a vector of the associated type's `result_type`.
+         *
+         * This structure takes a variadic number of types as template parameters, and for each type, it retrieves the associated
+         * `result_type` and creates a `std::vector` of that type. All these vectors are then used to form a `std::tuple`.
+         *
+         * @tparam Types Variadic template parameters representing the types for which the `result_type` is to be extracted.
+         */
         template< typename... Types >
         struct MakeResultTuple
         {
+            /**
+             * A `std::tuple` type where each element is a `std::vector` of the associated type's `result_type`.
+             */
             using type = std::tuple< std::vector< typename Types::result_type >... >;
         };
 
+        /**
+         * @brief A type alias for `MakeResultTuple<Types...>::type`.
+         *
+         * This type alias simplifies the usage of the `MakeResultTuple` metafunction, allowing for cleaner and more concise code.
+         *
+         * @tparam Types Variadic template parameters passed on to `MakeResultTuple`.
+         */
         template< typename... Types >
         using ResultTuple = typename MakeResultTuple< Types... >::type;
 
+        /**
+         * @brief Queries values for a variety of types and transforms the results into a vector of tuples.
+         *
+         * This function is designed to work with a variadic number of types. For each type in the template parameter pack,
+         * it queries a vector of values. The query is performed by calling the `queryValue<T>` function, where `T` is the
+         * type from the template parameter pack. The result of each query is expected to be a `std::vector<T::result_type>`.
+         *
+         * After querying the values, this function transforms the collected vectors into a single `std::vector` of `std::tuple`.
+         * Each tuple in the result vector corresponds to a specific index in the input vectors. The ith tuple contains the ith
+         * element from each of the input vectors.
+         *
+         * @tparam Types Variadic template parameter pack representing the types for which values are queried.
+         * @return std::vector<std::tuple<typename Types::result_type...>> A vector of tuples holding the queried values.
+         *
+         * @note It is assumed that all vectors returned from `queryValue<T>` calls have the same size. If they have different sizes,
+         *       the behavior is undefined.
+         */
         template< typename... Types >
         auto queryRecord()
         {
-            //            using inpTuple = std::tuple< Types... >;
-            //            ResultTuple< Types... > myTuple;
-            //
-            //            [&]< std::size_t... Indices >(std::index_sequence< Indices... >) {
-            //                ((std::get< Indices >(myTuple) = queryValue< std::tuple_element_t< Indices, inpTuple > >()), ...);
-            //            }(std::index_sequence_for< Types... > {});
-            //
-            //            return tupleOfVectorsToVectorOfTuples(myTuple);
-
             // ResultTuple is a tuple of vectors, where each vector's type is T::result_type for each type T in Types...
             ResultTuple< Types... > myTuple;
 
@@ -258,76 +285,5 @@ namespace hwinfo::WMI
         IEnumWbemClassObject* m_enumerator {};
     };
 
-    //
-    //    template< BatteryQuery Q >
-    //    auto batteryQuery(IWbemClassObject* WMIObject)
-    //    {
-    //        VARIANT vt_prop;
-    //
-    //        if constexpr (Q == BatteryQuery::Name) {
-    //            WMIObject->Get(L"Name", 0, &vt_prop, nullptr, nullptr);
-    //            VariantClear(&vt_prop);
-    //            return utils::wstring_to_std_string(vt_prop.bstrVal);
-    //        }
-    //
-    //        if constexpr (Q == BatteryQuery::Description) {
-    //            WMIObject->Get(L"Description", 0, &vt_prop, nullptr, nullptr);
-    //            VariantClear(&vt_prop);
-    //            return utils::wstring_to_std_string(vt_prop.bstrVal);
-    //        }
-    //        if constexpr (Q == BatteryQuery::Chemistry) {
-    //            WMIObject->Get(L"Chemistry", 0, &vt_prop, nullptr, nullptr);
-    //            VariantClear(&vt_prop);
-    //            return vt_prop.iVal;
-    //        }
-    //        if constexpr (Q == BatteryQuery::BatteryStatus) {
-    //            WMIObject->Get(L"BatteryStatus", 0, &vt_prop, nullptr, nullptr);
-    //            VariantClear(&vt_prop);
-    //            return vt_prop.iVal;
-    //        }
-    //        if constexpr (Q == BatteryQuery::Status) {
-    //            WMIObject->Get(L"Status", 0, &vt_prop, nullptr, nullptr);
-    //            VariantClear(&vt_prop);
-    //            return utils::wstring_to_std_string(vt_prop.bstrVal);
-    //        }
-    //        if constexpr (Q == BatteryQuery::FullChargeCapacity) {
-    //            WMIObject->Get(L"FullChargeCapacity", 0, &vt_prop, nullptr, nullptr);
-    //            VariantClear(&vt_prop);
-    //            return vt_prop.uintVal;
-    //        }
-    //    }
-    //
-    //    std::vector< detail::BatteryData > loadBatteryData()
-    //    {
-    //        utils::WMIWrapper wmi {};
-    //
-    //        const std::wstring query_string(
-    //            L"SELECT Name, Description, Chemistry, BatteryStatus, Status, FullChargeCapacity FROM Win32_Battery");
-    //        bool success = wmi.execute_query(query_string);
-    //        if (!success) return {};
-    //
-    //        std::vector< detail::BatteryData > batteries;
-    //
-    //        ULONG             u_return  = 0;
-    //        IWbemClassObject* WMIObject = nullptr;
-    //
-    //        while (wmi.m_enumerator) {
-    //            wmi.m_enumerator->Next(WBEM_INFINITE, 1, &WMIObject, &u_return);
-    //            if (!u_return) break;
-    //
-    //            detail::BatteryData battery;
-    //
-    //            battery.name        = batteryQuery< BatteryQuery::Name >(WMIObject);
-    //            battery.description = batteryQuery< BatteryQuery::Description >(WMIObject);
-    //            battery.technology  = static_cast< detail::BatteryTechnology >(batteryQuery< BatteryQuery::Chemistry >(WMIObject));
-    //            battery.status      = static_cast< detail::BatteryStatus >(batteryQuery< BatteryQuery::BatteryStatus >(WMIObject));
-    //            battery.health      = batteryQuery< BatteryQuery::Status >(WMIObject);
-    //            battery.capacity    = batteryQuery< BatteryQuery::FullChargeCapacity >(WMIObject);
-    //
-    //            WMIObject->Release();
-    //            batteries.push_back(std::move(battery));
-    //        }
-    //        return batteries;
-    //    }
 
 }    // namespace hwinfo::WMI

@@ -50,71 +50,71 @@ namespace hwinfo::detail
         [[nodiscard]]
         int id() const
         {
-            return impl().getId();
+            return m_id;
         }
 
         [[nodiscard]]
         const std::string& modelName() const
         {
-            return impl().getModelName();
+            return m_modelName;
         }
 
         [[nodiscard]]
         const std::string& vendor() const
         {
-            return impl().getVendor();
+            return m_vendor;
         }
 
         [[nodiscard]]
-        int64_t L1CacheSize_Bytes() const
+        int64_t L1CacheSize() const
         {
-            return impl().getL1CacheSize();
+            return m_L1CacheSize;
         }
 
         [[nodiscard]]
-        int64_t L2CacheSize_Bytes() const
+        int64_t L2CacheSize() const
         {
-            return impl().getL2CacheSize();
+            return m_L2CacheSize;
         }
 
         [[nodiscard]]
-        int64_t L3CacheSize_Bytes() const
+        int64_t L3CacheSize() const
         {
-            return impl().getL3CacheSize();
+            return m_L3CacheSize;
         }
 
         [[nodiscard]]
         int numPhysicalCores() const
         {
-            return impl().getNumPhysicalCores();
+            return m_numPhysicalCores;
         }
 
         [[nodiscard]]
         int numLogicalCores() const
         {
-            return impl().getNumLogicalCores();
+            return m_numLogicalCores;
         }
 
         [[nodiscard]]
-        int64_t maxClockSpeed_MHz() const
+        int64_t maxClockSpeed() const
         {
-            return impl().getMaxClockSpeed();
+            return m_maxClockSpeed;
         }
 
         [[nodiscard]]
-        int64_t regularClockSpeed_MHz() const
+        int64_t regularClockSpeed() const
         {
-            return impl().getRegularClockSpeed();
+            return m_regularClockSpeed;
         }
 
         [[nodiscard]]
-        int64_t currentClockSpeed_MHz(int thread_id) const
+        int64_t currentClockSpeed(int thread_id) const
         {
             return impl().getCurrentClockSpeed(thread_id);
         }
 
         [[nodiscard]]
-        std::vector< int64_t > currentClockSpeed_MHz() const
+        std::vector< int64_t > currentClockSpeed() const
         {
             return impl().getCurrentClockSpeed();
         }
@@ -140,9 +140,10 @@ namespace hwinfo::detail
         [[nodiscard]]
         const std::vector< std::string >& flags() const
         {
-            return impl().getFlags();
+            return m_flags;
         }
 
+        [[nodiscard]]
         static std::vector< IMPL > getAllCPUs() { return IMPL::getAllCPUs_impl(); }
 
     protected:
@@ -165,16 +166,16 @@ namespace hwinfo::detail
          */
         IMPL const& impl() const { return static_cast< IMPL const& >(*this); }
 
-        int                        _id { -1 };
-        std::string                _modelName;
-        std::string                _vendor;
-        int                        _numPhysicalCores { -1 };
-        int                        _numLogicalCores { -1 };
-        int64_t                    _maxClockSpeed_MHz { -1 };
-        int64_t                    _regularClockSpeed_MHz { -1 };
-        int64_t                    _L1CacheSize_Bytes { -1 };
-        int64_t                    _L2CacheSize_Bytes { -1 };
-        int64_t                    _L3CacheSize_Bytes { -1 };
-        std::vector< std::string > _flags {};
+        int                        m_id { -1 };
+        std::string                m_modelName;
+        std::string                m_vendor;
+        uint32_t                   m_numPhysicalCores { 0 };
+        uint32_t                   m_numLogicalCores { 0 };
+        int64_t                    m_maxClockSpeed { -1 };
+        int64_t                    m_regularClockSpeed { -1 };
+        int64_t                    m_L1CacheSize { -1 };
+        int64_t                    m_L2CacheSize { -1 };
+        int64_t                    m_L3CacheSize { -1 };
+        std::vector< std::string > m_flags {};
     };
 }    // namespace hwinfo

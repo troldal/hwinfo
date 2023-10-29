@@ -44,3 +44,8 @@
 #elif defined(HWINFO_WINDOWS)
 #    include "windows/cpuWin.hpp"
 #endif
+
+namespace hwinfo
+{
+    std::vector< CPU > getCPUs() { return CPU::getAllCPUs(); }
+}    // namespace hwinfo
