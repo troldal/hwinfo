@@ -58,79 +58,27 @@ namespace hwinfo
 
         private:
             [[nodiscard]]
-            std::string getVendor() const
-            {
-                return BASE::_vendor;
-            }
-
-            [[nodiscard]]
-            std::string getName() const
-            {
-                return BASE::_name;
-            }
-
-            [[nodiscard]]
-            std::string getDriverVersion() const
-            {
-                return BASE::_driverVersion;
-            }
-
-            [[nodiscard]]
-            int64_t getMemory() const
-            {
-                return BASE::_memory_Bytes;
-            }
-
-            [[nodiscard]]
-            int64_t getFrequency() const
-            {
-                return BASE::_frequency_MHz;
-            }
-
-            [[nodiscard]]
-            int getNumCores() const
-            {
-                return BASE::_num_cores;
-            }
-
-            [[nodiscard]]
-            int getId() const
-            {
-                return BASE::_id;
-            }
-
             static std::vector< GPUWin > getAllGPUs_impl()
             {
-                const std::wstring query_string(L"SELECT Name, AdapterCompatibility, DriverVersion, AdapterRam "
-                                                L"FROM WIN32_VideoController");
-                bool               success = s_wmi.execute_query(query_string);
-                if (!success) return {};
-
                 std::vector< GPUWin > gpus;
 
-                ULONG             u_return = 0;
-                IWbemClassObject* obj      = nullptr;
-                int               gpu_id   = 0;
-                while (s_wmi.m_enumerator) {
-                    s_wmi.m_enumerator->Next(WBEM_INFINITE, 1, &obj, &u_return);
-                    if (!u_return) break;
+                using namespace WMI;
+                auto info = wmiInterface.queryRecord< GpuInfo::NAME, GpuInfo::ADAPTERCOMPAT, GpuInfo::DRIVERVER, GpuInfo::ADAPTERRAM >();
 
-                    GPUWin gpu;
-                    gpu._id = gpu_id++;
-                    VARIANT vt_prop;
-                    obj->Get(L"Name", 0, &vt_prop, nullptr, nullptr);
-                    gpu._name = utils::wstring_to_std_string(vt_prop.bstrVal);
-                    obj->Get(L"AdapterCompatibility", 0, &vt_prop, nullptr, nullptr);
-                    gpu._vendor = utils::wstring_to_std_string(vt_prop.bstrVal);
-                    obj->Get(L"DriverVersion", 0, &vt_prop, nullptr, nullptr);
-                    gpu._driverVersion = utils::wstring_to_std_string(vt_prop.bstrVal);
-                    obj->Get(L"AdapterRam", 0, &vt_prop, nullptr, nullptr);
-                    gpu._memory_Bytes = vt_prop.intVal;
-                    VariantClear(&vt_prop);
-                    obj->Release();
-                    gpus.push_back(std::move(gpu));
+                if (info.empty()) return {};
+
+                for (const auto& gpu : info) {
+                    gpus.emplace_back();
+                    auto& processor = gpus.back();
+
+                    processor.m_name          = std::get< 0 >(gpu);
+                    processor.m_vendor        = std::get< 1 >(gpu);
+                    processor.m_driverVersion = std::get< 2 >(gpu);
+                    processor.m_memory        = std::get< 3 >(gpu);
                 }
+
 #ifdef USE_OCL
+
                 auto cl_gpus = mcl::DeviceManager::get_list< mcl::Filter::GPU >();
                 for (auto& gpu : gpus) {
                     for (auto* cl_gpu : cl_gpus) {
@@ -147,10 +95,10 @@ namespace hwinfo
                 return gpus;
             }
 
-            static WMI::WMIInterface s_wmi;
+            static WMI::WMIInterface wmiInterface;
         };
 
-        WMI::WMIInterface GPUWin::s_wmi {};
+        WMI::WMIInterface GPUWin::wmiInterface {};
 
     }    // namespace detail
 

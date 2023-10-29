@@ -56,43 +56,43 @@ namespace hwinfo
             [[nodiscard]]
             std::string getVendor() const
             {
-                return BASE::_vendor;
+                return BASE::m_vendor;
             }
 
             [[nodiscard]]
             std::string getName() const
             {
-                return BASE::_name;
+                return BASE::m_name;
             }
 
             [[nodiscard]]
             std::string getDriverVersion() const
             {
-                return BASE::_driverVersion;
+                return BASE::m_driverVersion;
             }
 
             [[nodiscard]]
             int64_t getMemory() const
             {
-                return BASE::_memory_Bytes;
+                return BASE::m_memory;
             }
 
             [[nodiscard]]
             int64_t getFrequency() const
             {
-                return BASE::_frequency_MHz;
+                return BASE::m_frequency;
             }
 
             [[nodiscard]]
             int getNumCores() const
             {
-                return BASE::_num_cores;
+                return BASE::m_num_cores;
             }
 
             [[nodiscard]]
             int getId() const
             {
-                return BASE::_id;
+                return BASE::m_id;
             }
 
             static std::vector< GPULinux > getAllGPUs_impl()
@@ -102,7 +102,7 @@ namespace hwinfo
                 int                     id  = 0;
                 while (true) {
                     GPULinux gpu;
-                    gpu._id = id;
+                    gpu.m_id = id;
                     std::string path("/sys/class/drm/card" + std::to_string(id) + '/');
                     if (!filesystem::exists(path)) {
                         if (id > 2) {
@@ -111,18 +111,18 @@ namespace hwinfo
                         id++;
                         continue;
                     }
-                    gpu._vendor_id = read_drm_by_path(path + "device/vendor");
-                    gpu._device_id = read_drm_by_path(path + "device/device");
-                    if (gpu._vendor_id.empty() || gpu._device_id.empty()) {
+                    gpu.m_vendor_id = read_drm_by_path(path + "device/vendor");
+                    gpu.m_device_id = read_drm_by_path(path + "device/device");
+                    if (gpu.m_vendor_id.empty() || gpu.m_device_id.empty()) {
                         id++;
                         continue;
                     }
-                    const PCIVendor& vendor = pci[gpu._vendor_id];
-                    const PCIDevice  device = vendor[gpu._device_id];
-                    gpu._vendor             = vendor.vendor_name;
-                    gpu._name               = vendor[gpu._device_id].device_name;
+                    const PCIVendor& vendor = pci[gpu.m_vendor_id];
+                    const PCIDevice  device = vendor[gpu.m_device_id];
+                    gpu.m_vendor            = vendor.vendor_name;
+                    gpu.m_name              = vendor[gpu.m_device_id].device_name;
                     auto frequencies        = get_frequencies(path);
-                    gpu._frequency_MHz      = frequencies[2];
+                    gpu.m_frequency         = frequencies[2];
                     gpus.push_back(std::move(gpu));
                     id++;
                 }

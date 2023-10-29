@@ -53,43 +53,43 @@ namespace hwinfo::detail
         [[nodiscard]]
         std::string vendor() const
         {
-            return impl().getVendor();
+            return m_vendor;
         }
 
         [[nodiscard]]
         std::string name() const
         {
-            return impl().getName();
+            return m_name;
         }
 
         [[nodiscard]]
         std::string driverVersion() const
         {
-            return impl().getDriverVersion();
+            return m_driverVersion;
         }
 
         [[nodiscard]]
         int64_t memory_Bytes() const
         {
-            return impl().getMemory();
+            return m_memory;
         }
 
         [[nodiscard]]
         int64_t frequency_MHz() const
         {
-            return impl().getFrequency();
+            return m_frequency;
         }
 
         [[nodiscard]]
         int num_cores() const
         {
-            return impl().getNumCores();
+            return m_num_cores;
         }
 
         [[nodiscard]]
         int id() const
         {
-            return impl().getId();
+            return m_id;
         }
 
         static std::vector< IMPL > getAllGPUs() { return IMPL::getAllGPUs_impl(); }
@@ -113,16 +113,16 @@ namespace hwinfo::detail
         IMPL const& impl() const { return static_cast< IMPL const& >(*this); }
 
         GPUBase() = default;
-        std::string _vendor {};
-        std::string _name {};
-        std::string _driverVersion {};
-        int64_t     _memory_Bytes { 0 };
-        int64_t     _frequency_MHz { 0 };
-        int         _num_cores { 0 };
-        int         _id { 0 };
+        std::string m_vendor {};
+        std::string m_name {};
+        std::string m_driverVersion {};
+        int64_t     m_memory { 0 };
+        int64_t     m_frequency { 0 };
+        int         m_num_cores { 0 };
+        int         m_id { 0 };
 
-        std::string _vendor_id {};
-        std::string _device_id {};
+        std::string m_vendor_id {};
+        std::string m_device_id {};
     };
 
 

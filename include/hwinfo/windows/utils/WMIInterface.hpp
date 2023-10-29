@@ -6,6 +6,7 @@
 #include "WMIBatteryInfo.hpp"
 #include "WMICpuInfo.hpp"
 #include "WMIDiskInfo.hpp"
+#include "WMIGpuInfo.hpp"
 #include "WMIPerfInfo.hpp"
 
 #include <algorithm>
