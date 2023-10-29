@@ -55,31 +55,31 @@ namespace hwinfo
             [[nodiscard]]
             std::string getVendor() const
             {
-                return BASE::_vendor;
+                return BASE::m_vendor;
             }
 
             [[nodiscard]]
             std::string getModel() const
             {
-                return BASE::_model;
+                return BASE::m_model;
             }
 
             [[nodiscard]]
             std::string getSerialNumber() const
             {
-                return BASE::_serialNumber;
+                return BASE::m_serialNumber;
             }
 
             [[nodiscard]]
             int64_t getSize() const
             {
-                return BASE::_size_Bytes;
+                return BASE::m_size;
             }
 
             [[nodiscard]]
             int getId() const
             {
-                return BASE::_id;
+                return BASE::m_id;
             }
 
             static std::vector< DiskLinux > getAllDisks_impl()
@@ -94,32 +94,32 @@ namespace hwinfo
                     }
                     std::ifstream f(path + "vendor");
                     if (f) {
-                        getline(f, disk._vendor);
+                        getline(f, disk.m_vendor);
                     }
                     else {
-                        disk._vendor = "<unknown>";
+                        disk.m_vendor = "<unknown>";
                     }
                     f.close();
                     f.open(path + "model");
                     if (f) {
-                        getline(f, disk._model);
+                        getline(f, disk.m_model);
                     }
                     else {
-                        disk._model = "<unknown>";
+                        disk.m_model = "<unknown>";
                     }
                     f.close();
                     f.open(path + "serial");
                     if (f) {
-                        getline(f, disk._serialNumber);
+                        getline(f, disk.m_serialNumber);
                     }
                     else {
-                        disk._serialNumber = "<unknown>";
+                        disk.m_serialNumber = "<unknown>";
                     }
                     f.close();
-                    utils::strip(disk._vendor);
-                    utils::strip(disk._model);
-                    utils::strip(disk._serialNumber);
-                    disk._size_Bytes = -1;
+                    utils::strip(disk.m_vendor);
+                    utils::strip(disk.m_model);
+                    utils::strip(disk.m_serialNumber);
+                    disk.m_size = -1;
                     /*
                     struct statvfs buf {};
                     std::string mount_path("/dev/");

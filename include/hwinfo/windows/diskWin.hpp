@@ -53,74 +53,30 @@ namespace hwinfo
             DiskWin() = default;
 
         private:
-            [[nodiscard]]
-            std::string getVendor() const
-            {
-                return BASE::_vendor;
-            }
-
-            [[nodiscard]]
-            std::string getModel() const
-            {
-                return BASE::_model;
-            }
-
-            [[nodiscard]]
-            std::string getSerialNumber() const
-            {
-                return BASE::_serialNumber;
-            }
-
-            [[nodiscard]]
-            int64_t getSize() const
-            {
-                return BASE::_size_Bytes;
-            }
-
-            [[nodiscard]]
-            int getId() const
-            {
-                return BASE::_id;
-            }
-
             static std::vector< DiskWin > getAllDisks_impl()
             {
-                const std::wstring query_string(L"SELECT Model, Manufacturer, SerialNumber, Size "
-                                                L"FROM Win32_DiskDrive");
-                bool               success = s_wmi.execute_query(query_string);
-                if (!success) return {};
-
                 std::vector< DiskWin > disks;
 
-                ULONG             u_return = 0;
-                IWbemClassObject* obj      = nullptr;
-                int               disk_id  = 0;
-                while (s_wmi.m_enumerator) {
-                    s_wmi.m_enumerator->Next(WBEM_INFINITE, 1, &obj, &u_return);
-                    if (!u_return) break;
+                using namespace WMI;
+                auto info = wmiInterface.queryRecord< DiskInfo::MODEL, DiskInfo::MANUFACTURER, DiskInfo::SERIALNUMBER, DiskInfo::SIZE >();
 
-                    DiskWin disk;
-                    disk._id = disk_id++;
-                    VARIANT vt_prop;
-                    obj->Get(L"Model", 0, &vt_prop, nullptr, nullptr);
-                    disk._model = utils::wstring_to_std_string(vt_prop.bstrVal);
-                    obj->Get(L"Manufacturer", 0, &vt_prop, nullptr, nullptr);
-                    disk._vendor = utils::wstring_to_std_string(vt_prop.bstrVal);
-                    obj->Get(L"SerialNumber", 0, &vt_prop, nullptr, nullptr);
-                    disk._serialNumber = utils::wstring_to_std_string(vt_prop.bstrVal);
-                    obj->Get(L"Size", 0, &vt_prop, nullptr, nullptr);
-                    disk._size_Bytes = static_cast< int64_t >(vt_prop.ullVal);
-                    VariantClear(&vt_prop);
-                    obj->Release();
-                    disks.push_back(std::move(disk));
+                for (const auto& disk : info) {
+                    disks.emplace_back();
+                    auto& processor = disks.back();
+
+                    processor.m_model        = std::get< 0 >(disk);
+                    processor.m_vendor       = std::get< 1 >(disk);
+                    processor.m_serialNumber = std::get< 2 >(disk);
+                    processor.m_size         = std::get< 3 >(disk);
                 }
+
                 return disks;
             }
 
-            static WMI::WMIInterface s_wmi;
+            static WMI::WMIInterface wmiInterface;
         };
 
-        WMI::WMIInterface DiskWin::s_wmi {};
+        WMI::WMIInterface DiskWin::wmiInterface {};
 
     }    // namespace detail
 

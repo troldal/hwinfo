@@ -47,21 +47,35 @@ namespace hwinfo::detail
         friend IMPL;
 
     public:
+        [[nodiscard]]
+        std::string vendor() const
+        {
+            return m_vendor;
+        }
 
         [[nodiscard]]
-        std::string vendor() const { return impl().getVendor(); }
+        std::string model() const
+        {
+            return m_model;
+        }
 
         [[nodiscard]]
-        std::string model() const { return impl().getModel(); }
+        std::string serialNumber() const
+        {
+            return m_serialNumber;
+        }
 
         [[nodiscard]]
-        std::string serialNumber() const { return impl().getSerialNumber(); }
+        int64_t size_Bytes() const
+        {
+            return m_size;
+        }
 
         [[nodiscard]]
-        int64_t            size_Bytes() const { return impl().getSize(); }
-
-        [[nodiscard]]
-        int                id() const { return impl().getId(); }
+        int id() const
+        {
+            return m_id;
+        }
 
         static std::vector< IMPL > getAllDisks() { return IMPL::getAllDisks_impl(); }
 
@@ -69,7 +83,6 @@ namespace hwinfo::detail
         ~DiskBase() = default;
 
     private:
-
         /**
          * @brief Provides access to the implementation-specific methods in the derived class.
          *
@@ -85,14 +98,11 @@ namespace hwinfo::detail
         IMPL const& impl() const { return static_cast< IMPL const& >(*this); }
 
         DiskBase() = default;
-        std::string _vendor;
-        std::string _model;
-        std::string _serialNumber;
-        int64_t     _size_Bytes { -1 };
-        int         _id { -1 };
+        std::string m_vendor;
+        std::string m_model;
+        std::string m_serialNumber;
+        uint64_t    m_size { 0 };
+        int         m_id { -1 };
     };
 
-
-
-}    // namespace hwinfo
-
+}    // namespace hwinfo::detail

@@ -38,6 +38,8 @@
 #include "../base/cpuBase.hpp"
 #include "utils/WMIInterface.hpp"
 
+#include <numeric>
+
 namespace hwinfo
 {
     namespace detail
@@ -72,7 +74,7 @@ namespace hwinfo
                 using namespace WMI;
                 auto info = wmiInterface.queryValue< PerfInfo::PROCESSORPERFORMANCE >();
 
-                if (info.empty()) result.resize(m_numLogicalCores, -1);
+                if (info.empty()) result.assign(m_numLogicalCores, -1);
                 else
                     for (auto& v : info)
                         result.push_back(static_cast< int64_t >(static_cast< double >(m_maxClockSpeed) * std::stod(v) / 100.0));
@@ -83,30 +85,14 @@ namespace hwinfo
             [[nodiscard]]
             double getCurrentUtilisation() const
             {
-                //                std::vector< bstr_t > percentage {};
-                //                const std::string&    query =
-                //                    "Win32_PerfFormattedData_Counters_ProcessorInformation WHERE Name='" + std::to_string(0) + ",_Total'";
-                //                wmi::queryWMI(query, "PercentProcessorUtility", percentage);
-                //                if (percentage.empty()) {
-                //                    return -1.0;
-                //                }
-                //
-                //                const char* strValue = static_cast< const char* >(percentage[0]);
-                //                return std::stod(strValue);
-
-                std::string filter = "Name='" + std::to_string(0) + ",_Total'";
-
-                auto data = wmiInterface.query< std::string >("Win32_PerfFormattedData_Counters_ProcessorInformation",
-                                                              "PercentProcessorUtility",
-                                                              filter);
-
-                if (data.empty()) return -1.0;
+                auto tutils = getThreadsUtilisation();
+                if (tutils.empty()) return -1.0;
                 else
-                    return std::stod(data.front());
+                    return std::accumulate(tutils.begin(), tutils.end(), 0.0) / tutils.size();
             }
 
             [[nodiscard]]
-            double getThreadUtilisation(int thread_id) const
+            double getThreadUtilisation(int thread_id) const    // NOLINT
             {
                 using namespace WMI;
                 auto info = wmiInterface.queryValue< PerfInfo::PROCESSORUTILITY >();
@@ -125,7 +111,7 @@ namespace hwinfo
                 using namespace WMI;
                 auto info = wmiInterface.queryValue< PerfInfo::PROCESSORUTILITY >();
 
-                if (info.empty()) thread_utility.resize(m_numLogicalCores, -1.f);
+                if (info.empty()) thread_utility.assign(m_numLogicalCores, -1.0);
                 else
                     for (const auto& cpu : info) thread_utility.push_back(std::stod(cpu) / 100.f);
 
