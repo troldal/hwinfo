@@ -112,9 +112,9 @@ namespace hwinfo::detail
         std::string _name {};
         std::string _model {};
         std::string _serialNumber {};
-        int64_t     _total_Bytes     = -1;
-        int64_t     _free_Bytes      = -1;
-        int64_t     _available_Bytes = -1;
+        uint64_t    _total_Bytes     = -1;
+        uint64_t    _free_Bytes      = -1;
+        uint64_t    _available_Bytes = -1;
         int         _frequency       = -1;
     };
 

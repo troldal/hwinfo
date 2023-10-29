@@ -9,6 +9,7 @@
 #include "WMIDiskInfo.hpp"
 #include "WMIGpuInfo.hpp"
 #include "WMIPerfInfo.hpp"
+#include "WMIRamInfo.hpp"
 
 #include <algorithm>
 #include <memory>

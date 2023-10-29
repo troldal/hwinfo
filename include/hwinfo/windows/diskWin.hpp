@@ -67,7 +67,7 @@ namespace hwinfo
                     processor.m_model        = std::get< 0 >(disk);
                     processor.m_vendor       = std::get< 1 >(disk);
                     processor.m_serialNumber = std::get< 2 >(disk);
-                    processor.m_size         = std::get< 3 >(disk);
+                    processor.m_size         = std::stoull(std::get< 3 >(disk));
                 }
 
                 return disks;

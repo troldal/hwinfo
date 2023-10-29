@@ -60,8 +60,8 @@ namespace hwinfo::WMI
          */
         struct SIZE
         {
-            using value_type  = uint64_t;    ///< Type of the value being used.
-            using result_type = uint64_t;    ///< Resultant type after conversion.
+            using value_type  = std::string;    ///< Type of the value being used.
+            using result_type = std::string;    ///< Resultant type after conversion.
 
             static const inline std::wstring wmi_class = L"Win32_DiskDrive";    ///< WMI class name.
             static const inline std::wstring wmi_field = L"Size";               ///< WMI field for the battery name.
