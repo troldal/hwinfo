@@ -41,6 +41,24 @@
 
 namespace hwinfo::detail
 {
+
+    // `BatteryBase` Class
+    // 1. Encapsulation:
+    //    - The derived class (`BatteryWin`) can directly modify the base class attributes (`_vendor`, `_model`, `_serialNumber`,
+    //    `_technology`, `_health`). This is a design choice in CRTP, but you might still want to ensure that data integrity is maintained.
+    //
+    // 2. Error Handling:
+    //    - The methods in the base class do not handle or convey any errors. Depending on the usage, you might consider exceptions, error
+    //    codes, or `std::optional`/`std::variant` for error reporting.
+    //
+    // 3. Lack of Initialization:
+    //    - The attributes of the `BatteryBase` class are not initialized in the constructor, which might lead to undefined behavior if
+    //    accessed before being set.
+    //
+    // 4. Incomplete API:
+    //    - Depending on the intended functionality, the class might be missing some battery-related features (e.g., setting thresholds,
+    //    retrieving temperature, charge/discharge rates, etc.).
+
     /**
      * @class BatteryBase
      * @brief Base class for battery information retrieval using the Curiously Recurring Template Pattern (CRTP).

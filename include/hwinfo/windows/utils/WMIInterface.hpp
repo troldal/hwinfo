@@ -201,14 +201,51 @@ namespace hwinfo::WMI
         template< typename... Types >
         auto queryRecord()
         {
-            using inpTuple = std::tuple< Types... >;
+            //            using inpTuple = std::tuple< Types... >;
+            //            ResultTuple< Types... > myTuple;
+            //
+            //            [&]< std::size_t... Indices >(std::index_sequence< Indices... >) {
+            //                ((std::get< Indices >(myTuple) = queryValue< std::tuple_element_t< Indices, inpTuple > >()), ...);
+            //            }(std::index_sequence_for< Types... > {});
+            //
+            //            return tupleOfVectorsToVectorOfTuples(myTuple);
+
+            // ResultTuple is a tuple of vectors, where each vector's type is T::result_type for each type T in Types...
             ResultTuple< Types... > myTuple;
 
-            [&]< std::size_t... Indices >(std::index_sequence< Indices... >) {
-                ((std::get< Indices >(myTuple) = queryValue< std::tuple_element_t< Indices, inpTuple > >()), ...);
-            }(std::index_sequence_for< Types... > {});
+            // Lambda function to populate each vector in the tuple.
+            // It takes an index_sequence as a template parameter,
+            // which generates a compile-time sequence of indices.
+            auto populateTuple = [&]< std::size_t... Is >(std::index_sequence< Is... >) {
+                ((std::get< Is >(myTuple) = queryValue< Types >()), ...);
+            };
 
-            return myTuple;
+            // Call the lambda function with an index sequence generated for Types...
+            populateTuple(std::index_sequence_for< Types... > {});
+
+            // Assume all vectors in the tuple have the same size.
+            const size_t size = std::get< 0 >(myTuple).size();    // Assuming all vectors have the same size
+
+            // Define the type of the resulting vector of tuples.
+            using ResultVector = std::vector< std::tuple< typename Types::result_type... > >;
+            ResultVector result;
+            result.reserve(size);
+
+            // Convert the tuple of vectors to a vector of tuples.
+            for (size_t i = 0; i < size; ++i) {
+                // Lambda function to emplace a tuple into the result vector.
+                // The tuple is constructed using the ith element from each vector in the tuple.
+                auto emplaceTupleElement = [&]< std::size_t... Is >(std::index_sequence< Is... >) {
+                    // For each index in Is, get the ith element from the corresponding
+                    // vector in the tuple and emplace_back a tuple into the result vector.
+                    result.emplace_back(std::get< Is >(myTuple)[i]...);
+                };
+
+                // Call the lambda function with an index sequence generated for Types...
+                emplaceTupleElement(std::index_sequence_for< Types... > {});
+            }
+
+            return result;
         }
 
         //            private:
