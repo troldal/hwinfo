@@ -61,7 +61,8 @@ namespace hwinfo
             [[nodiscard]]
             static std::string getVendor()
             {
-                auto result = s_wmi.query< std::string >("Win32_BaseBoard", "Manufacturer");
+                using namespace WMI;
+                auto result = wmiInterface.queryValue< BoardInfo::MANUFACTURER >();
                 if (result.empty()) return "<unknown>";
 
                 return result.front();
@@ -70,7 +71,8 @@ namespace hwinfo
             [[nodiscard]]
             static std::string getName()
             {
-                auto result = s_wmi.query< std::string >("Win32_BaseBoard", "Product");
+                using namespace WMI;
+                auto result = wmiInterface.queryValue< BoardInfo::PRODUCT >();
                 if (result.empty()) return "<unknown>";
 
                 return result.front();
@@ -79,7 +81,8 @@ namespace hwinfo
             [[nodiscard]]
             static std::string getVersion()
             {
-                auto result = s_wmi.query< std::string >("Win32_BaseBoard", "Version");
+                using namespace WMI;
+                auto result = wmiInterface.queryValue< BoardInfo::VERSION >();
                 if (result.empty()) return "<unknown>";
 
                 return result.front();
@@ -88,16 +91,17 @@ namespace hwinfo
             [[nodiscard]]
             static std::string getSerialNumber()
             {
-                auto result = s_wmi.query< std::string >("Win32_BaseBoard", "SerialNumber");
+                using namespace WMI;
+                auto result = wmiInterface.queryValue< BoardInfo::SERIALNUMBER >();
                 if (result.empty()) return "<unknown>";
 
                 return result.front();
             }
 
-            static WMI::WMIInterface s_wmi;
+            static WMI::WMIInterface wmiInterface;
         };
 
-        WMI::WMIInterface MainBoardWin::s_wmi {};
+        WMI::WMIInterface MainBoardWin::wmiInterface {};
 
     }    // namespace detail
 

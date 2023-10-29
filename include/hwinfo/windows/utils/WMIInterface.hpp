@@ -4,6 +4,7 @@
 
 #include "../../base/batteryBase.hpp"
 #include "WMIBatteryInfo.hpp"
+#include "WMIBoardInfo.hpp"
 #include "WMICpuInfo.hpp"
 #include "WMIDiskInfo.hpp"
 #include "WMIGpuInfo.hpp"
