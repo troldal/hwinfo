@@ -98,14 +98,34 @@ namespace hwinfo::WMI
         }
 
         template< typename T >
+        auto getVariantValue(const VARIANT& val)
+        {
+            if constexpr (std::is_same_v< typename T::value_type, int32_t >) return static_cast< typename T::result_type >(val.intVal);
+            else if constexpr (std::is_same_v< typename T::value_type, bool >)
+                return val.boolVal;
+            else if constexpr (std::is_same_v< typename T::value_type, uint32_t >)
+                return static_cast< typename T::result_type >(val.uintVal);
+            else if constexpr (std::is_same_v< typename T::value_type, uint16_t >)
+                return static_cast< typename T::result_type >(val.uiVal);
+            else if constexpr (std::is_same_v< typename T::value_type, int64_t >)
+                return static_cast< typename T::result_type >(val.llVal);
+            else if constexpr (std::is_same_v< typename T::value_type, uint64_t >)
+                return static_cast< typename T::result_type >(val.ullVal);
+            else if constexpr (std::is_same_v< typename T::value_type, std::string >)
+                return utils::wstring_to_std_string(val.bstrVal);
+            else
+                std::invoke([]< bool flag = false >() { static_assert(flag, "unsupported type"); });
+        }
+
+        template< typename T >
         std::vector< typename T::result_type > queryValue()
         {
             std::wstring wmi_class = T::wmi_class;
-            std::wstring field     = T::wmi_field;
+            std::wstring wmi_field = T::wmi_field;
 
             std::vector< typename T::result_type > result;
 
-            std::wstring query_string(L"SELECT " + field + L" FROM " + wmi_class);
+            std::wstring query_string(L"SELECT " + wmi_field + L" FROM " + wmi_class);
             if (!execute_query(query_string)) return {};
 
             ULONG             u_return = 0;
@@ -115,27 +135,9 @@ namespace hwinfo::WMI
                 if (!u_return) break;
 
                 VARIANT vt_prop;
-                obj->Get(field.c_str(), 0, &vt_prop, nullptr, nullptr);
+                obj->Get(wmi_field.c_str(), 0, &vt_prop, nullptr, nullptr);
 
-                if constexpr (std::is_same_v< typename T::value_type, long >) result.push_back(vt_prop.intVal);
-                else if constexpr (std::is_same_v< typename T::value_type, int > || std::is_same_v< typename T::value_type, int32_t >)
-                    result.push_back(static_cast< typename T::result_type >(vt_prop.intVal));
-                else if constexpr (std::is_same_v< typename T::value_type, bool >)
-                    result.push_back(vt_prop.boolVal);
-                else if constexpr (std::is_same_v< typename T::value_type, unsigned > || std::is_same_v< typename T::value_type, uint32_t >)
-                    result.push_back(static_cast< typename T::result_type >(vt_prop.uintVal));
-                else if constexpr (std::is_same_v< typename T::value_type, unsigned short > ||
-                                   std::is_same_v< typename T::value_type, uint16_t >)
-                    result.push_back(static_cast< typename T::result_type >(vt_prop.uiVal));
-                else if constexpr (std::is_same_v< typename T::value_type, long long > || std::is_same_v< typename T::value_type, int64_t >)
-                    result.push_back(static_cast< typename T::result_type >(vt_prop.llVal));
-                else if constexpr (std::is_same_v< typename T::value_type, unsigned long long > ||
-                                   std::is_same_v< typename T::value_type, uint64_t >)
-                    result.push_back(static_cast< typename T::result_type >(vt_prop.ullVal));
-                else if constexpr (std::is_same_v< typename T::value_type, std::string >)
-                    result.push_back(utils::wstring_to_std_string(vt_prop.bstrVal));
-                else
-                    std::invoke([]< bool flag = false >() { static_assert(flag, "unsupported type"); });
+                result.push_back(getVariantValue< T >(vt_prop));
 
                 VariantClear(&vt_prop);
                 obj->Release();
