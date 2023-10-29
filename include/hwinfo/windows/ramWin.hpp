@@ -114,7 +114,10 @@ namespace hwinfo
 
             static int64_t getFreeMemory()
             {
-                auto result = wmiInterface.query< std::string >("CIM_OperatingSystem", "FreePhysicalMemory");
+                // auto result = wmiInterface.query< std::string >("CIM_OperatingSystem", "FreePhysicalMemory");
+
+                using namespace WMI;
+                auto result = wmiInterface.queryValue< OSInfo::FREEMEMORY >();
                 if (result.empty()) return -1;
                 return std::stoll(result.front()) * 1024;
             }
