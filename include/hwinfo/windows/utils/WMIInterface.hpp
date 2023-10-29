@@ -5,6 +5,7 @@
 #include "../../base/batteryBase.hpp"
 #include "WMIBatteryInfo.hpp"
 #include "WMICpuInfo.hpp"
+#include "WMIPerfInfo.hpp"
 
 #include <algorithm>
 #include <memory>

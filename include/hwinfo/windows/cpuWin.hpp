@@ -55,12 +55,12 @@ namespace hwinfo
             [[nodiscard]]
             int64_t getCurrentClockSpeed(int thread_id) const
             {
-                auto data = wmiInterface.query< std::string >("Win32_PerfFormattedData_Counters_ProcessorInformation",
-                                                              "PercentProcessorPerformance");
-                if (data.empty()) return -1;
+                using namespace WMI;
+                auto info = wmiInterface.queryValue< PerfInfo::PROCESSORPERFORMANCE >();
 
-                double performance = std::stod(data[thread_id]) / 100;
-                return static_cast< int64_t >(static_cast< double >(m_maxClockSpeed) * performance);
+                if (info.empty()) return -1;
+                else
+                    return static_cast< int64_t >(static_cast< double >(m_maxClockSpeed) * std::stod(info[thread_id]) / 100.0);
             }
 
             [[nodiscard]]
@@ -68,16 +68,15 @@ namespace hwinfo
             {
                 std::vector< int64_t > result;
                 result.reserve(m_numLogicalCores);
-                auto data = wmiInterface.query< std::string >("Win32_PerfFormattedData_Counters_ProcessorInformation",
-                                                              "PercentProcessorPerformance");
-                if (data.empty()) {
-                    result.resize(m_numLogicalCores, -1);
-                    return result;
-                }
-                for (auto& v : data) {
-                    double performance = std::stod(v) / 100;
-                    result.push_back(static_cast< int64_t >(static_cast< double >(m_maxClockSpeed) * performance));
-                }
+
+                using namespace WMI;
+                auto info = wmiInterface.queryValue< PerfInfo::PROCESSORPERFORMANCE >();
+
+                if (info.empty()) result.resize(m_numLogicalCores, -1);
+                else
+                    for (auto& v : info)
+                        result.push_back(static_cast< int64_t >(static_cast< double >(m_maxClockSpeed) * std::stod(v) / 100.0));
+
                 return result;
             }
 
@@ -109,24 +108,12 @@ namespace hwinfo
             [[nodiscard]]
             double getThreadUtilisation(int thread_id) const
             {
-                //                auto data =
-                //                    utils::WMI::query< std::string >(L"Win32_PerfFormattedData_Counters_ProcessorInformation",
-                //                    L"PercentProcessorUtility");
-                //                if (data.empty()) {
-                //                    return -1.f;
-                //                }
-                //                std::string thread_value = data[thread_id];
-                //                if (thread_value.empty()) {
-                //                    return -1.f;
-                //                }
-                //                return std::stod(thread_value);
+                using namespace WMI;
+                auto info = wmiInterface.queryValue< PerfInfo::PROCESSORUTILITY >();
 
-                auto data =
-                    wmiInterface.query< std::string >("Win32_PerfFormattedData_Counters_ProcessorInformation", "PercentProcessorUtility");
-
-                if (data.empty()) return -1.f;
+                if (info.empty()) return -1.f;
                 else
-                    return std::stod(data[thread_id]);    // / 100.f;
+                    return std::stod(info[thread_id]) / 100.f;
             }
 
             [[nodiscard]]
@@ -135,17 +122,13 @@ namespace hwinfo
                 std::vector< double > thread_utility;
                 thread_utility.reserve(m_numLogicalCores);
 
-                auto data =
-                    wmiInterface.query< std::string >("Win32_PerfFormattedData_Counters_ProcessorInformation", "PercentProcessorUtility");
-                if (data.empty()) {
-                    thread_utility.resize(m_numLogicalCores, -1.f);
-                    return thread_utility;
-                }
-                for (const auto& v : data) {
-                    if (v.empty()) thread_utility.push_back(-1.f);
-                    else
-                        thread_utility.push_back(std::stod(v) / 100.f);
-                }
+                using namespace WMI;
+                auto info = wmiInterface.queryValue< PerfInfo::PROCESSORUTILITY >();
+
+                if (info.empty()) thread_utility.resize(m_numLogicalCores, -1.f);
+                else
+                    for (const auto& cpu : info) thread_utility.push_back(std::stod(cpu) / 100.f);
+
                 return thread_utility;
             }
 
