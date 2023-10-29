@@ -97,59 +97,6 @@ namespace hwinfo::WMI
                                                   &m_enumerator));
         }
 
-        template< typename T, typename = std::enable_if_t< std::is_integral< T >::value || std::is_same< T, std::string >::value > >
-        std::vector< T > query(const std::string& cls, const std::string& fields, const std::string& filter = "")
-        {
-            std::wstring wmi_class  = utils::NarrowStringToWideString(cls);
-            std::wstring field      = utils::NarrowStringToWideString(fields);
-            std::wstring wmi_filter = utils::NarrowStringToWideString(filter);
-
-            std::vector< T > result;
-
-            std::wstring filter_string;
-            if (!wmi_filter.empty()) {
-                filter_string.append(L" WHERE " + wmi_filter);
-            }
-            std::wstring query_string(L"SELECT " + field + L" FROM " + wmi_class + filter_string);
-            bool         success = execute_query(query_string);
-            if (!success) {
-                return {};
-            }
-
-            ULONG             u_return = 0;
-            IWbemClassObject* obj      = nullptr;
-            while (m_enumerator) {
-                m_enumerator->Next(WBEM_INFINITE, 1, &obj, &u_return);
-                if (!u_return) {
-                    break;
-                }
-                VARIANT vt_prop;
-                obj->Get(field.c_str(), 0, &vt_prop, nullptr, nullptr);
-
-                if constexpr (std::is_same_v< T, long >) result.push_back(vt_prop.intVal);
-                else if constexpr (std::is_same_v< T, int > || std::is_same_v< T, int32_t >)
-                    result.push_back(static_cast< int >(vt_prop.intVal));
-                else if constexpr (std::is_same_v< T, bool >)
-                    result.push_back(vt_prop.boolVal);
-                else if constexpr (std::is_same_v< T, unsigned > || std::is_same_v< T, uint32_t >)
-                    result.push_back(vt_prop.uintVal);
-                else if constexpr (std::is_same_v< T, unsigned short > || std::is_same_v< T, uint16_t >)
-                    result.push_back(vt_prop.uiVal);
-                else if constexpr (std::is_same_v< T, long long > || std::is_same_v< T, int64_t >)
-                    result.push_back(vt_prop.llVal);
-                else if constexpr (std::is_same_v< T, unsigned long long > || std::is_same_v< T, uint64_t >)
-                    result.push_back(vt_prop.ullVal);
-                else if constexpr (std::is_same_v< T, std::string >)
-                    result.push_back(utils::wstring_to_std_string(vt_prop.bstrVal));
-                else
-                    std::invoke([]< bool flag = false >() { static_assert(flag, "unsupported type"); });
-
-                VariantClear(&vt_prop);
-                obj->Release();
-            }
-            return result;
-        }
-
         template< typename T >
         std::vector< typename T::result_type > queryValue()
         {
