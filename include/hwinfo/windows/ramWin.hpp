@@ -68,56 +68,56 @@ namespace hwinfo
             static std::string getVendor()
             {
                 using namespace WMI;
-                auto result = wmiInterface.queryValue< RamInfo::MANUFACTURER >();
+                auto result = wmiInterface.query< RamInfo::MANUFACTURER >();
                 if (result.empty()) return "<unknown>";
 
-                return result.front();
+                return std::get< 0 >(result.front());
             }
 
             static std::string getName()
             {
                 using namespace WMI;
-                auto result = wmiInterface.queryValue< RamInfo::NAME >();
+                auto result = wmiInterface.query< RamInfo::NAME >();
                 if (result.empty()) return "<unknown>";
 
-                return result.front();
+                return std::get< 0 >(result.front());
             }
 
             static std::string getModel()
             {
                 using namespace WMI;
-                auto result = wmiInterface.queryValue< RamInfo::PARTNUMBER >();
+                auto result = wmiInterface.query< RamInfo::PARTNUMBER >();
                 if (result.empty()) return "<unknown>";
 
-                return result.front();
+                return std::get< 0 >(result.front());
             }
 
             static std::string getSerialNumber()
             {
                 using namespace WMI;
-                auto result = wmiInterface.queryValue< RamInfo::SERIALNUMBER >();
+                auto result = wmiInterface.query< RamInfo::SERIALNUMBER >();
                 if (result.empty()) return "<unknown>";
 
-                return result.front();
+                return std::get< 0 >(result.front());
             }
 
             static uint64_t getTotalSize_Bytes()
             {
                 using namespace WMI;
-                auto result = wmiInterface.queryValue< RamInfo::CAPACITY >();
+                auto result = wmiInterface.query< RamInfo::CAPACITY >();
                 if (result.empty()) return -1;
 
-                return std::accumulate(result.begin(), result.end(), uint64_t(0), [](uint64_t sum, const std::string& val) {
-                    return sum + std::stoll(val);
+                return std::accumulate(result.begin(), result.end(), uint64_t(0), [](uint64_t sum, const auto& val) {
+                    return sum + std::stoll(std::get< 0 >(val));
                 });
             }
 
             static int64_t getFreeMemory()
             {
                 using namespace WMI;
-                auto result = wmiInterface.queryValue< OSInfo::FREEMEMORY >();
+                auto result = wmiInterface.query< OSInfo::FREEMEMORY >();
                 if (result.empty()) return -1;
-                return std::stoll(result.front()) * 1024;
+                return std::stoll(std::get< 0 >(result.front())) * 1024;
             }
 
             static WMI::WMIInterface wmiInterface;

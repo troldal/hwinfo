@@ -117,34 +117,6 @@ namespace hwinfo::WMI
                 std::invoke([]< bool flag = false >() { static_assert(flag, "unsupported type"); });
         }
 
-        template< typename T >
-        std::vector< typename T::result_type > queryValue()
-        {
-            std::wstring wmi_class = T::wmi_class;
-            std::wstring wmi_field = T::wmi_field;
-
-            std::vector< typename T::result_type > result;
-
-            std::wstring query_string(L"SELECT " + wmi_field + L" FROM " + wmi_class);
-            if (!execute_query(query_string)) return {};
-
-            ULONG             u_return = 0;
-            IWbemClassObject* obj      = nullptr;
-            while (m_enumerator) {
-                m_enumerator->Next(WBEM_INFINITE, 1, &obj, &u_return);
-                if (!u_return) break;
-
-                VARIANT vt_prop;
-                obj->Get(wmi_field.c_str(), 0, &vt_prop, nullptr, nullptr);
-
-                result.push_back(getVariantValue< T >(vt_prop));
-
-                VariantClear(&vt_prop);
-                obj->Release();
-            }
-            return result;
-        }
-
         /**
          * @brief A metafunction to create a tuple type where each element is a vector of the associated type's `result_type`.
          *
@@ -190,16 +162,42 @@ namespace hwinfo::WMI
          *       the behavior is undefined.
          */
         template< typename... Types >
-        auto queryRecord()
+        auto query()
         {
             // ResultTuple is a tuple of vectors, where each vector's type is T::result_type for each type T in Types...
             ResultTuple< Types... > myTuple;
+
+            auto queryValue = [&]< typename T >(T t) -> std::vector< typename T::result_type > {
+                std::wstring wmi_class = T::wmi_class;
+                std::wstring wmi_field = T::wmi_field;
+
+                std::vector< typename T::result_type > result;
+
+                std::wstring query_string(L"SELECT " + wmi_field + L" FROM " + wmi_class);
+                if (!execute_query(query_string)) return {};
+
+                ULONG             u_return = 0;
+                IWbemClassObject* obj      = nullptr;
+                while (m_enumerator) {
+                    m_enumerator->Next(WBEM_INFINITE, 1, &obj, &u_return);
+                    if (!u_return) break;
+
+                    VARIANT vt_prop;
+                    obj->Get(wmi_field.c_str(), 0, &vt_prop, nullptr, nullptr);
+
+                    result.push_back(getVariantValue< T >(vt_prop));
+
+                    VariantClear(&vt_prop);
+                    obj->Release();
+                }
+                return result;
+            };
 
             // Lambda function to populate each vector in the tuple.
             // It takes an index_sequence as a template parameter,
             // which generates a compile-time sequence of indices.
             auto populateTuple = [&]< std::size_t... Is >(std::index_sequence< Is... >) {
-                ((std::get< Is >(myTuple) = queryValue< Types >()), ...);
+                ((std::get< Is >(myTuple) = queryValue(Types {})), ...);
             };
 
             // Call the lambda function with an index sequence generated for Types...

@@ -58,11 +58,12 @@ namespace hwinfo
             int64_t getCurrentClockSpeed(int thread_id) const
             {
                 using namespace WMI;
-                auto info = wmiInterface.queryValue< PerfInfo::PROCESSORPERFORMANCE >();
+                auto info = wmiInterface.query< PerfInfo::PROCESSORPERFORMANCE >();
 
                 if (info.empty()) return -1;
                 else
-                    return static_cast< int64_t >(static_cast< double >(m_maxClockSpeed) * std::stod(info[thread_id]) / 100.0);
+                    return static_cast< int64_t >(static_cast< double >(m_maxClockSpeed) * std::stod(std::get< 0 >(info[thread_id])) /
+                                                  100.0);
             }
 
             [[nodiscard]]
@@ -72,12 +73,13 @@ namespace hwinfo
                 result.reserve(m_numLogicalCores);
 
                 using namespace WMI;
-                auto info = wmiInterface.queryValue< PerfInfo::PROCESSORPERFORMANCE >();
+                auto info = wmiInterface.query< PerfInfo::PROCESSORPERFORMANCE >();
 
                 if (info.empty()) result.assign(m_numLogicalCores, -1);
                 else
                     for (auto& v : info)
-                        result.push_back(static_cast< int64_t >(static_cast< double >(m_maxClockSpeed) * std::stod(v) / 100.0));
+                        result.push_back(
+                            static_cast< int64_t >(static_cast< double >(m_maxClockSpeed) * std::stod(std::get< 0 >(v)) / 100.0));
 
                 return result;
             }
@@ -95,11 +97,11 @@ namespace hwinfo
             double getThreadUtilisation(int thread_id) const    // NOLINT
             {
                 using namespace WMI;
-                auto info = wmiInterface.queryValue< PerfInfo::PROCESSORUTILITY >();
+                auto info = wmiInterface.query< PerfInfo::PROCESSORUTILITY >();
 
                 if (info.empty()) return -1.f;
                 else
-                    return std::stod(info[thread_id]) / 100.f;
+                    return std::stod(std::get< 0 >(info[thread_id])) / 100.f;
             }
 
             [[nodiscard]]
@@ -109,11 +111,11 @@ namespace hwinfo
                 thread_utility.reserve(m_numLogicalCores);
 
                 using namespace WMI;
-                auto info = wmiInterface.queryValue< PerfInfo::PROCESSORUTILITY >();
+                auto info = wmiInterface.query< PerfInfo::PROCESSORUTILITY >();
 
                 if (info.empty()) thread_utility.assign(m_numLogicalCores, -1.0);
                 else
-                    for (const auto& cpu : info) thread_utility.push_back(std::stod(cpu) / 100.f);
+                    for (const auto& cpu : info) thread_utility.push_back(std::stod(std::get< 0 >(cpu)) / 100.f);
 
                 return thread_utility;
             }
@@ -124,13 +126,13 @@ namespace hwinfo
                 std::vector< CPUWin > cpus;
 
                 using namespace WMI;
-                auto info = wmiInterface.queryRecord< CpuInfo::NAME,
-                                                      CpuInfo::MANUFACTURER,
-                                                      CpuInfo::PHYSICALCORES,
-                                                      CpuInfo::LOGICALCORES,
-                                                      CpuInfo::CLOCKSPEED,
-                                                      CpuInfo::L2CACHESIZE,
-                                                      CpuInfo::L3CACHESIZE >();
+                auto info = wmiInterface.query< CpuInfo::NAME,
+                                                CpuInfo::MANUFACTURER,
+                                                CpuInfo::PHYSICALCORES,
+                                                CpuInfo::LOGICALCORES,
+                                                CpuInfo::CLOCKSPEED,
+                                                CpuInfo::L2CACHESIZE,
+                                                CpuInfo::L3CACHESIZE >();
 
                 for (const auto& cpu : info) {
                     cpus.emplace_back();

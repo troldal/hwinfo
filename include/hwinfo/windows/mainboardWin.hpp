@@ -62,40 +62,40 @@ namespace hwinfo
             static std::string getVendor()
             {
                 using namespace WMI;
-                auto result = wmiInterface.queryValue< BoardInfo::MANUFACTURER >();
+                auto result = wmiInterface.query< BoardInfo::MANUFACTURER >();
                 if (result.empty()) return "<unknown>";
 
-                return result.front();
+                return std::get< 0 >(result.front());
             }
 
             [[nodiscard]]
             static std::string getName()
             {
                 using namespace WMI;
-                auto result = wmiInterface.queryValue< BoardInfo::PRODUCT >();
+                auto result = wmiInterface.query< BoardInfo::PRODUCT >();
                 if (result.empty()) return "<unknown>";
 
-                return result.front();
+                return std::get< 0 >(result.front());
             }
 
             [[nodiscard]]
             static std::string getVersion()
             {
                 using namespace WMI;
-                auto result = wmiInterface.queryValue< BoardInfo::VERSION >();
+                auto result = wmiInterface.query< BoardInfo::VERSION >();
                 if (result.empty()) return "<unknown>";
 
-                return result.front();
+                return std::get< 0 >(result.front());
             }
 
             [[nodiscard]]
             static std::string getSerialNumber()
             {
                 using namespace WMI;
-                auto result = wmiInterface.queryValue< BoardInfo::SERIALNUMBER >();
+                auto result = wmiInterface.query< BoardInfo::SERIALNUMBER >();
                 if (result.empty()) return "<unknown>";
 
-                return result.front();
+                return std::get< 0 >(result.front());
             }
 
             static WMI::WMIInterface wmiInterface;

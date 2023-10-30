@@ -63,7 +63,7 @@ namespace hwinfo
                 std::vector< GPUWin > gpus;
 
                 using namespace WMI;
-                auto info = wmiInterface.queryRecord< GpuInfo::NAME, GpuInfo::ADAPTERCOMPAT, GpuInfo::DRIVERVER, GpuInfo::ADAPTERRAM >();
+                auto info = wmiInterface.query< GpuInfo::NAME, GpuInfo::ADAPTERCOMPAT, GpuInfo::DRIVERVER, GpuInfo::ADAPTERRAM >();
 
                 if (info.empty()) return {};
 

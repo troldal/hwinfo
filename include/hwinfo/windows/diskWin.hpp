@@ -58,7 +58,7 @@ namespace hwinfo
                 std::vector< DiskWin > disks;
 
                 using namespace WMI;
-                auto info = wmiInterface.queryRecord< DiskInfo::MODEL, DiskInfo::MANUFACTURER, DiskInfo::SERIALNUMBER, DiskInfo::SIZE >();
+                auto info = wmiInterface.query< DiskInfo::MODEL, DiskInfo::MANUFACTURER, DiskInfo::SERIALNUMBER, DiskInfo::SIZE >();
 
                 for (const auto& disk : info) {
                     disks.emplace_back();

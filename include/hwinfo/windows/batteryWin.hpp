@@ -111,10 +111,10 @@ namespace hwinfo
             uint32_t getCapacity() const    // NOLINT
             {
                 using namespace WMI;
-                auto res = wmiInterface.queryValue< BatteryInfo::CAPACITY >();
+                auto res = wmiInterface.query< BatteryInfo::CAPACITY >();
                 if (res.empty()) return {};
 
-                return res.front();
+                return std::get< 0 >(res.front());
             }
 
             /**
@@ -130,10 +130,10 @@ namespace hwinfo
             std::string getStatus() const    // NOLINT
             {
                 using namespace WMI;
-                auto res = wmiInterface.queryValue< BatteryInfo::STATUS >();
+                auto res = wmiInterface.query< BatteryInfo::STATUS >();
                 if (res.empty()) return {};
 
-                return to_string(res.front());
+                return to_string(std::get< 0 >(res.front()));
             }
 
             /**
@@ -148,7 +148,7 @@ namespace hwinfo
                 std::vector< BatteryWin > batteries;
 
                 using namespace WMI;
-                auto info = wmiInterface.queryRecord< BatteryInfo::NAME, BatteryInfo::CHEMISTRY, BatteryInfo::HEALTH >();
+                auto info = wmiInterface.query< BatteryInfo::NAME, BatteryInfo::CHEMISTRY, BatteryInfo::HEALTH >();
 
                 for (const auto& batt : info) {
                     batteries.emplace_back();
