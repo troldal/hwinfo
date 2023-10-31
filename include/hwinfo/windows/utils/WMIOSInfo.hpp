@@ -10,14 +10,14 @@
 namespace hwinfo::WMI
 {
     /**
-     * @struct CpuInfo
-     * @brief Represents battery information obtained from WMI.
+     * @struct OSInfo
+     * @brief Represents operating system information obtained from WMI.
      */
     struct OSInfo
     {
         /**
          * @struct FREEMEMORY
-         * @brief
+         * @brief Encapsulates the FreePhysicalMemory property of CIM_OperatingSystem.
          */
         struct FREEMEMORY
         {
@@ -25,7 +25,7 @@ namespace hwinfo::WMI
             using result_type = std::string;    ///< Resultant type after conversion.
 
             static const inline std::wstring wmi_class = L"CIM_OperatingSystem";    ///< WMI class name.
-            static const inline std::wstring wmi_field = L"FreePhysicalMemory";     ///< WMI field for the battery name.
+            static const inline std::wstring wmi_field = L"FreePhysicalMemory";     ///< WMI field for the free physical memory.
         };
     };
 }    // namespace hwinfo::WMI

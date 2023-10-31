@@ -10,14 +10,14 @@
 namespace hwinfo::WMI
 {
     /**
-     * @struct CpuInfo
-     * @brief Represents battery information obtained from WMI.
+     * @struct BoardInfo
+     * @brief Represents baseboard (motherboard) information obtained from WMI.
      */
     struct BoardInfo
     {
         /**
          * @struct MANUFACTURER
-         * @brief
+         * @brief Encapsulates the Manufacturer property of Win32_BaseBoard.
          */
         struct MANUFACTURER
         {
@@ -25,12 +25,12 @@ namespace hwinfo::WMI
             using result_type = std::string;    ///< Resultant type after conversion.
 
             static const inline std::wstring wmi_class = L"Win32_BaseBoard";    ///< WMI class name.
-            static const inline std::wstring wmi_field = L"Manufacturer";       ///< WMI field for the battery name.
+            static const inline std::wstring wmi_field = L"Manufacturer";       ///< WMI field for the manufacturer of the baseboard.
         };
 
         /**
          * @struct PRODUCT
-         * @brief
+         * @brief Encapsulates the Product property of Win32_BaseBoard.
          */
         struct PRODUCT
         {
@@ -38,12 +38,12 @@ namespace hwinfo::WMI
             using result_type = std::string;    ///< Resultant type after conversion.
 
             static const inline std::wstring wmi_class = L"Win32_BaseBoard";    ///< WMI class name.
-            static const inline std::wstring wmi_field = L"Product";            ///< WMI field for the battery name.
+            static const inline std::wstring wmi_field = L"Product";            ///< WMI field for the product name of the baseboard.
         };
 
         /**
          * @struct VERSION
-         * @brief
+         * @brief Encapsulates the Version property of Win32_BaseBoard.
          */
         struct VERSION
         {
@@ -51,12 +51,12 @@ namespace hwinfo::WMI
             using result_type = std::string;    ///< Resultant type after conversion.
 
             static const inline std::wstring wmi_class = L"Win32_BaseBoard";    ///< WMI class name.
-            static const inline std::wstring wmi_field = L"Version";            ///< WMI field for the battery name.
+            static const inline std::wstring wmi_field = L"Version";            ///< WMI field for the version of the baseboard.
         };
 
         /**
          * @struct SERIALNUMBER
-         * @brief
+         * @brief Encapsulates the SerialNumber property of Win32_BaseBoard.
          */
         struct SERIALNUMBER
         {
@@ -64,7 +64,7 @@ namespace hwinfo::WMI
             using result_type = std::string;    ///< Resultant type after conversion.
 
             static const inline std::wstring wmi_class = L"Win32_BaseBoard";    ///< WMI class name.
-            static const inline std::wstring wmi_field = L"SerialNumber";       ///< WMI field for the battery name.
+            static const inline std::wstring wmi_field = L"SerialNumber";       ///< WMI field for the serial number of the baseboard.
         };
     };
 }    // namespace hwinfo::WMI

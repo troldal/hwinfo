@@ -10,14 +10,14 @@
 namespace hwinfo::WMI
 {
     /**
-     * @struct CpuInfo
-     * @brief Represents battery information obtained from WMI.
+     * @struct RamInfo
+     * @brief Represents RAM (Random Access Memory) information obtained from WMI.
      */
     struct RamInfo
     {
         /**
          * @struct NAME
-         * @brief
+         * @brief Encapsulates the Name property of Win32_PhysicalMemory.
          */
         struct NAME
         {
@@ -25,12 +25,12 @@ namespace hwinfo::WMI
             using result_type = std::string;    ///< Resultant type after conversion.
 
             static const inline std::wstring wmi_class = L"Win32_PhysicalMemory";    ///< WMI class name.
-            static const inline std::wstring wmi_field = L"Name";                    ///< WMI field for the battery name.
+            static const inline std::wstring wmi_field = L"Name";                    ///< WMI field for the name of the RAM module.
         };
 
         /**
          * @struct MANUFACTURER
-         * @brief
+         * @brief Encapsulates the Manufacturer property of Win32_PhysicalMemory.
          */
         struct MANUFACTURER
         {
@@ -38,12 +38,12 @@ namespace hwinfo::WMI
             using result_type = std::string;    ///< Resultant type after conversion.
 
             static const inline std::wstring wmi_class = L"Win32_PhysicalMemory";    ///< WMI class name.
-            static const inline std::wstring wmi_field = L"Manufacturer";            ///< WMI field for the battery name.
+            static const inline std::wstring wmi_field = L"Manufacturer";            ///< WMI field for the manufacturer of the RAM module.
         };
 
         /**
          * @struct PARTNUMBER
-         * @brief
+         * @brief Encapsulates the PartNumber property of Win32_PhysicalMemory.
          */
         struct PARTNUMBER
         {
@@ -51,12 +51,12 @@ namespace hwinfo::WMI
             using result_type = std::string;    ///< Resultant type after conversion.
 
             static const inline std::wstring wmi_class = L"Win32_PhysicalMemory";    ///< WMI class name.
-            static const inline std::wstring wmi_field = L"PartNumber";              ///< WMI field for the battery name.
+            static const inline std::wstring wmi_field = L"PartNumber";              ///< WMI field for the part number of the RAM module.
         };
 
         /**
          * @struct SERIALNUMBER
-         * @brief
+         * @brief Encapsulates the SerialNumber property of Win32_PhysicalMemory.
          */
         struct SERIALNUMBER
         {
@@ -64,20 +64,20 @@ namespace hwinfo::WMI
             using result_type = std::string;    ///< Resultant type after conversion.
 
             static const inline std::wstring wmi_class = L"Win32_PhysicalMemory";    ///< WMI class name.
-            static const inline std::wstring wmi_field = L"SerialNumber";            ///< WMI field for the battery name.
+            static const inline std::wstring wmi_field = L"SerialNumber";            ///< WMI field for the serial number of the RAM module.
         };
 
         /**
          * @struct CAPACITY
-         * @brief
+         * @brief Encapsulates the Capacity property of Win32_PhysicalMemory.
          */
         struct CAPACITY
         {
-            using value_type  = std::string;    ///< Type of the value being used.
-            using result_type = std::string;    ///< Resultant type after conversion.
+            using value_type  = std::string;    ///< Type of the value being used. Consider using a numeric type for memory size.
+            using result_type = std::string;    ///< Resultant type after conversion. Consider using a numeric type for memory size.
 
             static const inline std::wstring wmi_class = L"Win32_PhysicalMemory";    ///< WMI class name.
-            static const inline std::wstring wmi_field = L"Capacity";                ///< WMI field for the battery name.
+            static const inline std::wstring wmi_field = L"Capacity";                ///< WMI field for the capacity of the RAM module.
         };
     };
 }    // namespace hwinfo::WMI

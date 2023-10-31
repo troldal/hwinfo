@@ -11,13 +11,13 @@ namespace hwinfo::WMI
 {
     /**
      * @struct CpuInfo
-     * @brief Represents battery information obtained from WMI.
+     * @brief Represents CPU (Central Processing Unit) information obtained from WMI.
      */
     struct CpuInfo
     {
         /**
          * @struct NAME
-         * @brief
+         * @brief Encapsulates the Name property of Win32_Processor.
          */
         struct NAME
         {
@@ -25,12 +25,12 @@ namespace hwinfo::WMI
             using result_type = std::string;    ///< Resultant type after conversion.
 
             static const inline std::wstring wmi_class = L"Win32_Processor";    ///< WMI class name.
-            static const inline std::wstring wmi_field = L"Name";               ///< WMI field for the battery name.
+            static const inline std::wstring wmi_field = L"Name";               ///< WMI field for the CPU name.
         };
 
         /**
          * @struct MANUFACTURER
-         * @brief
+         * @brief Encapsulates the Manufacturer property of Win32_Processor.
          */
         struct MANUFACTURER
         {
@@ -38,12 +38,12 @@ namespace hwinfo::WMI
             using result_type = std::string;    ///< Resultant type after conversion.
 
             static const inline std::wstring wmi_class = L"Win32_Processor";    ///< WMI class name.
-            static const inline std::wstring wmi_field = L"Manufacturer";       ///< WMI field for the battery description.
+            static const inline std::wstring wmi_field = L"Manufacturer";       ///< WMI field for the CPU manufacturer.
         };
 
         /**
          * @struct PHYSICALCORES
-         * @brief
+         * @brief Encapsulates the NumberOfCores property of Win32_Processor.
          */
         struct PHYSICALCORES
         {
@@ -51,12 +51,12 @@ namespace hwinfo::WMI
             using result_type = uint32_t;    ///< Resultant type after conversion.
 
             static const inline std::wstring wmi_class = L"Win32_Processor";    ///< WMI class name.
-            static const inline std::wstring wmi_field = L"NumberOfCores";      ///< WMI field for the battery chemistry.
+            static const inline std::wstring wmi_field = L"NumberOfCores";      ///< WMI field for the number of physical cores.
         };
 
         /**
          * @struct LOGICALCORES
-         * @brief
+         * @brief Encapsulates the NumberOfLogicalProcessors property of Win32_Processor.
          */
         struct LOGICALCORES
         {
@@ -64,12 +64,12 @@ namespace hwinfo::WMI
             using result_type = uint32_t;    ///< Resultant type after conversion.
 
             static const inline std::wstring wmi_class = L"Win32_Processor";              ///< WMI class name.
-            static const inline std::wstring wmi_field = L"NumberOfLogicalProcessors";    ///< WMI field for the battery chemistry.
+            static const inline std::wstring wmi_field = L"NumberOfLogicalProcessors";    ///< WMI field for the number of logical cores.
         };
 
         /**
          * @struct CLOCKSPEED
-         * @brief
+         * @brief Encapsulates the MaxClockSpeed property of Win32_Processor.
          */
         struct CLOCKSPEED
         {
@@ -77,12 +77,12 @@ namespace hwinfo::WMI
             using result_type = uint32_t;    ///< Resultant type after conversion.
 
             static const inline std::wstring wmi_class = L"Win32_Processor";    ///< WMI class name.
-            static const inline std::wstring wmi_field = L"MaxClockSpeed";      ///< WMI field for the battery status.
+            static const inline std::wstring wmi_field = L"MaxClockSpeed";      ///< WMI field for the maximum clock speed.
         };
 
         /**
          * @struct L2CACHESIZE
-         * @brief
+         * @brief Encapsulates the L2CacheSize property of Win32_Processor.
          */
         struct L2CACHESIZE
         {
@@ -90,12 +90,12 @@ namespace hwinfo::WMI
             using result_type = uint32_t;    ///< Resultant type after conversion.
 
             static const inline std::wstring wmi_class = L"Win32_Processor";    ///< WMI class name.
-            static const inline std::wstring wmi_field = L"L2CacheSize";        ///< WMI field for the battery status.
+            static const inline std::wstring wmi_field = L"L2CacheSize";        ///< WMI field for the L2 cache size.
         };
 
         /**
          * @struct L3CACHESIZE
-         * @brief
+         * @brief Encapsulates the L3CacheSize property of Win32_Processor.
          */
         struct L3CACHESIZE
         {
@@ -103,7 +103,7 @@ namespace hwinfo::WMI
             using result_type = uint32_t;    ///< Resultant type after conversion.
 
             static const inline std::wstring wmi_class = L"Win32_Processor";    ///< WMI class name.
-            static const inline std::wstring wmi_field = L"L3CacheSize";        ///< WMI field for the battery status.
+            static const inline std::wstring wmi_field = L"L3CacheSize";        ///< WMI field for the L3 cache size.
         };
     };
 }    // namespace hwinfo::WMI

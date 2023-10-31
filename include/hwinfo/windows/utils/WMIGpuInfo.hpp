@@ -10,14 +10,14 @@
 namespace hwinfo::WMI
 {
     /**
-     * @struct CpuInfo
-     * @brief Represents battery information obtained from WMI.
+     * @struct GpuInfo
+     * @brief Represents GPU (Graphics Processing Unit) information obtained from WMI.
      */
     struct GpuInfo
     {
         /**
          * @struct NAME
-         * @brief
+         * @brief Encapsulates the Name property of WIN32_VideoController.
          */
         struct NAME
         {
@@ -25,12 +25,12 @@ namespace hwinfo::WMI
             using result_type = std::string;    ///< Resultant type after conversion.
 
             static const inline std::wstring wmi_class = L"WIN32_VideoController";    ///< WMI class name.
-            static const inline std::wstring wmi_field = L"Name";                     ///< WMI field for the battery name.
+            static const inline std::wstring wmi_field = L"Name";                     ///< WMI field for the GPU name.
         };
 
         /**
          * @struct ADAPTERCOMPAT
-         * @brief
+         * @brief Encapsulates the AdapterCompatibility property of WIN32_VideoController.
          */
         struct ADAPTERCOMPAT
         {
@@ -38,12 +38,12 @@ namespace hwinfo::WMI
             using result_type = std::string;    ///< Resultant type after conversion.
 
             static const inline std::wstring wmi_class = L"WIN32_VideoController";    ///< WMI class name.
-            static const inline std::wstring wmi_field = L"AdapterCompatibility";     ///< WMI field for the battery description.
+            static const inline std::wstring wmi_field = L"AdapterCompatibility";     ///< WMI field for the GPU adapter compatibility.
         };
 
         /**
          * @struct DRIVERVER
-         * @brief
+         * @brief Encapsulates the DriverVersion property of WIN32_VideoController.
          */
         struct DRIVERVER
         {
@@ -51,12 +51,12 @@ namespace hwinfo::WMI
             using result_type = std::string;    ///< Resultant type after conversion.
 
             static const inline std::wstring wmi_class = L"WIN32_VideoController";    ///< WMI class name.
-            static const inline std::wstring wmi_field = L"DriverVersion";            ///< WMI field for the battery chemistry.
+            static const inline std::wstring wmi_field = L"DriverVersion";            ///< WMI field for the GPU driver version.
         };
 
         /**
          * @struct ADAPTERRAM
-         * @brief
+         * @brief Encapsulates the AdapterRAM property of WIN32_VideoController.
          */
         struct ADAPTERRAM
         {
@@ -64,7 +64,7 @@ namespace hwinfo::WMI
             using result_type = uint32_t;    ///< Resultant type after conversion.
 
             static const inline std::wstring wmi_class = L"WIN32_VideoController";    ///< WMI class name.
-            static const inline std::wstring wmi_field = L"AdapterRAM";               ///< WMI field for the battery chemistry.
+            static const inline std::wstring wmi_field = L"AdapterRAM";               ///< WMI field for the size of GPU memory.
         };
     };
 }    // namespace hwinfo::WMI

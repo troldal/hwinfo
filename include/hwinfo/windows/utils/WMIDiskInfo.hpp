@@ -10,14 +10,14 @@
 namespace hwinfo::WMI
 {
     /**
-     * @struct CpuInfo
-     * @brief Represents battery information obtained from WMI.
+     * @struct DiskInfo
+     * @brief Represents disk drive information obtained from WMI.
      */
     struct DiskInfo
     {
         /**
          * @struct MODEL
-         * @brief
+         * @brief Encapsulates the Model property of Win32_DiskDrive.
          */
         struct MODEL
         {
@@ -25,12 +25,12 @@ namespace hwinfo::WMI
             using result_type = std::string;    ///< Resultant type after conversion.
 
             static const inline std::wstring wmi_class = L"Win32_DiskDrive";    ///< WMI class name.
-            static const inline std::wstring wmi_field = L"Model";              ///< WMI field for the battery name.
+            static const inline std::wstring wmi_field = L"Model";              ///< WMI field for the disk drive model.
         };
 
         /**
          * @struct MANUFACTURER
-         * @brief
+         * @brief Encapsulates the Manufacturer property of Win32_DiskDrive.
          */
         struct MANUFACTURER
         {
@@ -38,12 +38,12 @@ namespace hwinfo::WMI
             using result_type = std::string;    ///< Resultant type after conversion.
 
             static const inline std::wstring wmi_class = L"Win32_DiskDrive";    ///< WMI class name.
-            static const inline std::wstring wmi_field = L"Manufacturer";       ///< WMI field for the battery name.
+            static const inline std::wstring wmi_field = L"Manufacturer";       ///< WMI field for the disk drive manufacturer.
         };
 
         /**
          * @struct SERIALNUMBER
-         * @brief
+         * @brief Encapsulates the SerialNumber property of Win32_DiskDrive.
          */
         struct SERIALNUMBER
         {
@@ -51,12 +51,12 @@ namespace hwinfo::WMI
             using result_type = std::string;    ///< Resultant type after conversion.
 
             static const inline std::wstring wmi_class = L"Win32_DiskDrive";    ///< WMI class name.
-            static const inline std::wstring wmi_field = L"SerialNumber";       ///< WMI field for the battery name.
+            static const inline std::wstring wmi_field = L"SerialNumber";       ///< WMI field for the disk drive serial number.
         };
 
         /**
          * @struct SIZE
-         * @brief
+         * @brief Encapsulates the Size property of Win32_DiskDrive.
          */
         struct SIZE
         {
@@ -64,7 +64,7 @@ namespace hwinfo::WMI
             using result_type = std::string;    ///< Resultant type after conversion.
 
             static const inline std::wstring wmi_class = L"Win32_DiskDrive";    ///< WMI class name.
-            static const inline std::wstring wmi_field = L"Size";               ///< WMI field for the battery name.
+            static const inline std::wstring wmi_field = L"Size";               ///< WMI field for the size of the disk drive.
         };
     };
 }    // namespace hwinfo::WMI
