@@ -13,6 +13,7 @@
 #include "WMIRamInfo.hpp"
 
 #include <algorithm>
+#include <functional>
 #include <memory>
 #include <variant>
 #include <vector>
@@ -58,7 +59,8 @@ namespace hwinfo::WMI
                 (LPVOID*)&m_locator      // Address of pointer variable that receives the interface pointer requested.
             );
 
-            res &= m_locator->ConnectServer(_bstr_t("ROOT\\CIMV2"),    // The path of the namespace for the connection.
+            BSTR path = SysAllocString(L"ROOT\\CIMV2");
+            res &= m_locator->ConnectServer(path,         // The path of the namespace for the connection.
                                             nullptr,                   // The name of the user.
                                             nullptr,                   // The password of the user.
                                             nullptr,                   // The locale identifier.
@@ -67,6 +69,7 @@ namespace hwinfo::WMI
                                             nullptr,                   // The context object.
                                             &m_service                 // A pointer to a pointer to the destination IWbemServices interface.
             );
+            SysFreeString(path);
 
             res &= CoSetProxyBlanket(m_service,                      // Pointer to the object to be set
                                      RPC_C_AUTHN_WINNT,              // The authentication service to be used
@@ -90,142 +93,96 @@ namespace hwinfo::WMI
 
         bool execute_query(const std::wstring& query)
         {
-            return SUCCEEDED(m_service->ExecQuery(bstr_t(L"WQL"),
-                                                  bstr_t(std::wstring(query.begin(), query.end()).c_str()),
-                                                  WBEM_FLAG_FORWARD_ONLY | WBEM_FLAG_RETURN_IMMEDIATELY,
-                                                  nullptr,
-                                                  &m_enumerator));
-        }
+            BSTR bstr_wql = SysAllocString(L"WQL");
+            BSTR bstr_sql = SysAllocString(query.c_str());
 
-        template< typename T >
-        auto getVariantValue(const VARIANT& val)
-        {
-            if constexpr (std::is_same_v< typename T::value_type, int32_t >) return static_cast< typename T::result_type >(val.intVal);
-            else if constexpr (std::is_same_v< typename T::value_type, bool >)
-                return val.boolVal;
-            else if constexpr (std::is_same_v< typename T::value_type, uint32_t >)
-                return static_cast< typename T::result_type >(val.uintVal);
-            else if constexpr (std::is_same_v< typename T::value_type, uint16_t >)
-                return static_cast< typename T::result_type >(val.uiVal);
-            else if constexpr (std::is_same_v< typename T::value_type, int64_t >)
-                return static_cast< typename T::result_type >(val.llVal);
-            else if constexpr (std::is_same_v< typename T::value_type, uint64_t >)
-                return static_cast< typename T::result_type >(val.ullVal);
-            else if constexpr (std::is_same_v< typename T::value_type, std::string >)
-                return utils::wstring_to_std_string(val.bstrVal);
-            else
-                std::invoke([]< bool flag = false >() { static_assert(flag, "unsupported type"); });
+            auto result = SUCCEEDED(
+                m_service->ExecQuery(bstr_wql, bstr_sql, WBEM_FLAG_FORWARD_ONLY | WBEM_FLAG_RETURN_IMMEDIATELY, nullptr, &m_enumerator));
+
+            SysFreeString(bstr_wql);
+            SysFreeString(bstr_sql);
+            return result;
         }
 
         /**
-         * @brief A metafunction to create a tuple type where each element is a vector of the associated type's `result_type`.
+         * @brief Executes a WMI query and retrieves results as a vector of tuples.
          *
-         * This structure takes a variadic number of types as template parameters, and for each type, it retrieves the associated
-         * `result_type` and creates a `std::vector` of that type. All these vectors are then used to form a `std::tuple`.
+         * This function builds a WMI query string based on the provided template parameters,
+         * executes the query, and converts the results into a vector of tuples. Each template
+         * parameter should be a struct representing a WMI class field with specific attributes.
          *
-         * @tparam Types Variadic template parameters representing the types for which the `result_type` is to be extracted.
-         */
-        template< typename... Types >
-        struct MakeResultTuple
-        {
-            /**
-             * A `std::tuple` type where each element is a `std::vector` of the associated type's `result_type`.
-             */
-            using type = std::tuple< std::vector< typename Types::result_type >... >;
-        };
-
-        /**
-         * @brief A type alias for `MakeResultTuple<Types...>::type`.
-         *
-         * This type alias simplifies the usage of the `MakeResultTuple` metafunction, allowing for cleaner and more concise code.
-         *
-         * @tparam Types Variadic template parameters passed on to `MakeResultTuple`.
-         */
-        template< typename... Types >
-        using ResultTuple = typename MakeResultTuple< Types... >::type;
-
-        /**
-         * @brief Queries values for a variety of types and transforms the results into a vector of tuples.
-         *
-         * This function is designed to work with a variadic number of types. For each type in the template parameter pack,
-         * it queries a vector of values. The query is performed by calling the `queryValue<T>` function, where `T` is the
-         * type from the template parameter pack. The result of each query is expected to be a `std::vector<T::result_type>`.
-         *
-         * After querying the values, this function transforms the collected vectors into a single `std::vector` of `std::tuple`.
-         * Each tuple in the result vector corresponds to a specific index in the input vectors. The ith tuple contains the ith
-         * element from each of the input vectors.
-         *
-         * @tparam Types Variadic template parameter pack representing the types for which values are queried.
-         * @return std::vector<std::tuple<typename Types::result_type...>> A vector of tuples holding the queried values.
-         *
-         * @note It is assumed that all vectors returned from `queryValue<T>` calls have the same size. If they have different sizes,
-         *       the behavior is undefined.
+         * @tparam Types Variadic template parameters, where each type represents a WMI class field.
+         * @return QueryResult A vector of tuples containing the results of the WMI query.
          */
         template< typename... Types >
         auto query()
         {
-            // ResultTuple is a tuple of vectors, where each vector's type is T::result_type for each type T in Types...
-            ResultTuple< Types... > myTuple;
-
-            auto queryValue = [&]< typename T >(T t) -> std::vector< typename T::result_type > {
-                std::wstring wmi_class = T::wmi_class;
-                std::wstring wmi_field = T::wmi_field;
-
-                std::vector< typename T::result_type > result;
-
-                std::wstring query_string(L"SELECT " + wmi_field + L" FROM " + wmi_class);
-                if (!execute_query(query_string)) return {};
-
-                ULONG             u_return = 0;
-                IWbemClassObject* obj      = nullptr;
-                while (m_enumerator) {
-                    m_enumerator->Next(WBEM_INFINITE, 1, &obj, &u_return);
-                    if (!u_return) break;
-
-                    VARIANT vt_prop;
-                    obj->Get(wmi_field.c_str(), 0, &vt_prop, nullptr, nullptr);
-
-                    result.push_back(getVariantValue< T >(vt_prop));
-
-                    VariantClear(&vt_prop);
-                    obj->Release();
-                }
-                return result;
-            };
-
-            // Lambda function to populate each vector in the tuple.
-            // It takes an index_sequence as a template parameter,
-            // which generates a compile-time sequence of indices.
-            auto populateTuple = [&]< std::size_t... Is >(std::index_sequence< Is... >) {
-                ((std::get< Is >(myTuple) = queryValue(Types {})), ...);
-            };
-
-            // Call the lambda function with an index sequence generated for Types...
-            populateTuple(std::index_sequence_for< Types... > {});
-
-            // Assume all vectors in the tuple have the same size.
-            const size_t size = std::get< 0 >(myTuple).size();    // Assuming all vectors have the same size
-
             // Define the type of the resulting vector of tuples.
-            using ResultVector = std::vector< std::tuple< typename Types::result_type... > >;
-            ResultVector result;
-            result.reserve(size);
+            using QueryResult = std::vector< std::tuple< typename Types::result_type... > >;
+            QueryResult queryResults;
 
-            // Convert the tuple of vectors to a vector of tuples.
-            for (size_t i = 0; i < size; ++i) {
-                // Lambda function to emplace a tuple into the result vector.
-                // The tuple is constructed using the ith element from each vector in the tuple.
-                auto emplaceTupleElement = [&]< std::size_t... Is >(std::index_sequence< Is... >) {
-                    // For each index in Is, get the ith element from the corresponding
-                    // vector in the tuple and emplace_back a tuple into the result vector.
-                    result.emplace_back(std::get< Is >(myTuple)[i]...);
-                };
+            // Lambda to build the WMI query string.
+            auto buildQueryString = [&]() -> std::wstring {
+                std::wstring queryString = L"SELECT ";
+                (..., (queryString += Types::wmi_field + L", "));
+                queryString.pop_back();    // Remove trailing comma and space
+                queryString.pop_back();
+                queryString += L" FROM " + std::tuple_element_t< 0, std::tuple< Types... > >::wmi_class;
+                return queryString;
+            };
 
-                // Call the lambda function with an index sequence generated for Types...
-                emplaceTupleElement(std::index_sequence_for< Types... > {});
+            // Lambda to convert a VARIANT to the specific result type.
+            auto convertVariant = []< typename T >(const VARIANT& val, T type) {
+                if constexpr (std::is_same_v< typename T::value_type, int32_t >) return static_cast< typename T::result_type >(val.intVal);
+                else if constexpr (std::is_same_v< typename T::value_type, bool >)
+                    return val.boolVal;
+                else if constexpr (std::is_same_v< typename T::value_type, uint32_t >)
+                    return static_cast< typename T::result_type >(val.uintVal);
+                else if constexpr (std::is_same_v< typename T::value_type, uint16_t >)
+                    return static_cast< typename T::result_type >(val.uiVal);
+                else if constexpr (std::is_same_v< typename T::value_type, int64_t >)
+                    return static_cast< typename T::result_type >(val.llVal);
+                else if constexpr (std::is_same_v< typename T::value_type, uint64_t >)
+                    return static_cast< typename T::result_type >(val.ullVal);
+                else if constexpr (std::is_same_v< typename T::value_type, std::string >)
+                    return utils::wstring_to_std_string(val.bstrVal);
+                else
+                    std::invoke([]< bool flag = false >() { static_assert(flag, "unsupported type"); });
+            };
+
+            // Lambda to retrieve a property from a WMI class object.
+            auto retrieveProperty = [&](IWbemClassObject* pObj, const std::wstring& propertyName) -> VARIANT {
+                VARIANT vtProperty;
+                pObj->Get(propertyName.c_str(), 0, &vtProperty, nullptr, nullptr);
+                return vtProperty;
+            };
+
+            // Lambda to populate the results vector.
+            auto populateQueryResults = [&]() {
+                ULONG             uReturned = 0;
+                IWbemClassObject* pObj      = nullptr;
+
+                // Iterate through the results of the WMI query.
+                while (m_enumerator) {
+                    m_enumerator->Next(WBEM_INFINITE, 1, &pObj, &uReturned);
+                    if (!uReturned) break;
+
+                    // Convert the properties of the object to the result types and add them to the results vector.
+                    // For each type in Types, retrieve the property, convert it, and add it to the tuple.
+                    queryResults.emplace_back(std::make_tuple(convertVariant(retrieveProperty(pObj, Types::wmi_field), Types {})...));
+                    pObj->Release();    // Release the object
+                }
+            };
+
+            // Build the query string and execute the query.
+            const std::wstring queryString = buildQueryString();
+            if (!execute_query(queryString)) {
+                return queryResults;    // Return an empty result if the query execution fails
             }
 
-            return result;
+            // Populate the results vector.
+            populateQueryResults();
+            return queryResults;    // Return the results
         }
 
         //            private:
