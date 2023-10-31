@@ -47,7 +47,7 @@ add_library(HWinfo INTERFACE)
 add_library(${PROJECT_NAME}::HWinfo ALIAS HWinfo)
 target_include_directories(HWinfo INTERFACE $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}>/include)
 
-if (WIN32)# AND (${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU") OR (${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang"))
+if (WIN32)
     target_link_libraries(HWinfo INTERFACE "wbemuuid")
 endif ()
 

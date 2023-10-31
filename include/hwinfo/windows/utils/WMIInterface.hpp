@@ -196,6 +196,7 @@ namespace hwinfo::WMI
         //                {}; std::unique_ptr< IWbemServices, decltype([](IWbemServices* p) { p->Release(); }) > m_service {};
         //                std::unique_ptr< IEnumWbemClassObject, decltype([](IEnumWbemClassObject* p) { p->Release(); }) >
         //                m_enumerator {};
+
         IWbemLocator*         m_locator {};
         IWbemServices*        m_service {};
         IEnumWbemClassObject* m_enumerator {};
