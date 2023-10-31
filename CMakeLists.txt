@@ -9,7 +9,7 @@ project(hwinfo VERSION 1.0.0 LANGUAGES CXX)
 if (NOT DEFINED NO_OCL)
     set(CMAKE_CXX_STANDARD 20)
 else ()
-    set(CMAKE_CXX_STANDARD 20)
+    set(CMAKE_CXX_STANDARD 17)
 endif ()
 
 # Ensure that the standard requirement is mandatory.
@@ -47,7 +47,7 @@ add_library(HWinfo INTERFACE)
 add_library(${PROJECT_NAME}::HWinfo ALIAS HWinfo)
 target_include_directories(HWinfo INTERFACE $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}>/include)
 
-if (WIN32 AND (${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU") OR (${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang"))
+if (WIN32)# AND (${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU") OR (${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang"))
     target_link_libraries(HWinfo INTERFACE "wbemuuid")
 endif ()
 

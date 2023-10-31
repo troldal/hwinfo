@@ -3,6 +3,7 @@
 #pragma once
 
 #include "../../base/batteryBase.hpp"
+#include "../../utils/stringutils.hpp"
 #include "WMIBatteryInfo.hpp"
 #include "WMIBoardInfo.hpp"
 #include "WMICpuInfo.hpp"
@@ -14,20 +15,16 @@
 
 #include <algorithm>
 #include <functional>
+#include <iostream>
 #include <memory>
+#include <string>
+#include <tuple>
+#include <type_traits>
 #include <variant>
 #include <vector>
 
-#include "../../utils/stringutils.hpp"
-
 #include <WbemIdl.h>
 #include <comdef.h>
-
-#include <iostream>
-#include <string>
-#include <type_traits>
-#include <vector>
-#pragma comment(lib, "wbemuuid.lib")
 
 namespace hwinfo::WMI
 {
@@ -91,19 +88,6 @@ namespace hwinfo::WMI
             CoUninitialize();
         }
 
-        bool execute_query(const std::wstring& query)
-        {
-            BSTR bstr_wql = SysAllocString(L"WQL");
-            BSTR bstr_sql = SysAllocString(query.c_str());
-
-            auto result = SUCCEEDED(
-                m_service->ExecQuery(bstr_wql, bstr_sql, WBEM_FLAG_FORWARD_ONLY | WBEM_FLAG_RETURN_IMMEDIATELY, nullptr, &m_enumerator));
-
-            SysFreeString(bstr_wql);
-            SysFreeString(bstr_sql);
-            return result;
-        }
-
         /**
          * @brief Executes a WMI query and retrieves results as a vector of tuples.
          *
@@ -121,9 +105,53 @@ namespace hwinfo::WMI
             using QueryResult = std::vector< std::tuple< typename Types::result_type... > >;
             QueryResult queryResults;
 
-            // Lambda to build the WMI query string.
-            auto buildQueryString = [&]() -> std::wstring {
-                std::wstring queryString = L"SELECT ";
+            // Build the query string and execute the query.
+            const std::wstring queryString = buildQueryString< Types... >();
+            if (!execQuery(queryString)) {
+                return queryResults;    // Return an empty result if the query execution fails
+            }
+
+            // Populate the results vector.
+            populateQueryResults< Types... >(queryResults);
+            return queryResults;    // Return the results
+        }
+
+    private:
+        bool execQuery(const std::wstring& queryString)
+        {
+            BSTR bstr_wql = SysAllocString(L"WQL");
+            BSTR bstr_sql = SysAllocString(queryString.c_str());
+
+            auto result = SUCCEEDED(
+                m_service->ExecQuery(bstr_wql, bstr_sql, WBEM_FLAG_FORWARD_ONLY | WBEM_FLAG_RETURN_IMMEDIATELY, nullptr, &m_enumerator));
+
+            SysFreeString(bstr_wql);
+            SysFreeString(bstr_sql);
+            return result;
+        }
+
+        template< typename... Types, typename T >
+        void populateQueryResults(T& queryResults)
+        {
+            ULONG             uReturned = 0;
+            IWbemClassObject* pObj      = nullptr;
+
+            // Iterate through the results of the WMI query.
+            while (m_enumerator) {
+                m_enumerator->Next(WBEM_INFINITE, 1, &pObj, &uReturned);
+                if (!uReturned) break;
+
+                // Convert the properties of the object to the result types and add them to the results vector.
+                // For each type in Types, retrieve the property, convert it, and add it to the tuple.
+                queryResults.emplace_back(std::make_tuple(convertVariant< Types >(retrieveProperty(pObj, Types::wmi_field))...));
+                pObj->Release();    // Release the object
+            }
+        };
+
+        template< typename... Types >
+        static std::wstring buildQueryString()
+        {
+            std::wstring queryString = L"SELECT ";
                 (..., (queryString += Types::wmi_field + L", "));
                 queryString.pop_back();    // Remove trailing comma and space
                 queryString.pop_back();
@@ -131,8 +159,22 @@ namespace hwinfo::WMI
                 return queryString;
             };
 
-            // Lambda to convert a VARIANT to the specific result type.
-            auto convertVariant = []< typename T >(const VARIANT& val, T type) {
+        static VARIANT retrieveProperty(IWbemClassObject* pObj, const std::wstring& propertyName)
+        {
+                VARIANT vtProperty;
+                pObj->Get(propertyName.c_str(), 0, &vtProperty, nullptr, nullptr);
+                return vtProperty;
+        };
+
+        template< bool flag = false >
+        static void typeError()
+        {
+                static_assert(flag, "unsupported type");
+        };
+
+        template< typename T >
+        static auto convertVariant(const VARIANT& val)
+        {
                 if constexpr (std::is_same_v< typename T::value_type, int32_t >) return static_cast< typename T::result_type >(val.intVal);
                 else if constexpr (std::is_same_v< typename T::value_type, bool >)
                     return val.boolVal;
@@ -147,45 +189,9 @@ namespace hwinfo::WMI
                 else if constexpr (std::is_same_v< typename T::value_type, std::string >)
                     return utils::wstring_to_std_string(val.bstrVal);
                 else
-                    std::invoke([]< bool flag = false >() { static_assert(flag, "unsupported type"); });
-            };
+                    typeError();
+        };
 
-            // Lambda to retrieve a property from a WMI class object.
-            auto retrieveProperty = [&](IWbemClassObject* pObj, const std::wstring& propertyName) -> VARIANT {
-                VARIANT vtProperty;
-                pObj->Get(propertyName.c_str(), 0, &vtProperty, nullptr, nullptr);
-                return vtProperty;
-            };
-
-            // Lambda to populate the results vector.
-            auto populateQueryResults = [&]() {
-                ULONG             uReturned = 0;
-                IWbemClassObject* pObj      = nullptr;
-
-                // Iterate through the results of the WMI query.
-                while (m_enumerator) {
-                    m_enumerator->Next(WBEM_INFINITE, 1, &pObj, &uReturned);
-                    if (!uReturned) break;
-
-                    // Convert the properties of the object to the result types and add them to the results vector.
-                    // For each type in Types, retrieve the property, convert it, and add it to the tuple.
-                    queryResults.emplace_back(std::make_tuple(convertVariant(retrieveProperty(pObj, Types::wmi_field), Types {})...));
-                    pObj->Release();    // Release the object
-                }
-            };
-
-            // Build the query string and execute the query.
-            const std::wstring queryString = buildQueryString();
-            if (!execute_query(queryString)) {
-                return queryResults;    // Return an empty result if the query execution fails
-            }
-
-            // Populate the results vector.
-            populateQueryResults();
-            return queryResults;    // Return the results
-        }
-
-        //            private:
         //                std::unique_ptr< IWbemLocator, decltype([](IWbemLocator* p) { p->Release(); }) >                 m_locator
         //                {}; std::unique_ptr< IWbemServices, decltype([](IWbemServices* p) { p->Release(); }) > m_service {};
         //                std::unique_ptr< IEnumWbemClassObject, decltype([](IEnumWbemClassObject* p) { p->Release(); }) >
