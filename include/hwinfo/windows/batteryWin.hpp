@@ -91,7 +91,6 @@ namespace hwinfo
 
             friend BASE;
 
-        public:
             /**
              * @brief Default constructor for BatteryWin.
              */
@@ -99,64 +98,32 @@ namespace hwinfo
 
         private:
             /**
-             * @brief Retrieves the current capacity of the battery.
-             *
-             * This method queries the WMI interface to obtain the current capacity of the battery and returns it.
-             *
-             * @return The current battery capacity as a percentage.
-             *
-             * @note This method is marked as [[nodiscard]] to encourage checking the returned value.
-             */
-            [[nodiscard]]
-            uint32_t getCapacity() const    // NOLINT
-            {
-                using namespace WMI;
-                auto res = wmiInterface.query< BatteryInfo::CAPACITY >();
-                if (res.empty()) return {};
-
-                return std::get< 0 >(res.front());
-            }
-
-            /**
-             * @brief Retrieves the status of the battery.
-             *
-             * This method queries the WMI interface to obtain the current status of the battery and returns it as a string.
-             *
-             * @return The current status of the battery.
-             *
-             * @note This method is marked as [[nodiscard]] to encourage checking the returned value.
-             */
-            [[nodiscard]]
-            std::string getStatus() const    // NOLINT
-            {
-                using namespace WMI;
-                auto res = wmiInterface.query< BatteryInfo::STATUS >();
-                if (res.empty()) return {};
-
-                return to_string(std::get< 0 >(res.front()));
-            }
-
-            /**
              * @brief Retrieves information of all available batteries.
              *
              * This method queries the WMI interface to obtain a list of all available batteries and their information.
              *
              * @return A vector of BatteryWin objects, each representing a battery.
              */
-            static std::vector< BatteryWin > getAllBatteries_impl()
+            static std::vector< BatteryWin > getAllBatteries()
             {
                 std::vector< BatteryWin > batteries;
 
                 using namespace WMI;
-                auto info = wmiInterface.query< BatteryInfo::NAME, BatteryInfo::CHEMISTRY, BatteryInfo::HEALTH >();
+                auto info = wmiInterface.query< BatteryInfo::NAME,
+                                                BatteryInfo::CHEMISTRY,
+                                                BatteryInfo::HEALTH,
+                                                BatteryInfo::STATUS,
+                                                BatteryInfo::CAPACITY >();
 
                 for (const auto& batt : info) {
-                    batteries.emplace_back();
+                    batteries.emplace_back(BatteryWin {});
                     auto& battery = batteries.back();
 
                     battery._model      = std::get< 0 >(batt);
                     battery._technology = to_string(std::get< 1 >(batt));
                     battery._health     = std::get< 2 >(batt);
+                    battery._status     = to_string(std::get< 3 >(batt));
+                    battery._capacity   = std::get< 4 >(batt);
                 }
 
                 return batteries;

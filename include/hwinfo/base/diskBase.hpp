@@ -77,7 +77,7 @@ namespace hwinfo::detail
             return m_id;
         }
 
-        static std::vector< IMPL > getAllDisks() { return IMPL::getAllDisks_impl(); }
+        static std::vector< IMPL > getDiskInfo() { return IMPL::getAllDisks(); }
 
     protected:
         ~DiskBase() = default;

@@ -106,7 +106,7 @@ The following methods are available for `CPU`:
 ### GPU
 
 You can also get information about all installed GPUs using hwinfo.
-`getAllGPUs()` returns a `std::vector<GPU>`. A `GPU` object represents a physical GPU.
+`getGpuInfo()` returns a `std::vector<GPU>`. A `GPU` object represents a physical GPU.
 
 The following methods are available for `GPU`:
 

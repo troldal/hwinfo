@@ -53,12 +53,11 @@ namespace hwinfo
             using BASE = GPUBase< GPUWin >;
             friend BASE;
 
-        public:
             GPUWin() = default;
 
         private:
             [[nodiscard]]
-            static std::vector< GPUWin > getAllGPUs_impl()
+            static std::vector< GPUWin > getAllGPUs()
             {
                 std::vector< GPUWin > gpus;
 
@@ -68,7 +67,7 @@ namespace hwinfo
                 if (info.empty()) return {};
 
                 for (const auto& gpu : info) {
-                    gpus.emplace_back();
+                    gpus.emplace_back(GPUWin {});
                     auto& processor = gpus.back();
 
                     processor.m_name          = std::get< 0 >(gpu);

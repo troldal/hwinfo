@@ -88,6 +88,8 @@ namespace hwinfo::detail
             return _available_Bytes;
         }
 
+        static std::vector< IMPL > getRamInfo() { return IMPL::getAllRam(); }
+
     protected:
         ~RAMBase() = default;
 

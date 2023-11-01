@@ -52,64 +52,31 @@ namespace hwinfo
             using BASE = RAMBase< RAMWin >;
             friend BASE;
 
-        public:
-            RAMWin()
-            {
-                BASE::_name            = getName();
-                BASE::_vendor          = getVendor();
-                BASE::_serialNumber    = getSerialNumber();
-                BASE::_model           = getModel();
-                BASE::_total_Bytes     = getTotalSize_Bytes();
-                BASE::_free_Bytes      = getFreeMemory();
-                BASE::_available_Bytes = getFreeMemory();
-            }
+            RAMWin() = default;
 
         private:
-            static std::string getVendor()
+            [[nodiscard]]
+            static std::vector< RAMWin > getAllRam()
             {
+                std::vector< RAMWin > ram_blocks;
+
                 using namespace WMI;
-                auto result = wmiInterface.query< RamInfo::MANUFACTURER >();
-                if (result.empty()) return "<unknown>";
+                auto info =
+                    wmiInterface
+                        .query< RamInfo::MANUFACTURER, RamInfo::NAME, RamInfo::PARTNUMBER, RamInfo::SERIALNUMBER, RamInfo::CAPACITY >();
 
-                return std::get< 0 >(result.front());
-            }
+                for (const auto& block : info) {
+                    ram_blocks.emplace_back(RAMWin {});    // NOLINT
+                    auto& current = ram_blocks.back();
 
-            static std::string getName()
-            {
-                using namespace WMI;
-                auto result = wmiInterface.query< RamInfo::NAME >();
-                if (result.empty()) return "<unknown>";
+                    current._vendor       = std::get< 0 >(block);
+                    current._name         = std::get< 1 >(block);
+                    current._model        = std::get< 2 >(block);
+                    current._serialNumber = std::get< 3 >(block);
+                    current._total_Bytes  = std::stoll(std::get< 4 >(block));
+                }
 
-                return std::get< 0 >(result.front());
-            }
-
-            static std::string getModel()
-            {
-                using namespace WMI;
-                auto result = wmiInterface.query< RamInfo::PARTNUMBER >();
-                if (result.empty()) return "<unknown>";
-
-                return std::get< 0 >(result.front());
-            }
-
-            static std::string getSerialNumber()
-            {
-                using namespace WMI;
-                auto result = wmiInterface.query< RamInfo::SERIALNUMBER >();
-                if (result.empty()) return "<unknown>";
-
-                return std::get< 0 >(result.front());
-            }
-
-            static uint64_t getTotalSize_Bytes()
-            {
-                using namespace WMI;
-                auto result = wmiInterface.query< RamInfo::CAPACITY >();
-                if (result.empty()) return -1;
-
-                return std::accumulate(result.begin(), result.end(), uint64_t(0), [](uint64_t sum, const auto& val) {
-                    return sum + std::stoll(std::get< 0 >(val));
-                });
+                return ram_blocks;
             }
 
             static int64_t getFreeMemory()

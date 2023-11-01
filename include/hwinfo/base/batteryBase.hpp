@@ -135,7 +135,7 @@ namespace hwinfo::detail
         [[nodiscard]]
         uint32_t capacity() const
         {
-            return impl().getCapacity();
+            return _capacity;
         }
 
         /**
@@ -146,7 +146,7 @@ namespace hwinfo::detail
         [[nodiscard]]
         std::string status() const
         {
-            return impl().getStatus();
+            return _status;
         }
 
         /**
@@ -154,7 +154,7 @@ namespace hwinfo::detail
          *
          * @return Vector containing all available batteries.
          */
-        static std::vector< IMPL > getAllBatteries() { return IMPL::getAllBatteries_impl();}
+        static std::vector< IMPL > getBatteryInfo() { return IMPL::getAllBatteries(); }
 
     protected:
         /**
@@ -189,6 +189,8 @@ namespace hwinfo::detail
         std::string _serialNumber {};     ///< Battery serial number.
         std::string _technology {};       ///< Battery technology type.
         std::string _health {};           ///< Battery health.
+        std::string _status {};           ///< Battery status.
+        uint32_t    _capacity {};         ///< Battery capacity.
     };
 }    // namespace hwinfo
 

@@ -48,54 +48,29 @@ namespace hwinfo
             using BASE = MainBoardBase< MainBoardWin >;
             friend BASE;
 
-        public:
-            MainBoardWin()
-            {
-                BASE::_vendor       = getVendor();
-                BASE::_name         = getName();
-                BASE::_version      = getVersion();
-                BASE::_serialNumber = getSerialNumber();
-            }
+            MainBoardWin() = default;
 
         private:
             [[nodiscard]]
-            static std::string getVendor()
+            static std::vector< MainBoardWin > getAllBaseboards()
             {
+                std::vector< MainBoardWin > boards;
+
                 using namespace WMI;
-                auto result = wmiInterface.query< BoardInfo::MANUFACTURER >();
-                if (result.empty()) return "<unknown>";
+                auto info =
+                    wmiInterface.query< BoardInfo::MANUFACTURER, BoardInfo::PRODUCT, BoardInfo::VERSION, BoardInfo::SERIALNUMBER >();
 
-                return std::get< 0 >(result.front());
-            }
+                for (const auto& board : info) {
+                    boards.emplace_back(MainBoardWin {});    // NOLINT
+                    auto& current = boards.back();
 
-            [[nodiscard]]
-            static std::string getName()
-            {
-                using namespace WMI;
-                auto result = wmiInterface.query< BoardInfo::PRODUCT >();
-                if (result.empty()) return "<unknown>";
+                    current._vendor       = std::get< 0 >(board);
+                    current._name         = std::get< 1 >(board);
+                    current._version      = std::get< 2 >(board);
+                    current._serialNumber = std::get< 3 >(board);
+                }
 
-                return std::get< 0 >(result.front());
-            }
-
-            [[nodiscard]]
-            static std::string getVersion()
-            {
-                using namespace WMI;
-                auto result = wmiInterface.query< BoardInfo::VERSION >();
-                if (result.empty()) return "<unknown>";
-
-                return std::get< 0 >(result.front());
-            }
-
-            [[nodiscard]]
-            static std::string getSerialNumber()
-            {
-                using namespace WMI;
-                auto result = wmiInterface.query< BoardInfo::SERIALNUMBER >();
-                if (result.empty()) return "<unknown>";
-
-                return std::get< 0 >(result.front());
+                return boards;
             }
 
             static WMI::WMIInterface wmiInterface;

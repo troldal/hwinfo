@@ -49,11 +49,10 @@ namespace hwinfo
             using BASE = DiskBase< DiskWin >;
             friend BASE;
 
-        public:
             DiskWin() = default;
 
         private:
-            static std::vector< DiskWin > getAllDisks_impl()
+            static std::vector< DiskWin > getAllDisks()
             {
                 std::vector< DiskWin > disks;
 
@@ -61,7 +60,7 @@ namespace hwinfo
                 auto info = wmiInterface.query< DiskInfo::MODEL, DiskInfo::MANUFACTURER, DiskInfo::SERIALNUMBER, DiskInfo::SIZE >();
 
                 for (const auto& disk : info) {
-                    disks.emplace_back();
+                    disks.emplace_back(DiskWin {});
                     auto& processor = disks.back();
 
                     processor.m_model        = std::get< 0 >(disk);

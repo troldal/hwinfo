@@ -44,3 +44,8 @@
 #elif defined(HWINFO_WINDOWS)
 #    include "windows/gpuWin.hpp"
 #endif
+
+namespace hwinfo
+{
+    std::vector< GPU > getGpuInfo() { return GPU::getGpuInfo(); }
+}    // namespace hwinfo

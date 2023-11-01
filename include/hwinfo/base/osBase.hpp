@@ -76,6 +76,8 @@ namespace hwinfo::detail
             return _littleEndian;
         }
 
+        static std::vector< IMPL > getOSInfo() { return {}; }
+
     protected:
         ~OSBase() = default;
 

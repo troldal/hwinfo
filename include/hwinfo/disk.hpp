@@ -44,3 +44,8 @@
 #elif defined(HWINFO_WINDOWS)
 #    include "windows/diskWin.hpp"
 #endif
+
+namespace hwinfo
+{
+    std::vector< Disk > getDiskInfo() { return Disk::getDiskInfo(); }
+}    // namespace hwinfo

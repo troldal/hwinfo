@@ -47,5 +47,5 @@
 
 namespace hwinfo
 {
-    std::vector< CPU > getCPUs() { return CPU::getAllCPUs(); }
+    std::vector< CPU > getCpuInfo() { return CPU::getCpuInfo(); }
 }    // namespace hwinfo

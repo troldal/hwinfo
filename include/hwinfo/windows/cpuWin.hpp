@@ -50,7 +50,6 @@ namespace hwinfo
             using BASE = CPUBase< CPUWin >;
             friend BASE;
 
-        public:
             CPUWin() = default;
 
         private:
@@ -121,7 +120,7 @@ namespace hwinfo
             }
 
             [[nodiscard]]
-            static std::vector< CPUWin > getAllCPUs_impl()
+            static std::vector< CPUWin > getAllCPUs()
             {
                 std::vector< CPUWin > cpus;
 
@@ -135,7 +134,7 @@ namespace hwinfo
                                                 CpuInfo::L3CACHESIZE >();
 
                 for (const auto& cpu : info) {
-                    cpus.emplace_back();
+                    cpus.emplace_back(CPUWin {});
                     auto& processor = cpus.back();
 
                     processor.m_modelName         = std::get< 0 >(cpu);

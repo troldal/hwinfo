@@ -45,3 +45,7 @@
 #    include "windows/ramWin.hpp"
 #endif
 
+namespace hwinfo
+{
+    std::vector< RAM > getRamInfo() { return RAM::getRamInfo(); }
+}    // namespace hwinfo

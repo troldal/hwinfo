@@ -17,7 +17,7 @@ int main(int argc, char** argv)
               << "Thanks for using hwinfo!" << std::endl;
     std::cout << std::endl << "Hardware Report:" << std::endl << std::endl;
     std::cout << "----------------------------------- CPU -----------------------------------" << std::endl;
-    auto cpus = hwinfo::getCPUs();
+    auto cpus = hwinfo::getCpuInfo();
     for (const auto& cpu : cpus) {
         std::cout << "Socket " << cpu.id() << ":\n";
         std::cout << std::left << std::setw(20) << " vendor:";
@@ -58,7 +58,7 @@ int main(int argc, char** argv)
     std::cout << std::left << std::setw(20) << "endianess:";
     std::cout << (os.isLittleEndian() ? "little endian" : "big endian") << std::endl;
 
-    auto gpus = hwinfo::GPU::getAllGPUs();
+    auto gpus = hwinfo::getGpuInfo();
     std::cout << "----------------------------------- GPU -----------------------------------" << std::endl;
     for (auto& gpu : gpus) {
         std::cout << "GPU " << gpu.id() << ":\n";
@@ -76,7 +76,7 @@ int main(int argc, char** argv)
         std::cout << gpu.num_cores() << std::endl;
     }
 
-    hwinfo::RAM ram;
+    auto ram = hwinfo::getRamInfo().front();
     std::cout << "----------------------------------- RAM -----------------------------------" << std::endl;
     std::cout << std::left << std::setw(20) << "vendor:";
     std::cout << ram.vendor() << std::endl;
@@ -93,7 +93,7 @@ int main(int argc, char** argv)
     std::cout << std::left << std::setw(20) << "available [MiB]:";
     std::cout << ram.available_Bytes() / 1024 / 1024 << std::endl;
 
-    hwinfo::MainBoard main_board;
+    auto main_board = hwinfo::getBaseboardInfo().front();
     std::cout << "------------------------------- Main Board --------------------------------" << std::endl;
     std::cout << std::left << std::setw(20) << "vendor:";
     std::cout << main_board.vendor() << std::endl;
@@ -104,7 +104,7 @@ int main(int argc, char** argv)
     std::cout << std::left << std::setw(20) << "serial-number:";
     std::cout << ram.serialNumber() << std::endl;
 
-    std::vector< hwinfo::Battery > batteries = hwinfo::getBatteries();
+    std::vector< hwinfo::Battery > batteries = hwinfo::getBatteryInfo();
     std::cout << "------------------------------- Batteries ---------------------------------" << std::endl;
     if (!batteries.empty()) {
         int battery_counter = 0;
@@ -131,7 +131,7 @@ int main(int argc, char** argv)
         std::cout << "No Batteries installed or detected" << std::endl;
     }
 
-    std::vector< hwinfo::Disk > disks = hwinfo::Disk::getAllDisks();
+    std::vector< hwinfo::Disk > disks = hwinfo::getDiskInfo();
     std::cout << "--------------------------------- Disks -----------------------------------" << std::endl;
     if (!disks.empty()) {
         int disk_counter = 0;

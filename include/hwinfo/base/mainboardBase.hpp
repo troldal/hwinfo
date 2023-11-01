@@ -73,6 +73,8 @@ namespace hwinfo::detail
             return _serialNumber;
         }
 
+        static std::vector< IMPL > getBaseboardInfo() { return IMPL::getAllBaseboards(); }
+
     protected:
         ~MainBoardBase() = default;
 

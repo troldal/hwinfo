@@ -144,7 +144,10 @@ namespace hwinfo::detail
         }
 
         [[nodiscard]]
-        static std::vector< IMPL > getAllCPUs() { return IMPL::getAllCPUs_impl(); }
+        static std::vector< IMPL > getCpuInfo()
+        {
+            return IMPL::getAllCPUs();
+        }
 
     protected:
         ~CPUBase() = default;

@@ -44,3 +44,8 @@
 #elif defined(HWINFO_WINDOWS)
 #    include "windows/mainboardWin.hpp"
 #endif
+
+namespace hwinfo
+{
+    std::vector< MainBoard > getBaseboardInfo() { return MainBoard::getBaseboardInfo(); }
+}    // namespace hwinfo

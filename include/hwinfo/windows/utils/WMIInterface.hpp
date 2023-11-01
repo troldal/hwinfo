@@ -109,11 +109,21 @@ namespace hwinfo::WMI
          */
         using BSTRPtr = std::unique_ptr< std::remove_pointer< BSTR >::type, BSTRDeleter >;
 
+        /**
+         * @brief Type trait to check if two types are of the same WMI class.
+         * @tparam T The first type to check.
+         * @tparam U The second type to check.
+         */
         template< typename T, typename U >
         struct has_same_wmi_class : std::integral_constant< bool, std::is_same_v< typename T::info_type, typename U::info_type > >
         {
         };
 
+        /**
+         * @brief Type trait to check if all types in a parameter pack are of the same WMI class.
+         * @tparam First The first type in the parameter pack.
+         * @tparam Rest The remaining types in the parameter pack.
+         */
         template< typename First, typename... Rest >
         struct all_same_wmi_class : std::conjunction< has_same_wmi_class< First, Rest >... >
         {
@@ -195,6 +205,7 @@ namespace hwinfo::WMI
         template< typename... Types >
         auto query()
         {
+            // Ensure that all types are of the same WMI class.
             static_assert(all_same_wmi_class< Types... >::value, "All types must be of the same WMI class");
 
             // Lock the mutex to ensure thread safety.

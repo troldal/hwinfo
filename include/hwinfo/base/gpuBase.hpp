@@ -92,7 +92,7 @@ namespace hwinfo::detail
             return m_id;
         }
 
-        static std::vector< IMPL > getAllGPUs() { return IMPL::getAllGPUs_impl(); }
+        static std::vector< IMPL > getGpuInfo() { return IMPL::getAllGPUs(); }
 
     protected:
         ~GPUBase() = default;
