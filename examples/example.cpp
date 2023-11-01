@@ -109,26 +109,26 @@ int main(int argc, char** argv)
     std::cout << std::left << std::setw(20) << "serial-number:";
     std::cout << main_board.serialNumber() << std::endl;
 
-    std::vector< hwinfo::Battery > batteries = hwinfo::getBatteryInfo();
+    hwinfo::Battery batteries = hwinfo::getBatteryInfo();
     std::cout << "------------------------------- Batteries ---------------------------------" << std::endl;
-    if (!batteries.empty()) {
+    if (!batteries.items().empty()) {
         int battery_counter = 0;
-        for (auto& battery : batteries) {
+        for (auto& battery : batteries.items()) {
             std::cout << "Battery " << battery_counter++ << ":" << std::endl;
             std::cout << std::left << std::setw(20) << "  vendor:";
-            std::cout << battery.vendor() << std::endl;
+            std::cout << battery.vendor << std::endl;
             std::cout << std::left << std::setw(20) << "  model:";
-            std::cout << battery.model() << std::endl;
+            std::cout << battery.model << std::endl;
             std::cout << std::left << std::setw(20) << "  serial-number:";
-            std::cout << battery.serialNumber() << std::endl;
+            std::cout << battery.serialNumber << std::endl;
             std::cout << std::left << std::setw(20) << "  technology:";
-            std::cout << battery.technology() << std::endl;
+            std::cout << battery.technology << std::endl;
             std::cout << std::left << std::setw(20) << "  status:";
-            std::cout << battery.status() << std::endl;
+            std::cout << battery.status << std::endl;
             std::cout << std::left << std::setw(20) << "  health:";
-            std::cout << battery.health() << std::endl;
+            std::cout << battery.health << std::endl;
             std::cout << std::left << std::setw(20) << "  capacity:";
-            std::cout << battery.capacity() << std::endl;
+            std::cout << battery.capacity << std::endl;
         }
         std::cout << "---------------------------------------------------------------------------" << std::endl;
     }

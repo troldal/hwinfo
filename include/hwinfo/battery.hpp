@@ -47,5 +47,5 @@
 
 namespace hwinfo
 {
-    std::vector< Battery > getBatteryInfo() { return Battery::getBatteryInfo(); }
+    Battery getBatteryInfo() { return Battery::getBatteryInfo(); }
 }    // namespace hwinfo

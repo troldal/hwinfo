@@ -104,9 +104,9 @@ namespace hwinfo
              *
              * @return A vector of BatteryWin objects, each representing a battery.
              */
-            static std::vector< BatteryWin > getAllBatteries()
+            static BatteryWin getAllBatteries()
             {
-                std::vector< BatteryWin > batteries;
+                BatteryWin batteries;
 
                 using namespace WMI;
                 auto info = wmiInterface.query< BatteryInfo::NAME,
@@ -116,14 +116,15 @@ namespace hwinfo
                                                 BatteryInfo::CAPACITY >();
 
                 for (const auto& batt : info) {
-                    batteries.emplace_back(BatteryWin {});
-                    auto& battery = batteries.back();
+                    auto battery = BASE::BatteryElementInfo {};
 
-                    battery._model      = std::get< 0 >(batt);
-                    battery._technology = to_string(std::get< 1 >(batt));
-                    battery._health     = std::get< 2 >(batt);
-                    battery._status     = to_string(std::get< 3 >(batt));
-                    battery._capacity   = std::get< 4 >(batt);
+                    battery.model      = std::get< 0 >(batt);
+                    battery.technology = to_string(std::get< 1 >(batt));
+                    battery.health     = std::get< 2 >(batt);
+                    battery.status     = to_string(std::get< 3 >(batt));
+                    battery.capacity   = std::get< 4 >(batt);
+
+                    batteries.addItem(battery);
                 }
 
                 return batteries;

@@ -70,91 +70,28 @@ namespace hwinfo::detail
     {
         friend IMPL;
 
+        struct BatteryElementInfo
+        {
+            std::string vendor {};
+            std::string model {};
+            std::string serialNumber {};
+            std::string technology {};
+            std::string health {};
+            std::string status {};
+            uint32_t    capacity { 0 };
+        };
+
     public:
+        std::vector< BatteryElementInfo > const& items() const { return _items; }
 
-        /**
-         * @brief Gets the battery vendor.
-         *
-         * @return Vendor name as a string.
-         */
-        [[nodiscard]]
-        std::string vendor() const
-        {
-            return _vendor;
-        }
-
-        /**
-         * @brief Gets the battery model.
-         *
-         * @return Model name as a string.
-         */
-        [[nodiscard]]
-        std::string model() const
-        {
-            return _model;
-        }
-
-        /**
-         * @brief Gets the battery serial number.
-         *
-         * @return Serial number as a string.
-         */
-        [[nodiscard]]
-        std::string serialNumber() const
-        {
-            return _serialNumber;
-        }
-
-        /**
-         * @brief Gets the battery technology.
-         *
-         * @return Technology as a string.
-         */
-        [[nodiscard]]
-        std::string technology() const
-        {
-            return _technology;
-        }
-
-        /**
-         * @brief Gets the battery health.
-         *
-         * @return Health as a string.
-         */
-        [[nodiscard]]
-        std::string health() const
-        {
-            return _health;
-        }
-
-        /**
-         * @brief Gets the current energy (in percent) the battery has.
-         *
-         * @return Energy value.
-         */
-        [[nodiscard]]
-        uint32_t capacity() const
-        {
-            return _capacity;
-        }
-
-        /**
-         * @brief Gets the battery status.
-         *
-         * @return Status as a string.
-         */
-        [[nodiscard]]
-        std::string status() const
-        {
-            return _status;
-        }
+        void addItem(const BatteryElementInfo& item) { _items.push_back(item); }
 
         /**
          * @brief Retrieves all batteries.
          *
          * @return Vector containing all available batteries.
          */
-        static std::vector< IMPL > getBatteryInfo() { return IMPL::getAllBatteries(); }
+        static IMPL getBatteryInfo() { return IMPL::getAllBatteries(); }
 
     protected:
         /**
@@ -184,13 +121,7 @@ namespace hwinfo::detail
          */
         IMPL const& impl() const { return static_cast<IMPL const&>( *this ); }
 
-        std::string _vendor {};           ///< Battery vendor.
-        std::string _model {};            ///< Battery model.
-        std::string _serialNumber {};     ///< Battery serial number.
-        std::string _technology {};       ///< Battery technology type.
-        std::string _health {};           ///< Battery health.
-        std::string _status {};           ///< Battery status.
-        uint32_t    _capacity {};         ///< Battery capacity.
+        std::vector< BatteryElementInfo > _items {};
     };
 }    // namespace hwinfo
 
