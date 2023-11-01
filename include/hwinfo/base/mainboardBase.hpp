@@ -38,70 +38,106 @@
 #include <string>
 #include <vector>
 
+/**
+ * @file MainBoardBase.hpp
+ * @namespace hwinfo::detail
+ * @brief Contains the definition of the MainBoardBase class template, a CRTP base class for mainboard (motherboard) information retrieval.
+ */
 namespace hwinfo::detail
 {
 
+    /**
+     * @class MainBoardBase
+     * @brief Curiously Recurring Template Pattern (CRTP) base class for retrieving mainboard (motherboard) information.
+     *
+     * This template class defines the common interface and data structures for retrieving mainboard information,
+     * to be implemented by platform-specific derived classes.
+     *
+     * @tparam IMPL The type of the derived class implementing the mainboard information retrieval.
+     */
     template< typename IMPL >
     class MainBoardBase
     {
-        friend IMPL;
+        friend IMPL;    ///< Make the derived class a friend to allow it to access private members.
 
+        /**
+         * @struct MainBoardItem
+         * @brief Structure holding information about the mainboard.
+         */
         struct MainBoardItem
         {
-            std::string vendor {};
-            std::string name {};
-            std::string version {};
-            std::string serialNumber {};
+            std::string vendor {};          ///< The vendor/manufacturer of the mainboard.
+            std::string name {};            ///< The name of the mainboard.
+            std::string version {};         ///< The version of the mainboard.
+            std::string serialNumber {};    ///< The serial number of the mainboard.
         };
 
     public:
+        /**
+         * @brief Retrieves the vendor of the mainboard.
+         * @return A string representing the mainboard's vendor.
+         */
         [[nodiscard]]
         std::string vendor() const
         {
             return _item.vendor;
         }
 
+        /**
+         * @brief Retrieves the name of the mainboard.
+         * @return A string representing the mainboard's name.
+         */
         [[nodiscard]]
         std::string name() const
         {
             return _item.name;
         }
 
+        /**
+         * @brief Retrieves the version of the mainboard.
+         * @return A string representing the mainboard's version.
+         */
         [[nodiscard]]
         std::string version() const
         {
             return _item.version;
         }
 
+        /**
+         * @brief Retrieves the serial number of the mainboard.
+         * @return A string representing the mainboard's serial number.
+         */
         [[nodiscard]]
         std::string serialNumber() const
         {
             return _item.serialNumber;
         }
 
+        /**
+         * @brief Factory method to retrieve mainboard information.
+         * @return An instance of the IMPL type, populated with mainboard information.
+         */
         static IMPL getBaseboardInfo() { return IMPL::getAllBaseboards(); }
 
     protected:
-        ~MainBoardBase() = default;
+        ~MainBoardBase() = default;    ///< Defaulted virtual destructor for safe polymorphism.
 
     private:
-        MainBoardBase() = default;
+        MainBoardBase() = default;    ///< Default constructor is private to ensure control of object creation.
 
         /**
-         * @brief Provides access to the implementation-specific methods in the derived class.
-         *
+         * @brief Retrieves a non-const reference to the derived class instance.
          * @return A reference to the derived class instance.
          */
         IMPL& impl() { return static_cast< IMPL& >(*this); }
 
         /**
-         * @brief Provides const access to the implementation-specific methods in the derived class.
-         *
+         * @brief Retrieves a const reference to the derived class instance.
          * @return A const reference to the derived class instance.
          */
         IMPL const& impl() const { return static_cast< IMPL const& >(*this); }
 
-        MainBoardItem _item {};
+        MainBoardItem _item {};    ///< The data structure holding the mainboard information.
     };
 
 }    // namespace hwinfo::detail

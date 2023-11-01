@@ -38,19 +38,41 @@
 #include "../base/mainboardBase.hpp"
 #include "utils/WMIInterface.hpp"
 
+/**
+ * @file MainBoardWin.hpp
+ * @namespace hwinfo::detail
+ * @brief Contains the definition of the MainBoardWin class, the Windows-specific implementation for mainboard information retrieval.
+ */
 namespace hwinfo
 {
     namespace detail
     {
 
+        /**
+         * @class MainBoardWin
+         * @brief Windows-specific implementation of the MainBoardBase class for mainboard (motherboard) information retrieval.
+         *
+         * This class provides the Windows-specific implementation for retrieving mainboard information using Windows Management
+         * Instrumentation (WMI).
+         */
         class MainBoardWin : public MainBoardBase< MainBoardWin >
         {
-            using BASE = MainBoardBase< MainBoardWin >;
-            friend BASE;
+            using BASE = MainBoardBase< MainBoardWin >;    ///< Alias for the base class type.
+            friend BASE;                                   ///< Make the base class a friend to allow it to access private members.
 
+            /**
+             * @brief Default constructor is private to prevent instantiation.
+             */
             MainBoardWin() = default;
 
         private:
+            /**
+             * @brief Retrieves information about all baseboards (mainboards) in the system.
+             *
+             * Uses Windows Management Instrumentation (WMI) to query the system for mainboard information.
+             *
+             * @return An instance of MainBoardWin populated with mainboard information.
+             */
             [[nodiscard]]
             static MainBoardWin getAllBaseboards()
             {
@@ -60,7 +82,7 @@ namespace hwinfo
                 auto info =
                     wmiInterface.query< BoardInfo::MANUFACTURER, BoardInfo::PRODUCT, BoardInfo::VERSION, BoardInfo::SERIALNUMBER >();
 
-                auto board   = info.front();
+                auto board = info.front();
                 auto item  = BASE::MainBoardItem {};
 
                 item.vendor       = std::get< 0 >(board);
@@ -73,13 +95,13 @@ namespace hwinfo
                 return boards;
             }
 
-            static WMI::WMIInterface wmiInterface;
+            static WMI::WMIInterface wmiInterface;    ///< Static instance of the WMI interface for querying system information.
         };
 
-        WMI::WMIInterface MainBoardWin::wmiInterface {};
+        WMI::WMIInterface MainBoardWin::wmiInterface {};    ///< Definition of the static WMI interface instance.
 
     }    // namespace detail
 
-    using MainBoard = detail::MainBoardWin;
+    using MainBoard = detail::MainBoardWin;    ///< Typedef for easier access to the GPUWin class outside of the detail namespace.
 
 }    // namespace hwinfo
