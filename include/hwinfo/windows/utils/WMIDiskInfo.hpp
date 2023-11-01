@@ -13,12 +13,13 @@ namespace hwinfo::WMI
      * @struct DiskInfo
      * @brief Represents disk drive information obtained from WMI.
      */
-    struct DiskInfo
+    class DiskInfo
     {
         struct DiskInfoType
         {
         };
 
+    public:
         /**
          * @struct MODEL
          * @brief Encapsulates the Model property of Win32_DiskDrive.

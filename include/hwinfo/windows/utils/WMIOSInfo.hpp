@@ -13,12 +13,13 @@ namespace hwinfo::WMI
      * @struct OSInfo
      * @brief Represents operating system information obtained from WMI.
      */
-    struct OSInfo
+    class OSInfo
     {
         struct OSInfoType
         {
         };
 
+    public:
         /**
          * @struct FREEMEMORY
          * @brief Encapsulates the FreePhysicalMemory property of CIM_OperatingSystem.

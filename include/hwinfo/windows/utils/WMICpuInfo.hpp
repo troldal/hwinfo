@@ -13,12 +13,13 @@ namespace hwinfo::WMI
      * @struct CpuInfo
      * @brief Represents CPU (Central Processing Unit) information obtained from WMI.
      */
-    struct CpuInfo
+    class CpuInfo
     {
         struct CpuInfoType
         {
         };
 
+    public:
         /**
          * @struct NAME
          * @brief Encapsulates the Name property of Win32_Processor.

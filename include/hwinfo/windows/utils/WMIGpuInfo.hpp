@@ -13,12 +13,13 @@ namespace hwinfo::WMI
      * @struct GpuInfo
      * @brief Represents GPU (Graphics Processing Unit) information obtained from WMI.
      */
-    struct GpuInfo
+    class GpuInfo
     {
         struct GpuInfoType
         {
         };
 
+    public:
         /**
          * @struct NAME
          * @brief Encapsulates the Name property of Win32_VideoController.

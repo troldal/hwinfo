@@ -13,12 +13,13 @@ namespace hwinfo::WMI
      * @struct PerfInfo
      * @brief Represents performance information obtained from WMI.
      */
-    struct PerfInfo
+    class PerfInfo
     {
         struct PerfInfoType
         {
         };
 
+    public:
         /**
          * @struct PROCESSORPERFORMANCE
          * @brief Encapsulates the PercentProcessorPerformance property of Win32_PerfFormattedData_Counters_ProcessorInformation.

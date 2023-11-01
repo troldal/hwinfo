@@ -13,12 +13,13 @@ namespace hwinfo::WMI
      * @struct BoardInfo
      * @brief Represents baseboard (motherboard) information obtained from WMI.
      */
-    struct BoardInfo
+    class BoardInfo
     {
         struct BoardInfoType
         {
         };
 
+    public:
         /**
          * @struct MANUFACTURER
          * @brief Encapsulates the Manufacturer property of Win32_BaseBoard.

@@ -13,12 +13,13 @@ namespace hwinfo::WMI
      * @struct RamInfo
      * @brief Represents RAM (Random Access Memory) information obtained from WMI.
      */
-    struct RamInfo
+    class RamInfo
     {
         struct RamInfoType
         {
         };
 
+    public:
         /**
          * @struct NAME
          * @brief Encapsulates the Name property of Win32_PhysicalMemory.

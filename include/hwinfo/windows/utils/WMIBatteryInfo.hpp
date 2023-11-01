@@ -13,12 +13,13 @@ namespace hwinfo::WMI
      * @struct BatteryInfo
      * @brief Represents battery information obtained from WMI.
      */
-    struct BatteryInfo
+    class BatteryInfo
     {
         struct BatteryInfoType
         {
         };
 
+    public:
         /**
          * @struct NAME
          * @brief Encapsulates the Name property of Win32_Battery.
