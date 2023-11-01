@@ -45,3 +45,7 @@
 #    include "windows/osWin.hpp"
 #endif
 
+namespace hwinfo
+{
+    OS getOSInfo() { return OS::getOSInfo(); }
+}    // namespace hwinfo

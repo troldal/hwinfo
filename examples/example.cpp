@@ -43,7 +43,7 @@ int main(int argc, char** argv)
         // std::cout << cpu.currentTemperature_Celsius() << std::endl;
     }
 
-    hwinfo::OS os;
+    hwinfo::OS os = hwinfo::getOSInfo();
     std::cout << "----------------------------------- OS ------------------------------------" << std::endl;
     std::cout << std::left << std::setw(20) << "Operating System:";
     std::cout << os.fullName() << std::endl;

@@ -44,6 +44,18 @@ namespace hwinfo::detail
     {
         friend IMPL;
 
+        struct OSItem
+        {
+            std::string fullName {};
+            std::string name {};
+            std::string version {};
+            std::string kernel {};
+            bool        _32bit        = false;
+            bool        _64bit        = false;
+            bool        _bigEndian    = false;
+            bool        _littleEndian = false;
+        };
+
     public:
         OSBase() = default;
 
@@ -58,25 +70,25 @@ namespace hwinfo::detail
         [[nodiscard]]
         bool is32bit() const
         {
-            return _32bit;
+            return _item._32bit;
         }
         [[nodiscard]]
         bool is64bit() const
         {
-            return _64bit;
+            return _item._64bit;
         }
         [[nodiscard]]
         bool isBigEndian() const
         {
-            return _bigEndian;
+            return _item._bigEndian;
         }
         [[nodiscard]]
         bool isLittleEndian() const
         {
-            return _littleEndian;
+            return _item._littleEndian;
         }
 
-        static std::vector< IMPL > getOSInfo() { return {}; }
+        static IMPL getOSInfo() { return IMPL::getAllOSs(); }
 
     protected:
         ~OSBase() = default;
@@ -96,14 +108,7 @@ namespace hwinfo::detail
          */
         IMPL const& impl() const { return static_cast< IMPL const& >(*this); }
 
-        std::string _fullName;
-        std::string _name;
-        std::string _version;
-        std::string _kernel;
-        bool        _32bit        = false;
-        bool        _64bit        = false;
-        bool        _bigEndian    = false;
-        bool        _littleEndian = false;
+        OSItem _item {};
     };
 
 }    // namespace hwinfo::detail

@@ -51,16 +51,27 @@ namespace hwinfo
             using BASE = OSBase< OSWin >;
             friend BASE;
 
-        public:
-            OSWin()
-            {
-                BASE::_32bit        = getIs32bit();
-                BASE::_64bit        = getIs64bit();
-                BASE::_bigEndian    = getIsBigEndian();
-                BASE::_littleEndian = !_bigEndian;
-            }
+            OSWin() = default;
 
         private:
+            static OSWin getAllOSs()
+            {
+                BASE::OSItem os;
+                os.fullName      = getFullName();
+                os.name          = getName();
+                os.version       = getVersion();
+                os.kernel        = getKernel();
+                os._32bit        = getIs32bit();
+                os._64bit        = getIs64bit();
+                os._bigEndian    = getIsBigEndian();
+                os._littleEndian = getIsLittleEndian();
+
+                OSWin osw;
+                osw._item = os;
+
+                return osw;
+            }
+
             static std::string getFullName()
             {
                 static NTSTATUS(__stdcall * RtlGetVersion)(OUT PRTL_OSVERSIONINFOEXW lpVersionInformation) =
@@ -331,8 +342,7 @@ namespace hwinfo
                 BOOL isWow64 = FALSE;
                 IsWow64Process(GetCurrentProcess(), &isWow64);
 
-                if (sizeof(void*) == 8 || isWow64)
-                    return true;
+                if (sizeof(void*) == 8 || isWow64) return true;
                 else
                     return false;
             }
