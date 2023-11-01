@@ -187,7 +187,7 @@ namespace hwinfo::detail
         ~CPUBase() = default;    ///< Defaulted virtual destructor for safe polymorphism.
 
     private:
-        CPUBase() = default;    //< Default constructor is private to ensure control of object creation.
+        CPUBase() = default;    ///< Default constructor is private to ensure control of object creation.
 
         /**
          * @brief Adds a CpuItem to the internal list.

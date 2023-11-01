@@ -33,6 +33,12 @@
     SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
+/**
+ * @file DiskWin.hpp
+ * @namespace hwinfo
+ * @brief Contains the implementation of the DiskWin class, a Windows-specific implementation for disk information retrieval.
+ */
+
 #pragma once
 
 #include "../base/diskBase.hpp"
@@ -44,42 +50,61 @@ namespace hwinfo
     namespace detail
     {
 
+        /**
+         * @class DiskWin
+         * @brief A Windows-specific implementation of the DiskBase class for disk information retrieval.
+         *
+         * This class is derived from DiskBase using the Curiously Recurring Template Pattern (CRTP) and provides
+         * an implementation specific to the Windows operating system for retrieving disk information using WMI.
+         */
         class DiskWin : public DiskBase< DiskWin >
         {
-            using BASE = DiskBase< DiskWin >;
-            friend BASE;
+            using BASE = DiskBase< DiskWin >;    ///< Typedef for the base class.
+            friend BASE;                         ///< Grants access to the base class for certain operations.
 
+            /**
+             * @brief Default constructor. It is private to ensure only methods within the class can create an instance.
+             */
             DiskWin() = default;
 
         private:
+            /**
+             * @brief Retrieves information about all disks on the system.
+             * @return DiskWin An instance of DiskWin containing the information about all disks.
+             *
+             * This function queries the system for information about all disks using WMI,
+             * and then populates a DiskWin instance with this information.
+             */
             static DiskWin getAllDisks()
             {
-                DiskWin disks;
+                DiskWin disks;    ///< Instance of DiskWin to hold the disk information.
 
                 using namespace WMI;
+
+                // Query disk information using WMI.
                 auto info = wmiInterface.query< DiskInfo::MODEL, DiskInfo::MANUFACTURER, DiskInfo::SERIALNUMBER, DiskInfo::SIZE >();
 
                 for (const auto& disk : info) {
-                    auto item = BASE::DiskItem {};
+                    auto item = BASE::DiskItem {};    ///< Temporary DiskItem to hold information about a single disk.
 
-                    item.model        = std::get< 0 >(disk);
-                    item.vendor       = std::get< 1 >(disk);
-                    item.serialNumber = std::get< 2 >(disk);
-                    item.size         = std::stoull(std::get< 3 >(disk));
+                    item.model        = std::get< 0 >(disk);                 ///< Set the model of the disk.
+                    item.vendor       = std::get< 1 >(disk);                 ///< Set the vendor of the disk.
+                    item.serialNumber = std::get< 2 >(disk);                 ///< Set the serial number of the disk.
+                    item.size         = std::stoull(std::get< 3 >(disk));    ///< Set the size of the disk.
 
-                    disks.addItem(item);
+                    disks.addItem(item);    ///< Add the DiskItem to the collection of disks.
                 }
 
-                return disks;
+                return disks;    ///< Return the instance of DiskWin containing the disk information.
             }
 
-            static WMI::WMIInterface wmiInterface;
+            static WMI::WMIInterface wmiInterface;    ///< Static instance of WMIInterface for querying WMI.
         };
 
-        WMI::WMIInterface DiskWin::wmiInterface {};
+        WMI::WMIInterface DiskWin::wmiInterface {};    ///< Initialization of the static WMIInterface member.
 
     }    // namespace detail
 
-    using Disk = detail::DiskWin;
+    using Disk = detail::DiskWin;    ///< Typedef for easier access to the DiskWin class outside of the detail namespace.
 
 }    // namespace hwinfo
