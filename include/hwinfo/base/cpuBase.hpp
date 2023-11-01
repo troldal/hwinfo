@@ -36,6 +36,7 @@
 #pragma once
 
 #include <memory>
+#include <numeric>
 #include <string>
 #include <vector>
 
@@ -46,65 +47,39 @@ namespace hwinfo::detail
     {
         friend IMPL;
 
+        struct CpuItem
+        {
+            std::string                vendor {};
+            std::string                modelName {};
+            int64_t                    L1CacheSize { -1 };
+            int64_t                    L2CacheSize { -1 };
+            int64_t                    L3CacheSize { -1 };
+            uint32_t                   numPhysicalCores { 0 };
+            uint32_t                   numLogicalCores { 0 };
+            int64_t                    maxClockSpeed { -1 };
+            int64_t                    regularClockSpeed { -1 };
+            std::vector< std::string > flags {};
+        };
+
     public:
-        [[nodiscard]]
-        int id() const
+        std::vector< CpuItem > const& items() const { return _items; }
+
+        void addItem(const CpuItem& item) { _items.push_back(item); }
+
+        auto cpuCount() const { return _items.size(); }
+
+        auto physicalCoreCount() const
         {
-            return m_id;
+            return std::accumulate(_items.begin(), _items.end(), uint32_t(0), [](uint32_t sum, const CpuItem& item) {
+                return sum + item.numPhysicalCores;
+            });
         }
 
-        [[nodiscard]]
-        const std::string& modelName() const
+        auto logicalCoreCount() const
         {
-            return m_modelName;
-        }
-
-        [[nodiscard]]
-        const std::string& vendor() const
-        {
-            return m_vendor;
-        }
-
-        [[nodiscard]]
-        int64_t L1CacheSize() const
-        {
-            return m_L1CacheSize;
-        }
-
-        [[nodiscard]]
-        int64_t L2CacheSize() const
-        {
-            return m_L2CacheSize;
-        }
-
-        [[nodiscard]]
-        int64_t L3CacheSize() const
-        {
-            return m_L3CacheSize;
-        }
-
-        [[nodiscard]]
-        int numPhysicalCores() const
-        {
-            return m_numPhysicalCores;
-        }
-
-        [[nodiscard]]
-        int numLogicalCores() const
-        {
-            return m_numLogicalCores;
-        }
-
-        [[nodiscard]]
-        int64_t maxClockSpeed() const
-        {
-            return m_maxClockSpeed;
-        }
-
-        [[nodiscard]]
-        int64_t regularClockSpeed() const
-        {
-            return m_regularClockSpeed;
+            return std::accumulate(_items.begin(), _items.end(), uint32_t(0), [](uint32_t sum, const CpuItem& item) {
+                return sum + item.numLogicalCores;
+            });
         }
 
         [[nodiscard]]
@@ -138,13 +113,7 @@ namespace hwinfo::detail
         }
 
         [[nodiscard]]
-        const std::vector< std::string >& flags() const
-        {
-            return m_flags;
-        }
-
-        [[nodiscard]]
-        static std::vector< IMPL > getCpuInfo()
+        static IMPL getCpuInfo()
         {
             return IMPL::getAllCPUs();
         }
@@ -169,16 +138,6 @@ namespace hwinfo::detail
          */
         IMPL const& impl() const { return static_cast< IMPL const& >(*this); }
 
-        int                        m_id { -1 };
-        std::string                m_modelName;
-        std::string                m_vendor;
-        uint32_t                   m_numPhysicalCores { 0 };
-        uint32_t                   m_numLogicalCores { 0 };
-        int64_t                    m_maxClockSpeed { -1 };
-        int64_t                    m_regularClockSpeed { -1 };
-        int64_t                    m_L1CacheSize { -1 };
-        int64_t                    m_L2CacheSize { -1 };
-        int64_t                    m_L3CacheSize { -1 };
-        std::vector< std::string > m_flags {};
+        std::vector< CpuItem > _items {};
     };
-}    // namespace hwinfo
+}    // namespace hwinfo::detail

@@ -59,26 +59,28 @@ namespace hwinfo
                 using namespace WMI;
                 auto info = wmiInterface.query< PerfInfo::PROCESSORPERFORMANCE >();
 
+                auto clockSpeed = _items.front().maxClockSpeed;
+
                 if (info.empty()) return -1;
                 else
-                    return static_cast< int64_t >(static_cast< double >(m_maxClockSpeed) * std::stod(std::get< 0 >(info[thread_id])) /
-                                                  100.0);
+                    return static_cast< int64_t >(static_cast< double >(clockSpeed) * std::stod(std::get< 0 >(info[thread_id])) / 100.0);
             }
 
             [[nodiscard]]
             std::vector< int64_t > getCurrentClockSpeed() const
             {
                 std::vector< int64_t > result;
-                result.reserve(m_numLogicalCores);
+                result.reserve(logicalCoreCount());
 
                 using namespace WMI;
                 auto info = wmiInterface.query< PerfInfo::PROCESSORPERFORMANCE >();
 
-                if (info.empty()) result.assign(m_numLogicalCores, -1);
+                auto clockSpeed = _items.front().maxClockSpeed;
+
+                if (info.empty()) result.assign(logicalCoreCount(), -1);
                 else
                     for (auto& v : info)
-                        result.push_back(
-                            static_cast< int64_t >(static_cast< double >(m_maxClockSpeed) * std::stod(std::get< 0 >(v)) / 100.0));
+                        result.push_back(static_cast< int64_t >(static_cast< double >(clockSpeed) * std::stod(std::get< 0 >(v)) / 100.0));
 
                 return result;
             }
@@ -107,12 +109,12 @@ namespace hwinfo
             std::vector< double > getThreadsUtilisation() const
             {
                 std::vector< double > thread_utility;
-                thread_utility.reserve(m_numLogicalCores);
+                thread_utility.reserve(logicalCoreCount());
 
                 using namespace WMI;
                 auto info = wmiInterface.query< PerfInfo::PROCESSORUTILITY >();
 
-                if (info.empty()) thread_utility.assign(m_numLogicalCores, -1.0);
+                if (info.empty()) thread_utility.assign(logicalCoreCount(), -1.0);
                 else
                     for (const auto& cpu : info) thread_utility.push_back(std::stod(std::get< 0 >(cpu)) / 100.f);
 
@@ -120,9 +122,9 @@ namespace hwinfo
             }
 
             [[nodiscard]]
-            static std::vector< CPUWin > getAllCPUs()
+            static CPUWin getAllCPUs()
             {
-                std::vector< CPUWin > cpus;
+                CPUWin cpus;
 
                 using namespace WMI;
                 auto info = wmiInterface.query< CpuInfo::NAME,
@@ -134,17 +136,18 @@ namespace hwinfo
                                                 CpuInfo::L3CACHESIZE >();
 
                 for (const auto& cpu : info) {
-                    cpus.emplace_back(CPUWin {});
-                    auto& processor = cpus.back();
+                    auto processor = BASE::CpuItem {};
 
-                    processor.m_modelName         = std::get< 0 >(cpu);
-                    processor.m_vendor            = std::get< 1 >(cpu);
-                    processor.m_numPhysicalCores  = std::get< 2 >(cpu);
-                    processor.m_numLogicalCores   = std::get< 3 >(cpu);
-                    processor.m_maxClockSpeed     = std::get< 4 >(cpu);
-                    processor.m_regularClockSpeed = std::get< 4 >(cpu);
-                    processor.m_L2CacheSize       = std::get< 5 >(cpu);
-                    processor.m_L3CacheSize       = std::get< 6 >(cpu);
+                    processor.modelName         = std::get< 0 >(cpu);
+                    processor.vendor            = std::get< 1 >(cpu);
+                    processor.numPhysicalCores  = std::get< 2 >(cpu);
+                    processor.numLogicalCores   = std::get< 3 >(cpu);
+                    processor.maxClockSpeed     = std::get< 4 >(cpu);
+                    processor.regularClockSpeed = std::get< 4 >(cpu);
+                    processor.L2CacheSize       = std::get< 5 >(cpu);
+                    processor.L3CacheSize       = std::get< 6 >(cpu);
+
+                    cpus.addItem(processor);
                 }
 
                 return cpus;

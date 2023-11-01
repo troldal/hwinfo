@@ -18,24 +18,24 @@ int main(int argc, char** argv)
     std::cout << std::endl << "Hardware Report:" << std::endl << std::endl;
     std::cout << "----------------------------------- CPU -----------------------------------" << std::endl;
     auto cpus = hwinfo::getCpuInfo();
-    for (const auto& cpu : cpus) {
-        std::cout << "Socket " << cpu.id() << ":\n";
+    for (const auto& cpu : cpus.items()) {
+        //        std::cout << "Socket " << cpu.id() << ":\n";
         std::cout << std::left << std::setw(20) << " vendor:";
-        std::cout << cpu.vendor() << std::endl;
+        std::cout << cpu.vendor << std::endl;
         std::cout << std::left << std::setw(20) << " model:";
-        std::cout << cpu.modelName() << std::endl;
+        std::cout << cpu.modelName << std::endl;
         std::cout << std::left << std::setw(20) << " physical cores:";
-        std::cout << cpu.numPhysicalCores() << std::endl;
+        std::cout << cpu.numPhysicalCores << std::endl;
         std::cout << std::left << std::setw(20) << " logical cores:";
-        std::cout << cpu.numLogicalCores() << std::endl;
+        std::cout << cpu.numLogicalCores << std::endl;
         std::cout << std::left << std::setw(20) << " max frequency:";
-        std::cout << cpu.maxClockSpeed() << std::endl;
+        std::cout << cpu.maxClockSpeed << std::endl;
         std::cout << std::left << std::setw(20) << " regular frequency:";
-        std::cout << cpu.regularClockSpeed() << std::endl;
+        std::cout << cpu.regularClockSpeed << std::endl;
         std::cout << std::left << std::setw(20) << " cache size (L1, L2, L3): ";
-        std::cout << cpu.L1CacheSize() << ", " << cpu.L2CacheSize() << ", " << cpu.L3CacheSize() << std::endl;
-        auto threads_utility = cpu.threadsUtilisation();
-        auto threads_speed   = cpu.currentClockSpeed();
+        std::cout << cpu.L1CacheSize << ", " << cpu.L2CacheSize << ", " << cpu.L3CacheSize << std::endl;
+        auto threads_utility = cpus.threadsUtilisation();
+        auto threads_speed   = cpus.currentClockSpeed();
         for (int thread_id = 0; thread_id < threads_utility.size(); ++thread_id) {
             std::cout << std::left << std::setw(20) << "   Thread " + std::to_string(thread_id) + ": ";
             std::cout << threads_speed[thread_id] << " MHz (" << threads_utility[thread_id] * 100 << "%)" << std::endl;
