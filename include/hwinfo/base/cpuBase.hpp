@@ -33,6 +33,11 @@
     SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
+/**
+ * @file cpuBase.hpp
+ * @brief This file contains the base class for retrieving CPU information using CRTP.
+ */
+
 #pragma once
 
 #include <memory>
@@ -42,81 +47,136 @@
 
 namespace hwinfo::detail
 {
+    /**
+     * @class CPUBase
+     * @brief A Curiously Recurring Template Pattern (CRTP) base class for retrieving CPU information.
+     * @tparam IMPL The derived class that inherits from CPUBase.
+     *
+     * This class provides a common interface and data structure to represent CPU information. The derived class
+     * should provide the implementation specific to the platform.
+     */
     template< typename IMPL >
     class CPUBase
     {
-        friend IMPL;
+        friend IMPL;    ///< Allow the derived class to access private members.
 
+        /**
+         * @struct CpuItem
+         * @brief Represents a single CPU's information.
+         */
         struct CpuItem
         {
-            std::string                vendor {};
-            std::string                modelName {};
-            int64_t                    L1CacheSize { -1 };
-            int64_t                    L2CacheSize { -1 };
-            int64_t                    L3CacheSize { -1 };
-            uint32_t                   numPhysicalCores { 0 };
-            uint32_t                   numLogicalCores { 0 };
-            int64_t                    maxClockSpeed { -1 };
-            int64_t                    regularClockSpeed { -1 };
-            std::vector< std::string > flags {};
+            std::string                vendor {};                   ///< The CPU's vendor.
+            std::string                modelName {};                ///< The model name of the CPU.
+            int64_t                    L1CacheSize { -1 };          ///< The size of the L1 cache in KB. -1 if unknown.
+            int64_t                    L2CacheSize { -1 };          ///< The size of the L2 cache in KB. -1 if unknown.
+            int64_t                    L3CacheSize { -1 };          ///< The size of the L3 cache in KB. -1 if unknown.
+            uint32_t                   numPhysicalCores { 0 };      ///< The number of physical cores.
+            uint32_t                   numLogicalCores { 0 };       ///< The number of logical cores (including hyper-threaded cores).
+            int64_t                    maxClockSpeed { -1 };        ///< The maximum clock speed in MHz.
+            int64_t                    regularClockSpeed { -1 };    ///< The regular clock speed in MHz.
+            std::vector< std::string > flags {};                    ///< A list of flags or features supported by the CPU.
         };
 
     public:
+        /**
+         * @brief Retrieves the list of CPU items.
+         * @return A const reference to a vector of CpuItem structures.
+         */
         [[nodiscard]]
-        std::vector< CpuItem > const& items() const { return _items; }
+        std::vector< CpuItem > const& items() const
+        {
+            return _items;
+        }
 
+        /**
+         * @brief Retrieves the number of CPU items.
+         * @return The number of CPU items.
+         */
         [[nodiscard]]
         size_t count() const
         {
             return _items.size();
         }
 
+        /**
+         * @brief Calculates the total number of physical cores.
+         * @return The total number of physical cores across all CPU items.
+         */
         [[nodiscard]]
         auto physicalCoreCount() const
         {
-            return std::accumulate(_items.begin(), _items.end(), uint32_t(0), [](uint32_t sum, const CpuItem& item) {
-                return sum + item.numPhysicalCores;
-            });
+            return std::accumulate(_items.begin(), _items.end(), uint32_t(0),
+                                   [](uint32_t sum, const CpuItem& item) { return sum + item.numPhysicalCores; });
         }
 
+        /**
+         * @brief Calculates the total number of logical cores.
+         * @return The total number of logical cores across all CPU items.
+         */
         [[nodiscard]]
         auto logicalCoreCount() const
         {
-            return std::accumulate(_items.begin(), _items.end(), uint32_t(0), [](uint32_t sum, const CpuItem& item) {
-                return sum + item.numLogicalCores;
-            });
+            return std::accumulate(_items.begin(), _items.end(), uint32_t(0),
+                                   [](uint32_t sum, const CpuItem& item) { return sum + item.numLogicalCores; });
         }
 
+        /**
+         * @brief Retrieves the current clock speed of a specific thread.
+         * @param thread_id The index of the thread.
+         * @return The current clock speed in MHz.
+         */
         [[nodiscard]]
         int64_t currentClockSpeed(int thread_id) const
         {
             return impl().getCurrentClockSpeed(thread_id);
         }
 
+        /**
+         * @brief Retrieves the current clock speeds of all threads.
+         * @return A vector of current clock speeds in MHz.
+         */
         [[nodiscard]]
         std::vector< int64_t > currentClockSpeed() const
         {
             return impl().getCurrentClockSpeed();
         }
 
+        /**
+         * @brief Calculates the average CPU utilization across all threads.
+         * @return The average CPU utilization as a percentage.
+         */
         [[nodiscard]]
         double currentUtilisation() const
         {
             return impl().getCurrentUtilisation();
         }
 
+        /**
+         * @brief Retrieves the CPU utilization of a specific thread.
+         * @param thread_index The index of the thread.
+         * @return The CPU utilization as a percentage.
+         */
         [[nodiscard]]
         double threadUtilisation(int thread_index) const
         {
             return impl().getThreadUtilisation(thread_index);
         }
 
+        /**
+         * @brief Retrieves the CPU utilization of all threads.
+         * @return A vector of CPU utilizations as percentages.
+         */
         [[nodiscard]]
         std::vector< double > threadsUtilisation() const
         {
             return impl().getThreadsUtilisation();
         }
 
+        /**
+         * @brief Factory function to create and retrieve an instance of the derived class.
+         * @return An instance of the derived class.
+         */
         [[nodiscard]]
         static IMPL getCpuInfo()
         {
@@ -124,27 +184,29 @@ namespace hwinfo::detail
         }
 
     protected:
-        ~CPUBase() = default;
+        ~CPUBase() = default;    ///< Defaulted virtual destructor for safe polymorphism.
 
     private:
-        CPUBase() = default;
+        CPUBase() = default;    //< Default constructor is private to ensure control of object creation.
 
+        /**
+         * @brief Adds a CpuItem to the internal list.
+         * @param item The CpuItem to add.
+         */
         void addItem(const CpuItem& item) { _items.push_back(item); }
 
         /**
-         * @brief Provides access to the implementation-specific methods in the derived class.
-         *
-         * @return A reference to the derived class instance.
+         * @brief Casts the instance to the derived type.
+         * @return A reference to the derived instance.
          */
         IMPL& impl() { return static_cast< IMPL& >(*this); }
 
         /**
-         * @brief Provides const access to the implementation-specific methods in the derived class.
-         *
-         * @return A const reference to the derived class instance.
+         * @brief Casts the instance to the derived type.
+         * @return A const reference to the derived instance.
          */
         IMPL const& impl() const { return static_cast< IMPL const& >(*this); }
 
-        std::vector< CpuItem > _items {};
+        std::vector< CpuItem > _items {};    ///< Internal storage of CPU information.
     };
 }    // namespace hwinfo::detail

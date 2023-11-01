@@ -33,6 +33,11 @@
     SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
+/**
+ * @file CPUWin.hpp
+ * @brief This file contains the derived class for retrieving CPU information on Windows platforms.
+ */
+
 #pragma once
 
 #include "../base/cpuBase.hpp"
@@ -45,14 +50,29 @@ namespace hwinfo
     namespace detail
     {
 
+        /**
+         * @class CPUWin
+         * @brief Derived class for retrieving CPU information on Windows platforms.
+         *
+         * This class provides an implementation of the CPUBase class using Windows Management Instrumentation (WMI)
+         * to retrieve CPU information on Windows platforms.
+         */
         class CPUWin : public CPUBase< CPUWin >
         {
-            using BASE = CPUBase< CPUWin >;
-            friend BASE;
+            using BASE = CPUBase< CPUWin >;    ///< Type alias for the base class.
+            friend BASE;                       ///< Allow the base class to access private members.
 
+            /**
+             * @brief Default constructor.
+             */
             CPUWin() = default;
 
         private:
+            /**
+             * @brief Retrieves the current clock speed of a specific CPU thread.
+             * @param thread_id The ID of the CPU thread.
+             * @return The current clock speed in Hz, or -1 if the information could not be retrieved.
+             */
             [[nodiscard]]
             int64_t getCurrentClockSpeed(int thread_id) const
             {
@@ -66,6 +86,11 @@ namespace hwinfo
                     return static_cast< int64_t >(static_cast< double >(clockSpeed) * std::stod(std::get< 0 >(info[thread_id])) / 100.0);
             }
 
+            /**
+             * @brief Retrieves the current clock speed of all CPU threads.
+             * @return A vector of current clock speeds in Hz. If information could not be retrieved, the vector contains -1 for each
+             * thread.
+             */
             [[nodiscard]]
             std::vector< int64_t > getCurrentClockSpeed() const
             {
@@ -85,6 +110,10 @@ namespace hwinfo
                 return result;
             }
 
+            /**
+             * @brief Retrieves the overall CPU utilization.
+             * @return The overall CPU utilization as a percentage, or -1.0 if the information could not be retrieved.
+             */
             [[nodiscard]]
             double getCurrentUtilisation() const
             {
@@ -94,6 +123,11 @@ namespace hwinfo
                     return std::accumulate(tutils.begin(), tutils.end(), 0.0) / tutils.size();
             }
 
+            /**
+             * @brief Retrieves the CPU utilization of a specific thread.
+             * @param thread_id The ID of the CPU thread.
+             * @return The CPU utilization as a percentage, or -1.0 if the information could not be retrieved.
+             */
             [[nodiscard]]
             double getThreadUtilisation(int thread_id) const    // NOLINT
             {
@@ -105,6 +139,11 @@ namespace hwinfo
                     return std::stod(std::get< 0 >(info[thread_id])) / 100.f;
             }
 
+            /**
+             * @brief Retrieves the CPU utilization for all threads.
+             * @return A vector of CPU utilizations as percentages. If information could not be retrieved, the vector contains -1.0 for each
+             * thread.
+             */
             [[nodiscard]]
             std::vector< double > getThreadsUtilisation() const
             {
@@ -121,12 +160,18 @@ namespace hwinfo
                 return thread_utility;
             }
 
+            /**
+             * @brief Retrieves information for all CPUs.
+             * @return A CPUWin instance populated with information about all CPUs.
+             */
             [[nodiscard]]
             static CPUWin getAllCPUs()
             {
-                CPUWin cpus;
+                CPUWin cpus;    // Creating a CPUWin instance.
 
                 using namespace WMI;
+
+                // Querying CPU information.
                 auto info = wmiInterface.query< CpuInfo::NAME,
                                                 CpuInfo::MANUFACTURER,
                                                 CpuInfo::PHYSICALCORES,
@@ -135,9 +180,11 @@ namespace hwinfo
                                                 CpuInfo::L2CACHESIZE,
                                                 CpuInfo::L3CACHESIZE >();
 
+                // Populating the CPUWin instance with CPU information.
                 for (const auto& cpu : info) {
-                    auto item = BASE::CpuItem {};
+                    auto item = BASE::CpuItem {};    // Creating a new CpuItem.
 
+                    // Assigning values to the CpuItem.
                     item.modelName         = std::get< 0 >(cpu);
                     item.vendor            = std::get< 1 >(cpu);
                     item.numPhysicalCores  = std::get< 2 >(cpu);
@@ -147,19 +194,21 @@ namespace hwinfo
                     item.L2CacheSize       = std::get< 5 >(cpu);
                     item.L3CacheSize       = std::get< 6 >(cpu);
 
-                    cpus.addItem(item);
+                    cpus.addItem(item);    // Adding the CpuItem to the CPUWin instance.
                 }
 
-                return cpus;
+                return cpus;    // Returning the populated CPUWin instance.
             }
 
-            static WMI::WMIInterface wmiInterface;
+            static WMI::WMIInterface wmiInterface;    ///< Static instance of WMIInterface for querying WMI.
         };
 
+        // Initialize the static WMIInterface instance.
         WMI::WMIInterface CPUWin::wmiInterface {};
 
     }    // namespace detail
 
+    // Alias the CPUWin class in the hwinfo namespace for easier access.
     using CPU = detail::CPUWin;
 
 }    // namespace hwinfo
