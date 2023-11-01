@@ -47,5 +47,5 @@
 
 namespace hwinfo
 {
-    std::vector< GPU > getGpuInfo() { return GPU::getGpuInfo(); }
+    GPU getGpuInfo() { return GPU::getGpuInfo(); }
 }    // namespace hwinfo

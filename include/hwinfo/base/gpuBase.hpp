@@ -36,6 +36,7 @@
 #pragma once
 
 #include <cstdint>
+#include <numeric>
 #include <string>
 #include <vector>
 
@@ -45,54 +46,34 @@ namespace hwinfo::detail
     template< typename IMPL >
     class GPUBase
     {
-
         friend IMPL;
 
+        struct GpuItem
+        {
+            std::string vendor {};
+            std::string name {};
+            std::string driverVersion {};
+            int64_t     memory { 0 };
+            int64_t     frequency { 0 };
+            int         num_cores { 0 };
+            int         id { 0 };
+        };
+
     public:
+        std::vector< GpuItem > const& items() const { return _items; }
 
-        [[nodiscard]]
-        std::string vendor() const
+        void addItem(const GpuItem& item) { _items.push_back(item); }
+
+        auto gpuCount() const { return _items.size(); }
+
+        auto coreCount() const
         {
-            return m_vendor;
+            return std::accumulate(_items.begin(), _items.end(), uint32_t(0), [](uint32_t sum, const GpuItem& item) {
+                return sum + item.num_cores;
+            });
         }
 
-        [[nodiscard]]
-        std::string name() const
-        {
-            return m_name;
-        }
-
-        [[nodiscard]]
-        std::string driverVersion() const
-        {
-            return m_driverVersion;
-        }
-
-        [[nodiscard]]
-        int64_t memory_Bytes() const
-        {
-            return m_memory;
-        }
-
-        [[nodiscard]]
-        int64_t frequency_MHz() const
-        {
-            return m_frequency;
-        }
-
-        [[nodiscard]]
-        int num_cores() const
-        {
-            return m_num_cores;
-        }
-
-        [[nodiscard]]
-        int id() const
-        {
-            return m_id;
-        }
-
-        static std::vector< IMPL > getGpuInfo() { return IMPL::getAllGPUs(); }
+        static IMPL getGpuInfo() { return IMPL::getAllGPUs(); }
 
     protected:
         ~GPUBase() = default;
@@ -113,17 +94,8 @@ namespace hwinfo::detail
         IMPL const& impl() const { return static_cast< IMPL const& >(*this); }
 
         GPUBase() = default;
-        std::string m_vendor {};
-        std::string m_name {};
-        std::string m_driverVersion {};
-        int64_t     m_memory { 0 };
-        int64_t     m_frequency { 0 };
-        int         m_num_cores { 0 };
-        int         m_id { 0 };
 
-        std::string m_vendor_id {};
-        std::string m_device_id {};
+        std::vector< GpuItem > _items {};
     };
-
 
 }    // namespace hwinfo::detail

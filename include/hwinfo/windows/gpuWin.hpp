@@ -57,9 +57,9 @@ namespace hwinfo
 
         private:
             [[nodiscard]]
-            static std::vector< GPUWin > getAllGPUs()
+            static GPUWin getAllGPUs()
             {
-                std::vector< GPUWin > gpus;
+                GPUWin gpus;
 
                 using namespace WMI;
                 auto info = wmiInterface.query< GpuInfo::NAME, GpuInfo::ADAPTERCOMPAT, GpuInfo::DRIVERVER, GpuInfo::ADAPTERRAM >();
@@ -67,13 +67,14 @@ namespace hwinfo
                 if (info.empty()) return {};
 
                 for (const auto& gpu : info) {
-                    gpus.emplace_back(GPUWin {});
-                    auto& processor = gpus.back();
+                    auto processor = BASE::GpuItem {};
 
-                    processor.m_name          = std::get< 0 >(gpu);
-                    processor.m_vendor        = std::get< 1 >(gpu);
-                    processor.m_driverVersion = std::get< 2 >(gpu);
-                    processor.m_memory        = std::get< 3 >(gpu);
+                    processor.name          = std::get< 0 >(gpu);
+                    processor.vendor        = std::get< 1 >(gpu);
+                    processor.driverVersion = std::get< 2 >(gpu);
+                    processor.memory        = std::get< 3 >(gpu);
+
+                    gpus.addItem(processor);
                 }
 
 #ifdef USE_OCL

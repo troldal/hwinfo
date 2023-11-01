@@ -60,20 +60,20 @@ int main(int argc, char** argv)
 
     auto gpus = hwinfo::getGpuInfo();
     std::cout << "----------------------------------- GPU -----------------------------------" << std::endl;
-    for (auto& gpu : gpus) {
-        std::cout << "GPU " << gpu.id() << ":\n";
+    for (auto& gpu : gpus.items()) {
+        //        std::cout << "GPU " << gpu.id() << ":\n";
         std::cout << std::left << std::setw(20) << "  vendor:";
-        std::cout << gpu.vendor() << std::endl;
+        std::cout << gpu.vendor << std::endl;
         std::cout << std::left << std::setw(20) << "  model:";
-        std::cout << gpu.name() << std::endl;
+        std::cout << gpu.name << std::endl;
         std::cout << std::left << std::setw(20) << "  driverVersion:";
-        std::cout << gpu.driverVersion() << std::endl;
+        std::cout << gpu.driverVersion << std::endl;
         std::cout << std::left << std::setw(20) << "  memory [MiB]:";
-        std::cout << static_cast< double >(gpu.memory_Bytes()) / 1024.0 / 1024.0 << std::endl;
+        std::cout << static_cast< double >(gpu.memory) / 1024.0 / 1024.0 << std::endl;
         std::cout << std::left << std::setw(20) << "  frequency:";
-        std::cout << gpu.frequency_MHz() << std::endl;
+        std::cout << gpu.frequency << std::endl;
         std::cout << std::left << std::setw(20) << "  cores:";
-        std::cout << gpu.num_cores() << std::endl;
+        std::cout << gpu.num_cores << std::endl;
     }
 
     auto ram = hwinfo::getRamInfo();
