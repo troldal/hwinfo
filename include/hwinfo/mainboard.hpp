@@ -47,5 +47,5 @@
 
 namespace hwinfo
 {
-    std::vector< MainBoard > getBaseboardInfo() { return MainBoard::getBaseboardInfo(); }
+    MainBoard getBaseboardInfo() { return MainBoard::getBaseboardInfo(); }
 }    // namespace hwinfo

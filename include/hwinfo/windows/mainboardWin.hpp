@@ -52,23 +52,23 @@ namespace hwinfo
 
         private:
             [[nodiscard]]
-            static std::vector< MainBoardWin > getAllBaseboards()
+            static MainBoardWin getAllBaseboards()
             {
-                std::vector< MainBoardWin > boards;
+                MainBoardWin boards;
 
                 using namespace WMI;
                 auto info =
                     wmiInterface.query< BoardInfo::MANUFACTURER, BoardInfo::PRODUCT, BoardInfo::VERSION, BoardInfo::SERIALNUMBER >();
 
-                for (const auto& board : info) {
-                    boards.emplace_back(MainBoardWin {});    // NOLINT
-                    auto& current = boards.back();
+                auto board   = info.front();
+                auto current = BASE::MainBoardItem {};
 
-                    current._vendor       = std::get< 0 >(board);
-                    current._name         = std::get< 1 >(board);
-                    current._version      = std::get< 2 >(board);
-                    current._serialNumber = std::get< 3 >(board);
-                }
+                current.vendor       = std::get< 0 >(board);
+                current.name         = std::get< 1 >(board);
+                current.version      = std::get< 2 >(board);
+                current.serialNumber = std::get< 3 >(board);
+
+                boards._item = current;
 
                 return boards;
             }

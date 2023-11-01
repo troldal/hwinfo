@@ -46,34 +46,42 @@ namespace hwinfo::detail
     {
         friend IMPL;
 
+        struct MainBoardItem
+        {
+            std::string vendor {};
+            std::string name {};
+            std::string version {};
+            std::string serialNumber {};
+        };
+
     public:
         MainBoardBase() = default;
 
         [[nodiscard]]
         std::string vendor() const
         {
-            return _vendor;
+            return _item.vendor;
         }
 
         [[nodiscard]]
         std::string name() const
         {
-            return _name;
+            return _item.name;
         }
 
         [[nodiscard]]
         std::string version() const
         {
-            return _version;
+            return _item.version;
         }
 
         [[nodiscard]]
         std::string serialNumber() const
         {
-            return _serialNumber;
+            return _item.serialNumber;
         }
 
-        static std::vector< IMPL > getBaseboardInfo() { return IMPL::getAllBaseboards(); }
+        static IMPL getBaseboardInfo() { return IMPL::getAllBaseboards(); }
 
     protected:
         ~MainBoardBase() = default;
@@ -93,10 +101,7 @@ namespace hwinfo::detail
          */
         IMPL const& impl() const { return static_cast< IMPL const& >(*this); }
 
-        std::string _vendor;
-        std::string _name;
-        std::string _version;
-        std::string _serialNumber;
+        MainBoardItem _item {};
     };
 
 }    // namespace hwinfo::detail

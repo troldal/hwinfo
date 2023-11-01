@@ -98,7 +98,7 @@ int main(int argc, char** argv)
         std::cout << block.totalMem / 1024 / 1024 << " MiB" << std::endl;
     }
 
-    auto main_board = hwinfo::getBaseboardInfo().front();
+    auto main_board = hwinfo::getBaseboardInfo();
     std::cout << "------------------------------- Main Board --------------------------------" << std::endl;
     std::cout << std::left << std::setw(20) << "vendor:";
     std::cout << main_board.vendor() << std::endl;
