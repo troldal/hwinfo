@@ -15,12 +15,17 @@ namespace hwinfo::WMI
      */
     struct BoardInfo
     {
+        struct BoardInfoType
+        {
+        };
+
         /**
          * @struct MANUFACTURER
          * @brief Encapsulates the Manufacturer property of Win32_BaseBoard.
          */
         struct MANUFACTURER
         {
+            using info_type   = BoardInfoType;
             using value_type  = std::string;    ///< Type of the value being used.
             using result_type = std::string;    ///< Resultant type after conversion.
 
@@ -34,6 +39,7 @@ namespace hwinfo::WMI
          */
         struct PRODUCT
         {
+            using info_type   = BoardInfoType;
             using value_type  = std::string;    ///< Type of the value being used.
             using result_type = std::string;    ///< Resultant type after conversion.
 
@@ -47,6 +53,7 @@ namespace hwinfo::WMI
          */
         struct VERSION
         {
+            using info_type   = BoardInfoType;
             using value_type  = std::string;    ///< Type of the value being used.
             using result_type = std::string;    ///< Resultant type after conversion.
 
@@ -60,6 +67,7 @@ namespace hwinfo::WMI
          */
         struct SERIALNUMBER
         {
+            using info_type   = BoardInfoType;
             using value_type  = std::string;    ///< Type of the value being used.
             using result_type = std::string;    ///< Resultant type after conversion.
 

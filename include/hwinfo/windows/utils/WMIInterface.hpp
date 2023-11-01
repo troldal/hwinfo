@@ -109,6 +109,16 @@ namespace hwinfo::WMI
          */
         using BSTRPtr = std::unique_ptr< std::remove_pointer< BSTR >::type, BSTRDeleter >;
 
+        template< typename T, typename U >
+        struct has_same_wmi_class : std::integral_constant< bool, std::is_same_v< typename T::info_type, typename U::info_type > >
+        {
+        };
+
+        template< typename First, typename... Rest >
+        struct all_same_wmi_class : std::conjunction< has_same_wmi_class< First, Rest >... >
+        {
+        };
+
     public:
         /**
          * @brief Default constructor for WMIInterface.
@@ -185,6 +195,8 @@ namespace hwinfo::WMI
         template< typename... Types >
         auto query()
         {
+            static_assert(all_same_wmi_class< Types... >::value, "All types must be of the same WMI class");
+
             // Lock the mutex to ensure thread safety.
             std::lock_guard< std::mutex > lock(m_wmiMutex);
 

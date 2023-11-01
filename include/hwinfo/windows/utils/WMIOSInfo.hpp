@@ -15,12 +15,17 @@ namespace hwinfo::WMI
      */
     struct OSInfo
     {
+        struct OSInfoType
+        {
+        };
+
         /**
          * @struct FREEMEMORY
          * @brief Encapsulates the FreePhysicalMemory property of CIM_OperatingSystem.
          */
         struct FREEMEMORY
         {
+            using info_type   = OSInfoType;
             using value_type  = std::string;    ///< Type of the value being used.
             using result_type = std::string;    ///< Resultant type after conversion.
 

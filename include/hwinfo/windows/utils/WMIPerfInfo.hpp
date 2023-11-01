@@ -15,12 +15,17 @@ namespace hwinfo::WMI
      */
     struct PerfInfo
     {
+        struct PerfInfoType
+        {
+        };
+
         /**
          * @struct PROCESSORPERFORMANCE
          * @brief Encapsulates the PercentProcessorPerformance property of Win32_PerfFormattedData_Counters_ProcessorInformation.
          */
         struct PROCESSORPERFORMANCE
         {
+            using info_type   = PerfInfoType;
             using value_type  = std::string;    ///< Type of the value being used. This might need to be changed to a numeric type.
             using result_type = std::string;    ///< Resultant type after conversion. This might need to be changed to a numeric type.
 
@@ -35,6 +40,7 @@ namespace hwinfo::WMI
          */
         struct PROCESSORUTILITY
         {
+            using info_type   = PerfInfoType;
             using value_type  = std::string;    ///< Type of the value being used. This might need to be changed to a numeric type.
             using result_type = std::string;    ///< Resultant type after conversion. This might need to be changed to a numeric type.
 

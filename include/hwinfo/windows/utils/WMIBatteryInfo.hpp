@@ -15,12 +15,17 @@ namespace hwinfo::WMI
      */
     struct BatteryInfo
     {
+        struct BatteryInfoType
+        {
+        };
+
         /**
          * @struct NAME
          * @brief Encapsulates the Name property of Win32_Battery.
          */
         struct NAME
         {
+            using info_type   = BatteryInfoType;
             using value_type  = std::string;    ///< Type of the value being used.
             using result_type = std::string;    ///< Resultant type after conversion.
 
@@ -34,6 +39,7 @@ namespace hwinfo::WMI
          */
         struct DESCRIPTION
         {
+            using info_type   = BatteryInfoType;
             using value_type  = std::string;    ///< Type of the value being used.
             using result_type = std::string;    ///< Resultant type after conversion.
 
@@ -63,6 +69,7 @@ namespace hwinfo::WMI
          */
         struct CHEMISTRY
         {
+            using info_type   = BatteryInfoType;
             using value_type  = uint16_t;     ///< Type of the value being used.
             using result_type = Chemistry;    ///< Resultant type after conversion.
 
@@ -93,6 +100,7 @@ namespace hwinfo::WMI
          */
         struct STATUS
         {
+            using info_type   = BatteryInfoType;
             using value_type  = uint16_t;    ///< Type of the value being used.
             using result_type = Status;      ///< Resultant type after conversion.
 
@@ -106,6 +114,7 @@ namespace hwinfo::WMI
          */
         struct HEALTH
         {
+            using info_type   = BatteryInfoType;
             using value_type  = std::string;    ///< Type of the value being used.
             using result_type = std::string;    ///< Resultant type after conversion.
 
@@ -119,6 +128,7 @@ namespace hwinfo::WMI
          */
         struct CAPACITY
         {
+            using info_type   = BatteryInfoType;
             using value_type  = uint16_t;    ///< Type of the value being used.
             using result_type = uint16_t;    ///< Resultant type after conversion.
 

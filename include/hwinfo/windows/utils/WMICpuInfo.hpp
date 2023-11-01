@@ -15,12 +15,17 @@ namespace hwinfo::WMI
      */
     struct CpuInfo
     {
+        struct CpuInfoType
+        {
+        };
+
         /**
          * @struct NAME
          * @brief Encapsulates the Name property of Win32_Processor.
          */
         struct NAME
         {
+            using info_type   = CpuInfoType;
             using value_type  = std::string;    ///< Type of the value being used.
             using result_type = std::string;    ///< Resultant type after conversion.
 
@@ -34,6 +39,7 @@ namespace hwinfo::WMI
          */
         struct MANUFACTURER
         {
+            using info_type   = CpuInfoType;
             using value_type  = std::string;    ///< Type of the value being used.
             using result_type = std::string;    ///< Resultant type after conversion.
 
@@ -47,6 +53,7 @@ namespace hwinfo::WMI
          */
         struct PHYSICALCORES
         {
+            using info_type   = CpuInfoType;
             using value_type  = uint32_t;    ///< Type of the value being used.
             using result_type = uint32_t;    ///< Resultant type after conversion.
 
@@ -60,6 +67,7 @@ namespace hwinfo::WMI
          */
         struct LOGICALCORES
         {
+            using info_type   = CpuInfoType;
             using value_type  = uint32_t;    ///< Type of the value being used.
             using result_type = uint32_t;    ///< Resultant type after conversion.
 
@@ -73,6 +81,7 @@ namespace hwinfo::WMI
          */
         struct CLOCKSPEED
         {
+            using info_type   = CpuInfoType;
             using value_type  = uint32_t;    ///< Type of the value being used.
             using result_type = uint32_t;    ///< Resultant type after conversion.
 
@@ -86,6 +95,7 @@ namespace hwinfo::WMI
          */
         struct L2CACHESIZE
         {
+            using info_type   = CpuInfoType;
             using value_type  = uint32_t;    ///< Type of the value being used.
             using result_type = uint32_t;    ///< Resultant type after conversion.
 
@@ -99,6 +109,7 @@ namespace hwinfo::WMI
          */
         struct L3CACHESIZE
         {
+            using info_type   = CpuInfoType;
             using value_type  = uint32_t;    ///< Type of the value being used.
             using result_type = uint32_t;    ///< Resultant type after conversion.
 

@@ -15,12 +15,17 @@ namespace hwinfo::WMI
      */
     struct DiskInfo
     {
+        struct DiskInfoType
+        {
+        };
+
         /**
          * @struct MODEL
          * @brief Encapsulates the Model property of Win32_DiskDrive.
          */
         struct MODEL
         {
+            using info_type   = DiskInfoType;
             using value_type  = std::string;    ///< Type of the value being used.
             using result_type = std::string;    ///< Resultant type after conversion.
 
@@ -34,6 +39,7 @@ namespace hwinfo::WMI
          */
         struct MANUFACTURER
         {
+            using info_type   = DiskInfoType;
             using value_type  = std::string;    ///< Type of the value being used.
             using result_type = std::string;    ///< Resultant type after conversion.
 
@@ -47,6 +53,7 @@ namespace hwinfo::WMI
          */
         struct SERIALNUMBER
         {
+            using info_type   = DiskInfoType;
             using value_type  = std::string;    ///< Type of the value being used.
             using result_type = std::string;    ///< Resultant type after conversion.
 
@@ -60,6 +67,7 @@ namespace hwinfo::WMI
          */
         struct SIZE
         {
+            using info_type   = DiskInfoType;
             using value_type  = std::string;    ///< Type of the value being used.
             using result_type = std::string;    ///< Resultant type after conversion.
 

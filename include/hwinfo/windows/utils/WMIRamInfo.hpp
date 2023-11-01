@@ -15,12 +15,17 @@ namespace hwinfo::WMI
      */
     struct RamInfo
     {
+        struct RamInfoType
+        {
+        };
+
         /**
          * @struct NAME
          * @brief Encapsulates the Name property of Win32_PhysicalMemory.
          */
         struct NAME
         {
+            using info_type   = RamInfoType;
             using value_type  = std::string;    ///< Type of the value being used.
             using result_type = std::string;    ///< Resultant type after conversion.
 
@@ -34,6 +39,7 @@ namespace hwinfo::WMI
          */
         struct MANUFACTURER
         {
+            using info_type   = RamInfoType;
             using value_type  = std::string;    ///< Type of the value being used.
             using result_type = std::string;    ///< Resultant type after conversion.
 
@@ -47,6 +53,7 @@ namespace hwinfo::WMI
          */
         struct PARTNUMBER
         {
+            using info_type   = RamInfoType;
             using value_type  = std::string;    ///< Type of the value being used.
             using result_type = std::string;    ///< Resultant type after conversion.
 
@@ -60,6 +67,7 @@ namespace hwinfo::WMI
          */
         struct SERIALNUMBER
         {
+            using info_type   = RamInfoType;
             using value_type  = std::string;    ///< Type of the value being used.
             using result_type = std::string;    ///< Resultant type after conversion.
 
@@ -73,6 +81,7 @@ namespace hwinfo::WMI
          */
         struct CAPACITY
         {
+            using info_type   = RamInfoType;
             using value_type  = std::string;    ///< Type of the value being used. Consider using a numeric type for memory size.
             using result_type = std::string;    ///< Resultant type after conversion. Consider using a numeric type for memory size.
 
