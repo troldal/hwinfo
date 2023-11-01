@@ -36,6 +36,7 @@
 #pragma once
 
 #include <cstdint>
+#include <numeric>
 #include <string>
 #include <vector>
 
@@ -46,38 +47,42 @@ namespace hwinfo::detail
     {
         friend IMPL;
 
+        struct DiskItem
+        {
+            std::string vendor {};
+            std::string model {};
+            std::string serialNumber {};
+            uint64_t    size { 0 };
+        };
+
     public:
         [[nodiscard]]
-        std::string vendor() const
+        std::vector< DiskItem > const& items() const
         {
-            return m_vendor;
+            return _items;
+        }
+
+        void addItem(const DiskItem& item) { _items.push_back(item); }
+
+        [[nodiscard]]
+        auto diskCount() const
+        {
+            return _items.size();
         }
 
         [[nodiscard]]
-        std::string model() const
+        auto totalDiskSpace() const
         {
-            return m_model;
+            return std::accumulate(_items.begin(), _items.end(), int64_t(0), [](int64_t sum, const DiskItem& item) {
+                return sum + item.size;
+            });
         }
 
         [[nodiscard]]
-        std::string serialNumber() const
+        static IMPL getDiskInfo()
         {
-            return m_serialNumber;
+            return IMPL::getAllDisks();
         }
-
-        [[nodiscard]]
-        int64_t size_Bytes() const
-        {
-            return m_size;
-        }
-
-        [[nodiscard]]
-        int id() const
-        {
-            return m_id;
-        }
-
-        static std::vector< IMPL > getDiskInfo() { return IMPL::getAllDisks(); }
 
     protected:
         ~DiskBase() = default;
@@ -98,11 +103,8 @@ namespace hwinfo::detail
         IMPL const& impl() const { return static_cast< IMPL const& >(*this); }
 
         DiskBase() = default;
-        std::string m_vendor;
-        std::string m_model;
-        std::string m_serialNumber;
-        uint64_t    m_size { 0 };
-        int         m_id { -1 };
+
+        std::vector< DiskItem > _items {};
     };
 
 }    // namespace hwinfo::detail

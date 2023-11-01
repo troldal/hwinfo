@@ -52,21 +52,22 @@ namespace hwinfo
             DiskWin() = default;
 
         private:
-            static std::vector< DiskWin > getAllDisks()
+            static DiskWin getAllDisks()
             {
-                std::vector< DiskWin > disks;
+                DiskWin disks;
 
                 using namespace WMI;
                 auto info = wmiInterface.query< DiskInfo::MODEL, DiskInfo::MANUFACTURER, DiskInfo::SERIALNUMBER, DiskInfo::SIZE >();
 
                 for (const auto& disk : info) {
-                    disks.emplace_back(DiskWin {});
-                    auto& processor = disks.back();
+                    auto processor = BASE::DiskItem {};
 
-                    processor.m_model        = std::get< 0 >(disk);
-                    processor.m_vendor       = std::get< 1 >(disk);
-                    processor.m_serialNumber = std::get< 2 >(disk);
-                    processor.m_size         = std::stoull(std::get< 3 >(disk));
+                    processor.model        = std::get< 0 >(disk);
+                    processor.vendor       = std::get< 1 >(disk);
+                    processor.serialNumber = std::get< 2 >(disk);
+                    processor.size         = std::stoull(std::get< 3 >(disk));
+
+                    disks.addItem(processor);
                 }
 
                 return disks;

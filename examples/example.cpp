@@ -136,20 +136,20 @@ int main(int argc, char** argv)
         std::cout << "No Batteries installed or detected" << std::endl;
     }
 
-    std::vector< hwinfo::Disk > disks = hwinfo::getDiskInfo();
+    hwinfo::Disk disks = hwinfo::getDiskInfo();
     std::cout << "--------------------------------- Disks -----------------------------------" << std::endl;
-    if (!disks.empty()) {
+    if (!disks.items().empty()) {
         int disk_counter = 0;
-        for (const auto& disk : disks) {
+        for (const auto& disk : disks.items()) {
             std::cout << "Disk " << disk_counter++ << ":" << std::endl;
             std::cout << std::left << std::setw(20) << "  vendor:";
-            std::cout << disk.vendor() << std::endl;
+            std::cout << disk.vendor << std::endl;
             std::cout << std::left << std::setw(20) << "  model:";
-            std::cout << disk.model() << std::endl;
+            std::cout << disk.model << std::endl;
             std::cout << std::left << std::setw(20) << "  serial-number:";
-            std::cout << disk.serialNumber() << std::endl;
+            std::cout << disk.serialNumber << std::endl;
             std::cout << std::left << std::setw(20) << "  size:";
-            std::cout << disk.size_Bytes() << std::endl;
+            std::cout << disk.size << std::endl;
         }
         std::cout << "---------------------------------------------------------------------------" << std::endl;
     }

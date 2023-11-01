@@ -47,5 +47,5 @@
 
 namespace hwinfo
 {
-    std::vector< Disk > getDiskInfo() { return Disk::getDiskInfo(); }
+    Disk getDiskInfo() { return Disk::getDiskInfo(); }
 }    // namespace hwinfo
