@@ -33,6 +33,12 @@
     SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
+/**
+ * @file GPUWin.hpp
+ * @namespace hwinfo::detail
+ * @brief Contains the definition of the GPUWin class, a Windows-specific implementation for GPU information retrieval.
+ */
+
 #pragma once
 
 #include "../base/gpuBase.hpp"
@@ -48,33 +54,51 @@ namespace hwinfo
     namespace detail
     {
 
+        /**
+         * @class GPUWin
+         * @brief Windows-specific implementation for retrieving GPU information.
+         *
+         * This class inherits from GPUBase and implements GPU information retrieval for the Windows operating system.
+         * It utilizes the WMI interface for querying system information and, optionally, OpenCL for additional GPU details.
+         */
         class GPUWin : public GPUBase< GPUWin >
         {
-            using BASE = GPUBase< GPUWin >;
-            friend BASE;
+            using BASE = GPUBase< GPUWin >;    ///< Alias for the base class type.
+            friend BASE;                       ///< Make the base class a friend to allow it to access private members.
 
+            /**
+             * @brief Default constructor is private to ensure instances are only created through the factory method.
+             */
             GPUWin() = default;
 
         private:
+            /**
+             * @brief Retrieves information about all GPUs on the system.
+             * @return A GPUWin instance populated with information about all available GPUs.
+             */
             [[nodiscard]]
             static GPUWin getAllGPUs()
             {
-                GPUWin gpus;
+                GPUWin gpus;    // Create an instance to store GPU information.
 
                 using namespace WMI;
+
+                // Query GPU information using the WMI interface.
                 auto info = wmiInterface.query< GpuInfo::NAME, GpuInfo::ADAPTERCOMPAT, GpuInfo::DRIVERVER, GpuInfo::ADAPTERRAM >();
 
-                if (info.empty()) return {};
+                if (info.empty()) return {};    // If no GPUs are found, return an empty instance.
 
+                // Iterate over the queried GPU information and add each GPU to the instance.
                 for (const auto& gpu : info) {
-                    auto item = BASE::GpuItem {};
+                    auto item = BASE::GpuItem {};    // Create a GpuItem to store information about a single GPU.
 
+                    // Populate the GpuItem with information from the query.
                     item.name          = std::get< 0 >(gpu);
                     item.vendor        = std::get< 1 >(gpu);
                     item.driverVersion = std::get< 2 >(gpu);
                     item.memory        = std::get< 3 >(gpu);
 
-                    gpus.addItem(item);
+                    gpus.addItem(item);    // Add the GpuItem to the instance.
                 }
 
 #ifdef USE_OCL
@@ -92,16 +116,16 @@ namespace hwinfo
                     }
                 }
 #endif    // USE_OCL
-                return gpus;
+                return gpus;    // Return the instance populated with GPU information.
             }
 
-            static WMI::WMIInterface wmiInterface;
+            static WMI::WMIInterface wmiInterface;    ///< Static instance of the WMI interface for querying system information.
         };
 
-        WMI::WMIInterface GPUWin::wmiInterface {};
+        WMI::WMIInterface GPUWin::wmiInterface {};    ///< Definition of the static WMI interface instance.
 
     }    // namespace detail
 
-    using GPU = detail::GPUWin;
+    using GPU = detail::GPUWin;    ///< Typedef for easier access to the GPUWin class outside of the detail namespace.
 
 }    // namespace hwinfo

@@ -33,6 +33,12 @@
     SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
+/**
+ * @file GPUBase.hpp
+ * @namespace hwinfo::detail
+ * @brief Contains the definition of the GPUBase class template, serving as a CRTP base class for GPU information retrieval.
+ */
+
 #pragma once
 
 #include <cstdint>
@@ -43,32 +49,57 @@
 namespace hwinfo::detail
 {
 
+    /**
+     * @class GPUBase
+     * @brief A Curiously Recurring Template Pattern (CRTP) base class for retrieving GPU information.
+     *
+     * This class template provides common functionality for retrieving and storing GPU information.
+     * Derived classes should provide the actual implementation specific to different operating systems or libraries.
+     * @tparam IMPL The type of the derived class implementing the GPU information retrieval.
+     */
     template< typename IMPL >
     class GPUBase
     {
-        friend IMPL;
+        friend IMPL;    ///< Grant access to the derived class for certain operations.
 
+        /**
+         * @struct GpuItem
+         * @brief Represents information about a single GPU.
+         */
         struct GpuItem
         {
-            std::string vendor {};
-            std::string name {};
-            std::string driverVersion {};
-            int64_t     memory { 0 };
-            int64_t     frequency { 0 };
-            int         num_cores { 0 };
-            int         id { 0 };
+            std::string vendor {};           ///< The GPU vendor.
+            std::string name {};             ///< The name of the GPU.
+            std::string driverVersion {};    ///< The version of the GPU driver.
+            int64_t     memory { 0 };        ///< The amount of memory on the GPU in bytes.
+            int64_t     frequency { 0 };     ///< The frequency of the GPU in Hz.
+            int         num_cores { 0 };     ///< The number of cores in the GPU.
+            int         id { 0 };            ///< A unique identifier for the GPU.
         };
 
     public:
+        /**
+         * @brief Retrieves the GPU information items.
+         * @return A constant reference to a vector of GpuItem structures.
+         * Each item in the vector represents information about a single GPU.
+         */
         [[nodiscard]]
         std::vector< GpuItem > const& items() const { return _items; }
 
+        /**
+         * @brief Retrieves the number of GPU items.
+         * @return The number of GPU items.
+         */
         [[nodiscard]]
         size_t count() const
         {
             return _items.size();
         }
 
+        /**
+         * @brief Calculates the total number of GPU cores.
+         * @return The total number of cores across all GPUs.
+         */
         [[nodiscard]]
         auto coreCount() const
         {
@@ -77,31 +108,37 @@ namespace hwinfo::detail
             });
         }
 
+        /**
+         * @brief Creates an instance of the derived class and retrieves GPU information.
+         * @return An instance of the derived class populated with GPU information.
+         */
         static IMPL getGpuInfo() { return IMPL::getAllGPUs(); }
 
     protected:
-        ~GPUBase() = default;
+        ~GPUBase() = default;    ///< Defaulted virtual destructor for safe polymorphism.
 
     private:
-        GPUBase() = default;
+        GPUBase() = default;    ///< Default constructor is private to ensure control of object creation.
 
+        /**
+         * @brief Adds a GPU information item to the list.
+         * @param item The GPU information item to add.
+         */
         void addItem(const GpuItem& item) { _items.push_back(item); }
 
         /**
-         * @brief Provides access to the implementation-specific methods in the derived class.
-         *
+         * @brief Provides non-const access to the derived class instance.
          * @return A reference to the derived class instance.
          */
         IMPL& impl() { return static_cast< IMPL& >(*this); }
 
         /**
-         * @brief Provides const access to the implementation-specific methods in the derived class.
-         *
+         * @brief Provides const access to the derived class instance.
          * @return A const reference to the derived class instance.
          */
         IMPL const& impl() const { return static_cast< IMPL const& >(*this); }
 
-        std::vector< GpuItem > _items {};
+        std::vector< GpuItem > _items {};    ///< The list of GPU information items.
     };
 
 }    // namespace hwinfo::detail
