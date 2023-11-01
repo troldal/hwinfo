@@ -39,35 +39,56 @@
 #include <numeric>
 #include <string>
 
+/**
+ * @file RAMBase.hpp
+ * @namespace hwinfo::detail
+ * @brief Contains the definition of the RAMBase class template, which serves as the base class for RAM information retrieval.
+ */
 namespace hwinfo::detail
 {
     template< typename IMPL >
     class RAMBase
     {
-        friend IMPL;
+        friend IMPL;    ///< Allow the implementation class to access private members.
 
+        /**
+         * @struct RamItem
+         * @brief Represents a single RAM module's information.
+         */
         struct RamItem
         {
-            std::string vendor {};
-            std::string name {};
-            std::string model {};
-            std::string serialNumber {};
-            uint64_t    totalMem { 0 };
+            std::string vendor {};          ///< The vendor or manufacturer of the RAM.
+            std::string name {};            ///< The name or identifier of the RAM.
+            std::string model {};           ///< The model number of the RAM.
+            std::string serialNumber {};    ///< The serial number of the RAM.
+            uint64_t    totalMem { 0 };     ///< The total memory capacity of the RAM in bytes.
         };
 
     public:
+        /**
+         * @brief Retrieves a constant reference to the vector of RamItem objects.
+         * @return A constant reference to the vector of RamItem objects representing the RAM modules.
+         */
         [[nodiscard]]
         std::vector< RamItem > const& items() const
         {
             return _items;
         }
 
+        /**
+         * @brief Retrieves the count of RAM modules.
+         * @return The number of RAM modules.
+         */
         [[nodiscard]]
         size_t count() const
         {
             return _items.size();
         }
 
+        /**
+         * @brief Calculates the total memory capacity of all RAM modules.
+         * @return The total memory capacity in bytes.
+         */
         [[nodiscard]]
         int64_t totalMem() const
         {
@@ -76,38 +97,48 @@ namespace hwinfo::detail
             });
         }
 
+        /**
+         * @brief Retrieves the amount of free memory.
+         * @return The amount of free memory in bytes.
+         */
         [[nodiscard]]
         int64_t freeMem() const
         {
             return _freeRam;
         }
 
+        /**
+         * @brief Retrieves RAM information.
+         * @return An instance of IMPL containing the RAM information.
+         */
         static IMPL getRamInfo() { return IMPL::getAllRam(); }
 
     protected:
-        ~RAMBase() = default;
+        ~RAMBase() = default;    ///< Defaulted virtual destructor for safe polymorphism.
 
     private:
-        RAMBase() = default;
+        RAMBase() = default;    ///< Default constructor is private to ensure control of object creation.
 
+        /**
+         * @brief Adds a RAM module's information to the list.
+         * @param item The RAM module's information.
+         */
         void addItem(const RamItem& item) { _items.push_back(item); }
 
         /**
-         * @brief Provides access to the implementation-specific methods in the derived class.
-         *
+         * @brief Provides non-const access to the derived class instance.
          * @return A reference to the derived class instance.
          */
         IMPL& impl() { return static_cast< IMPL& >(*this); }
 
         /**
-         * @brief Provides const access to the implementation-specific methods in the derived class.
-         *
+         * @brief Provides const access to the derived class instance.
          * @return A const reference to the derived class instance.
          */
         IMPL const& impl() const { return static_cast< IMPL const& >(*this); }
 
-        uint64_t               _freeRam = -1;
-        std::vector< RamItem > _items {};
+        uint64_t               _freeRam = -1;    ///< The amount of free memory in bytes.
+        std::vector< RamItem > _items {};        ///< The list of RAM modules.
     };
 
 }    // namespace hwinfo::detail

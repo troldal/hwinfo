@@ -41,29 +41,51 @@
 #include <string>
 #include <vector>
 
+/**
+ * @file RAMWin.hpp
+ * @namespace hwinfo::detail
+ * @brief Contains the definition of the RAMWin class, which is a Windows-specific implementation for retrieving RAM information.
+ */
 namespace hwinfo
 {
     namespace detail
     {
 
+        /**
+         * @class RAMWin
+         * @brief Windows-specific implementation for retrieving RAM (Random Access Memory) information.
+         *
+         * This class extends the RAMBase class template, providing functionalities
+         * specific to Windows for retrieving information about RAM modules.
+         */
         class RAMWin : public RAMBase< RAMWin >
         {
-            using BASE = RAMBase< RAMWin >;
-            friend BASE;
+            using BASE = RAMBase< RAMWin >;    ///< Type alias for the base class.
+            friend BASE;                       ///< Allow the base class to access private members.
 
+            /**
+             * @brief Default constructor is private to ensure controlled object creation.
+             */
             RAMWin() = default;
 
         private:
+            /**
+             * @brief Retrieves information about all RAM modules in the system.
+             * @return A RAMWin instance populated with information about all RAM modules.
+             */
             [[nodiscard]]
             static RAMWin getAllRam()
             {
                 RAMWin ram_blocks;
 
                 using namespace WMI;
+
+                // Querying RAM information using Windows Management Instrumentation (WMI)
                 auto info =
                     wmiInterface
                         .query< RamInfo::MANUFACTURER, RamInfo::NAME, RamInfo::PARTNUMBER, RamInfo::SERIALNUMBER, RamInfo::CAPACITY >();
 
+                // Iterating through the query results and populating the RAMWin instance
                 for (const auto& block : info) {
                     auto item = BASE::RamItem {};
 
@@ -76,19 +98,20 @@ namespace hwinfo
                     ram_blocks.addItem(item);
                 }
 
+                // Querying the total free memory in the system
                 auto result         = wmiInterface.query< OSInfo::FREEMEMORY >();
                 ram_blocks._freeRam = (result.empty()) ? 0 : std::stoll(std::get< 0 >(result.front())) * 1024;
 
                 return ram_blocks;
             }
 
-            static WMI::WMIInterface wmiInterface;
+            static WMI::WMIInterface wmiInterface;    ///< Static instance of the WMI interface for querying system information.
         };
 
-        WMI::WMIInterface RAMWin::wmiInterface {};
+        WMI::WMIInterface RAMWin::wmiInterface {};    ///< Definition of the static WMI interface instance.
 
     }    // namespace detail
 
-    using RAM = detail::RAMWin;
+    using RAM = detail::RAMWin;    ///< Typedef for easier access to the RAMWin class outside of the detail namespace.
 
 }    // namespace hwinfo

@@ -102,6 +102,6 @@ namespace hwinfo
 
     }    // namespace detail
 
-    using MainBoard = detail::MainBoardWin;    ///< Typedef for easier access to the GPUWin class outside of the detail namespace.
+    using MainBoard = detail::MainBoardWin;    ///< Typedef for easier access to the MainBoardWin class outside of the detail namespace.
 
 }    // namespace hwinfo
