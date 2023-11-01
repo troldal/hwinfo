@@ -38,7 +38,6 @@
 #include "../base/ramBase.hpp"
 #include "utils/WMIInterface.hpp"
 
-#include <numeric>
 #include <string>
 #include <vector>
 
@@ -56,9 +55,9 @@ namespace hwinfo
 
         private:
             [[nodiscard]]
-            static std::vector< RAMWin > getAllRam()
+            static RAMWin getAllRam()
             {
-                std::vector< RAMWin > ram_blocks;
+                RAMWin ram_blocks;
 
                 using namespace WMI;
                 auto info =
@@ -66,25 +65,21 @@ namespace hwinfo
                         .query< RamInfo::MANUFACTURER, RamInfo::NAME, RamInfo::PARTNUMBER, RamInfo::SERIALNUMBER, RamInfo::CAPACITY >();
 
                 for (const auto& block : info) {
-                    ram_blocks.emplace_back(RAMWin {});    // NOLINT
-                    auto& current = ram_blocks.back();
+                    auto current = BASE::RamBlockInfo {};
 
-                    current._vendor       = std::get< 0 >(block);
-                    current._name         = std::get< 1 >(block);
-                    current._model        = std::get< 2 >(block);
-                    current._serialNumber = std::get< 3 >(block);
-                    current._total_Bytes  = std::stoll(std::get< 4 >(block));
+                    current.vendor       = std::get< 0 >(block);
+                    current.name         = std::get< 1 >(block);
+                    current.model        = std::get< 2 >(block);
+                    current.serialNumber = std::get< 3 >(block);
+                    current.totalMem     = std::stoll(std::get< 4 >(block));
+
+                    ram_blocks.addItem(current);
                 }
 
-                return ram_blocks;
-            }
+                auto result         = wmiInterface.query< OSInfo::FREEMEMORY >();
+                ram_blocks._freeRam = (result.empty()) ? 0 : std::stoll(std::get< 0 >(result.front())) * 1024;
 
-            static int64_t getFreeMemory()
-            {
-                using namespace WMI;
-                auto result = wmiInterface.query< OSInfo::FREEMEMORY >();
-                if (result.empty()) return -1;
-                return std::stoll(std::get< 0 >(result.front())) * 1024;
+                return ram_blocks;
             }
 
             static WMI::WMIInterface wmiInterface;

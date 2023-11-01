@@ -76,22 +76,27 @@ int main(int argc, char** argv)
         std::cout << gpu.num_cores() << std::endl;
     }
 
-    auto ram = hwinfo::getRamInfo().front();
+    auto ram = hwinfo::getRamInfo();
     std::cout << "----------------------------------- RAM -----------------------------------" << std::endl;
-    std::cout << std::left << std::setw(20) << "vendor:";
-    std::cout << ram.vendor() << std::endl;
-    std::cout << std::left << std::setw(20) << "model:";
-    std::cout << ram.model() << std::endl;
-    std::cout << std::left << std::setw(20) << "name:";
-    std::cout << ram.name() << std::endl;
-    std::cout << std::left << std::setw(20) << "serial-number:";
-    std::cout << ram.serialNumber() << std::endl;
+
     std::cout << std::left << std::setw(20) << "size [MiB]:";
-    std::cout << ram.total_Bytes() / 1024 / 1024 << std::endl;
+    std::cout << ram.totalMem() / 1024 / 1024 << std::endl;
     std::cout << std::left << std::setw(20) << "free [MiB]:";
-    std::cout << ram.free_Bytes() / 1024 / 1024 << std::endl;
-    std::cout << std::left << std::setw(20) << "available [MiB]:";
-    std::cout << ram.available_Bytes() / 1024 / 1024 << std::endl;
+    std::cout << ram.freeMem() / 1024 / 1024 << std::endl;
+
+    for (const auto& block : ram.items()) {
+        std::cout << std::left << std::setw(20) << "vendor:";
+        std::cout << block.vendor << std::endl;
+        std::cout << std::left << std::setw(20) << "model:";
+        std::cout << block.model << std::endl;
+        std::cout << std::left << std::setw(20) << "name:";
+        std::cout << block.name << std::endl;
+        std::cout << std::left << std::setw(20) << "serial-number:";
+        std::cout << block.serialNumber << std::endl;
+
+        std::cout << std::left << std::setw(20) << "  block:";
+        std::cout << block.totalMem / 1024 / 1024 << " MiB" << std::endl;
+    }
 
     auto main_board = hwinfo::getBaseboardInfo().front();
     std::cout << "------------------------------- Main Board --------------------------------" << std::endl;
@@ -102,7 +107,7 @@ int main(int argc, char** argv)
     std::cout << std::left << std::setw(20) << "version:";
     std::cout << main_board.version() << std::endl;
     std::cout << std::left << std::setw(20) << "serial-number:";
-    std::cout << ram.serialNumber() << std::endl;
+    std::cout << main_board.serialNumber() << std::endl;
 
     std::vector< hwinfo::Battery > batteries = hwinfo::getBatteryInfo();
     std::cout << "------------------------------- Batteries ---------------------------------" << std::endl;

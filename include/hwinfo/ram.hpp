@@ -47,5 +47,5 @@
 
 namespace hwinfo
 {
-    std::vector< RAM > getRamInfo() { return RAM::getRamInfo(); }
+    RAM getRamInfo() { return RAM::getRamInfo(); }
 }    // namespace hwinfo

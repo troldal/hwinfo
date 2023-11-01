@@ -36,6 +36,7 @@
 #pragma once
 
 #include <cstdint>
+#include <numeric>
 #include <string>
 
 namespace hwinfo::detail
@@ -45,56 +46,41 @@ namespace hwinfo::detail
     {
         friend IMPL;
 
+        struct RamBlockInfo
+        {
+            std::string vendor {};
+            std::string name {};
+            std::string model {};
+            std::string serialNumber {};
+            uint64_t    totalMem { 0 };
+        };
+
     public:
+        std::vector< RamBlockInfo > const& items() const { return _items; }
+
         [[nodiscard]]
-        std::string vendor() const
+        int64_t totalMem() const
         {
-            return _vendor;
+            return std::accumulate(_items.begin(), _items.end(), uint64_t(0), [](int64_t sum, const RamBlockInfo& item) {
+                return sum + item.totalMem;
+            });
         }
 
         [[nodiscard]]
-        std::string name() const
+        int64_t freeMem() const
         {
-            return _name;
+            return _freeRam;
         }
 
-        [[nodiscard]]
-        std::string model() const
-        {
-            return _model;
-        }
-
-        [[nodiscard]]
-        std::string serialNumber() const
-        {
-            return _serialNumber;
-        }
-
-        [[nodiscard]]
-        int64_t total_Bytes() const
-        {
-            return _total_Bytes;
-        }
-
-        [[nodiscard]]
-        int64_t free_Bytes() const
-        {
-            return _free_Bytes;
-        }
-
-        [[nodiscard]]
-        int64_t available_Bytes() const
-        {
-            return _available_Bytes;
-        }
-
-        static std::vector< IMPL > getRamInfo() { return IMPL::getAllRam(); }
+        static IMPL getRamInfo() { return IMPL::getAllRam(); }
 
     protected:
         ~RAMBase() = default;
 
     private:
         RAMBase() = default;
+
+        void addItem(const RamBlockInfo& item) { _items.push_back(item); }
 
         /**
          * @brief Provides access to the implementation-specific methods in the derived class.
@@ -110,14 +96,8 @@ namespace hwinfo::detail
          */
         IMPL const& impl() const { return static_cast< IMPL const& >(*this); }
 
-        std::string _vendor {};
-        std::string _name {};
-        std::string _model {};
-        std::string _serialNumber {};
-        uint64_t    _total_Bytes     = -1;
-        uint64_t    _free_Bytes      = -1;
-        uint64_t    _available_Bytes = -1;
-        int         _frequency       = -1;
+        uint64_t                    _freeRam = -1;
+        std::vector< RamBlockInfo > _items {};
     };
 
 }    // namespace hwinfo::detail
