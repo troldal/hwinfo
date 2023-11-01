@@ -57,8 +57,6 @@ namespace hwinfo::detail
         };
 
     public:
-        OSBase() = default;
-
         std::string fullName() { return IMPL::getFullName(); }
 
         std::string name() { return IMPL::getName(); }
@@ -94,6 +92,8 @@ namespace hwinfo::detail
         ~OSBase() = default;
 
     private:
+        OSBase() = default;
+
         /**
          * @brief Provides access to the implementation-specific methods in the derived class.
          *

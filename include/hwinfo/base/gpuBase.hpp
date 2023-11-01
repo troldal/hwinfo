@@ -60,12 +60,16 @@ namespace hwinfo::detail
         };
 
     public:
+        [[nodiscard]]
         std::vector< GpuItem > const& items() const { return _items; }
 
-        void addItem(const GpuItem& item) { _items.push_back(item); }
+        [[nodiscard]]
+        size_t count() const
+        {
+            return _items.size();
+        }
 
-        auto gpuCount() const { return _items.size(); }
-
+        [[nodiscard]]
         auto coreCount() const
         {
             return std::accumulate(_items.begin(), _items.end(), uint32_t(0), [](uint32_t sum, const GpuItem& item) {
@@ -79,6 +83,10 @@ namespace hwinfo::detail
         ~GPUBase() = default;
 
     private:
+        GPUBase() = default;
+
+        void addItem(const GpuItem& item) { _items.push_back(item); }
+
         /**
          * @brief Provides access to the implementation-specific methods in the derived class.
          *
@@ -92,8 +100,6 @@ namespace hwinfo::detail
          * @return A const reference to the derived class instance.
          */
         IMPL const& impl() const { return static_cast< IMPL const& >(*this); }
-
-        GPUBase() = default;
 
         std::vector< GpuItem > _items {};
     };

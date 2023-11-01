@@ -136,18 +136,18 @@ namespace hwinfo
                                                 CpuInfo::L3CACHESIZE >();
 
                 for (const auto& cpu : info) {
-                    auto processor = BASE::CpuItem {};
+                    auto item = BASE::CpuItem {};
 
-                    processor.modelName         = std::get< 0 >(cpu);
-                    processor.vendor            = std::get< 1 >(cpu);
-                    processor.numPhysicalCores  = std::get< 2 >(cpu);
-                    processor.numLogicalCores   = std::get< 3 >(cpu);
-                    processor.maxClockSpeed     = std::get< 4 >(cpu);
-                    processor.regularClockSpeed = std::get< 4 >(cpu);
-                    processor.L2CacheSize       = std::get< 5 >(cpu);
-                    processor.L3CacheSize       = std::get< 6 >(cpu);
+                    item.modelName         = std::get< 0 >(cpu);
+                    item.vendor            = std::get< 1 >(cpu);
+                    item.numPhysicalCores  = std::get< 2 >(cpu);
+                    item.numLogicalCores   = std::get< 3 >(cpu);
+                    item.maxClockSpeed     = std::get< 4 >(cpu);
+                    item.regularClockSpeed = std::get< 4 >(cpu);
+                    item.L2CacheSize       = std::get< 5 >(cpu);
+                    item.L3CacheSize       = std::get< 6 >(cpu);
 
-                    cpus.addItem(processor);
+                    cpus.addItem(item);
                 }
 
                 return cpus;

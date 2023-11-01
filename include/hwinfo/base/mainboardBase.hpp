@@ -55,8 +55,6 @@ namespace hwinfo::detail
         };
 
     public:
-        MainBoardBase() = default;
-
         [[nodiscard]]
         std::string vendor() const
         {
@@ -87,6 +85,8 @@ namespace hwinfo::detail
         ~MainBoardBase() = default;
 
     private:
+        MainBoardBase() = default;
+
         /**
          * @brief Provides access to the implementation-specific methods in the derived class.
          *

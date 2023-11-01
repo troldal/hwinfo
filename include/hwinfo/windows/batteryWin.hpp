@@ -115,16 +115,16 @@ namespace hwinfo
                                                 BatteryInfo::STATUS,
                                                 BatteryInfo::CAPACITY >();
 
-                for (const auto& batt : info) {
-                    auto battery = BASE::BatteryElementInfo {};
+                for (const auto& battery : info) {
+                    auto item = BASE::BatteryItem {};
 
-                    battery.model      = std::get< 0 >(batt);
-                    battery.technology = to_string(std::get< 1 >(batt));
-                    battery.health     = std::get< 2 >(batt);
-                    battery.status     = to_string(std::get< 3 >(batt));
-                    battery.capacity   = std::get< 4 >(batt);
+                    item.model      = std::get< 0 >(battery);
+                    item.technology = to_string(std::get< 1 >(battery));
+                    item.health     = std::get< 2 >(battery);
+                    item.status     = to_string(std::get< 3 >(battery));
+                    item.capacity   = std::get< 4 >(battery);
 
-                    batteries.addItem(battery);
+                    batteries.addItem(item);
                 }
 
                 return batteries;

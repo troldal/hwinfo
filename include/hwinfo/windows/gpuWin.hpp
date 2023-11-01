@@ -67,14 +67,14 @@ namespace hwinfo
                 if (info.empty()) return {};
 
                 for (const auto& gpu : info) {
-                    auto processor = BASE::GpuItem {};
+                    auto item = BASE::GpuItem {};
 
-                    processor.name          = std::get< 0 >(gpu);
-                    processor.vendor        = std::get< 1 >(gpu);
-                    processor.driverVersion = std::get< 2 >(gpu);
-                    processor.memory        = std::get< 3 >(gpu);
+                    item.name          = std::get< 0 >(gpu);
+                    item.vendor        = std::get< 1 >(gpu);
+                    item.driverVersion = std::get< 2 >(gpu);
+                    item.memory        = std::get< 3 >(gpu);
 
-                    gpus.addItem(processor);
+                    gpus.addItem(item);
                 }
 
 #ifdef USE_OCL

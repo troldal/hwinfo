@@ -60,14 +60,14 @@ namespace hwinfo
                 auto info = wmiInterface.query< DiskInfo::MODEL, DiskInfo::MANUFACTURER, DiskInfo::SERIALNUMBER, DiskInfo::SIZE >();
 
                 for (const auto& disk : info) {
-                    auto processor = BASE::DiskItem {};
+                    auto item = BASE::DiskItem {};
 
-                    processor.model        = std::get< 0 >(disk);
-                    processor.vendor       = std::get< 1 >(disk);
-                    processor.serialNumber = std::get< 2 >(disk);
-                    processor.size         = std::stoull(std::get< 3 >(disk));
+                    item.model        = std::get< 0 >(disk);
+                    item.vendor       = std::get< 1 >(disk);
+                    item.serialNumber = std::get< 2 >(disk);
+                    item.size         = std::stoull(std::get< 3 >(disk));
 
-                    disks.addItem(processor);
+                    disks.addItem(item);
                 }
 
                 return disks;

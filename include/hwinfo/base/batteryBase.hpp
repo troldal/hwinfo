@@ -70,7 +70,7 @@ namespace hwinfo::detail
     {
         friend IMPL;
 
-        struct BatteryElementInfo
+        struct BatteryItem
         {
             std::string vendor {};
             std::string model {};
@@ -82,15 +82,24 @@ namespace hwinfo::detail
         };
 
     public:
-        std::vector< BatteryElementInfo > const& items() const { return _items; }
+        [[nodiscard]]
+        std::vector< BatteryItem > const& items() const
+        {
+            return _items;
+        }
 
-        void addItem(const BatteryElementInfo& item) { _items.push_back(item); }
+        [[nodiscard]]
+        size_t count() const
+        {
+            return _items.size();
+        }
 
         /**
          * @brief Retrieves all batteries.
          *
          * @return Vector containing all available batteries.
          */
+        [[nodiscard]]
         static IMPL getBatteryInfo() { return IMPL::getAllBatteries(); }
 
     protected:
@@ -107,6 +116,8 @@ namespace hwinfo::detail
          */
         BatteryBase() = default;
 
+        void addItem(const BatteryItem& item) { _items.push_back(item); }
+
         /**
          * @brief Provides access to the implementation-specific methods in the derived class.
          *
@@ -121,7 +132,7 @@ namespace hwinfo::detail
          */
         IMPL const& impl() const { return static_cast<IMPL const&>( *this ); }
 
-        std::vector< BatteryElementInfo > _items {};
+        std::vector< BatteryItem > _items {};
     };
 }    // namespace hwinfo
 

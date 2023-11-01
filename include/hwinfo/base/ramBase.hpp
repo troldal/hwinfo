@@ -46,7 +46,7 @@ namespace hwinfo::detail
     {
         friend IMPL;
 
-        struct RamBlockInfo
+        struct RamItem
         {
             std::string vendor {};
             std::string name {};
@@ -56,13 +56,23 @@ namespace hwinfo::detail
         };
 
     public:
-        std::vector< RamBlockInfo > const& items() const { return _items; }
+        [[nodiscard]]
+        std::vector< RamItem > const& items() const
+        {
+            return _items;
+        }
+
+        [[nodiscard]]
+        size_t count() const
+        {
+            return _items.size();
+        }
 
         [[nodiscard]]
         int64_t totalMem() const
         {
-            return std::accumulate(_items.begin(), _items.end(), uint64_t(0), [](int64_t sum, const RamBlockInfo& item) {
-                return sum + item.totalMem;
+            return std::accumulate(_items.begin(), _items.end(), uint64_t(0),
+                                   [](int64_t sum, const RamItem& item) { return sum + item.totalMem;
             });
         }
 
@@ -80,7 +90,7 @@ namespace hwinfo::detail
     private:
         RAMBase() = default;
 
-        void addItem(const RamBlockInfo& item) { _items.push_back(item); }
+        void addItem(const RamItem& item) { _items.push_back(item); }
 
         /**
          * @brief Provides access to the implementation-specific methods in the derived class.
@@ -96,8 +106,8 @@ namespace hwinfo::detail
          */
         IMPL const& impl() const { return static_cast< IMPL const& >(*this); }
 
-        uint64_t                    _freeRam = -1;
-        std::vector< RamBlockInfo > _items {};
+        uint64_t               _freeRam = -1;
+        std::vector< RamItem > _items {};
     };
 
 }    // namespace hwinfo::detail

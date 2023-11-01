@@ -62,10 +62,8 @@ namespace hwinfo::detail
             return _items;
         }
 
-        void addItem(const DiskItem& item) { _items.push_back(item); }
-
         [[nodiscard]]
-        auto diskCount() const
+        size_t count() const
         {
             return _items.size();
         }
@@ -88,6 +86,10 @@ namespace hwinfo::detail
         ~DiskBase() = default;
 
     private:
+        DiskBase() = default;
+
+        void addItem(const DiskItem& item) { _items.push_back(item); }
+
         /**
          * @brief Provides access to the implementation-specific methods in the derived class.
          *
@@ -101,8 +103,6 @@ namespace hwinfo::detail
          * @return A const reference to the derived class instance.
          */
         IMPL const& impl() const { return static_cast< IMPL const& >(*this); }
-
-        DiskBase() = default;
 
         std::vector< DiskItem > _items {};
     };

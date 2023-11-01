@@ -61,14 +61,14 @@ namespace hwinfo
                     wmiInterface.query< BoardInfo::MANUFACTURER, BoardInfo::PRODUCT, BoardInfo::VERSION, BoardInfo::SERIALNUMBER >();
 
                 auto board   = info.front();
-                auto current = BASE::MainBoardItem {};
+                auto item  = BASE::MainBoardItem {};
 
-                current.vendor       = std::get< 0 >(board);
-                current.name         = std::get< 1 >(board);
-                current.version      = std::get< 2 >(board);
-                current.serialNumber = std::get< 3 >(board);
+                item.vendor       = std::get< 0 >(board);
+                item.name         = std::get< 1 >(board);
+                item.version      = std::get< 2 >(board);
+                item.serialNumber = std::get< 3 >(board);
 
-                boards._item = current;
+                boards._item = item;
 
                 return boards;
             }

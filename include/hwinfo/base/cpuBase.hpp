@@ -62,12 +62,16 @@ namespace hwinfo::detail
         };
 
     public:
+        [[nodiscard]]
         std::vector< CpuItem > const& items() const { return _items; }
 
-        void addItem(const CpuItem& item) { _items.push_back(item); }
+        [[nodiscard]]
+        size_t count() const
+        {
+            return _items.size();
+        }
 
-        auto cpuCount() const { return _items.size(); }
-
+        [[nodiscard]]
         auto physicalCoreCount() const
         {
             return std::accumulate(_items.begin(), _items.end(), uint32_t(0), [](uint32_t sum, const CpuItem& item) {
@@ -75,6 +79,7 @@ namespace hwinfo::detail
             });
         }
 
+        [[nodiscard]]
         auto logicalCoreCount() const
         {
             return std::accumulate(_items.begin(), _items.end(), uint32_t(0), [](uint32_t sum, const CpuItem& item) {
@@ -123,6 +128,8 @@ namespace hwinfo::detail
 
     private:
         CPUBase() = default;
+
+        void addItem(const CpuItem& item) { _items.push_back(item); }
 
         /**
          * @brief Provides access to the implementation-specific methods in the derived class.

@@ -65,15 +65,15 @@ namespace hwinfo
                         .query< RamInfo::MANUFACTURER, RamInfo::NAME, RamInfo::PARTNUMBER, RamInfo::SERIALNUMBER, RamInfo::CAPACITY >();
 
                 for (const auto& block : info) {
-                    auto current = BASE::RamBlockInfo {};
+                    auto item = BASE::RamItem {};
 
-                    current.vendor       = std::get< 0 >(block);
-                    current.name         = std::get< 1 >(block);
-                    current.model        = std::get< 2 >(block);
-                    current.serialNumber = std::get< 3 >(block);
-                    current.totalMem     = std::stoll(std::get< 4 >(block));
+                    item.vendor       = std::get< 0 >(block);
+                    item.name         = std::get< 1 >(block);
+                    item.model        = std::get< 2 >(block);
+                    item.serialNumber = std::get< 3 >(block);
+                    item.totalMem     = std::stoll(std::get< 4 >(block));
 
-                    ram_blocks.addItem(current);
+                    ram_blocks.addItem(item);
                 }
 
                 auto result         = wmiInterface.query< OSInfo::FREEMEMORY >();
