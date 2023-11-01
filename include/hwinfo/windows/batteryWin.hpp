@@ -33,119 +33,85 @@
     SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
+/**
+ * @file batteryWin.hpp
+ * @brief This file defines the class for retrieving battery information on Windows systems.
+ */
+
 #pragma once
 
 #include "../base/batteryBase.hpp"
 #include "utils/WMIInterface.hpp"
 
+/**
+ * @namespace hwinfo
+ * @brief The namespace for hardware information gathering.
+ */
 namespace hwinfo
 {
 
+    /**
+     * @namespace detail
+     * @brief Namespace for implementation details.
+     */
     namespace detail
     {
-
-        // `BatteryWin` Class
-        // 1. Dependency on WMI:
-        //    - The class is tightly coupled with the Windows Management Instrumentation (WMI) interface. This is typical for
-        //    platform-specific implementations but consider this in case portability becomes a requirement.
-        //
-        // 2. Lack of Error Handling:
-        //    - The `getCapacity` and `getStatus` methods do not handle errors explicitly. They return an empty string or zero, which might
-        //    be ambiguous.
-        //
-        // 3. Magic Values:
-        //    - The methods return default values (`{}` or empty string) in case of an error or if no value is found. Define these values
-        //    explicitly as constants or use `std::optional`.
-        //
-        // 4. Data Synchronization:
-        //    - The `getAllBatteries_impl` method populates the battery objects but does not ensure that the data in each vector (`models`,
-        //    `chemistry`, `health`) is synchronized or has the same size.
-        //
-        // 5. Direct Data Modification:
-        //    - The `getAllBatteries_impl` method directly sets the private members of `BatteryWin` instances. This is acceptable in CRTP,
-        //    but ensure consistency and data integrity.
-        //
-        // 6. Lack of Comprehensive Documentation:
-        //    - Ensure that all methods, especially those interacting with external libraries or APIs, are well-documented.
-        //
-        // 7. Resource Management:
-        //    - Ensure that the `wmiInterface` is properly managing its resources, especially if it's acquiring system handles or other
-        //    resources.
-
-        // General Recommendations
-        // - Unit Tests: Design the code in a way that allows for unit testing, possibly by abstracting dependencies and using mock objects.
-        // - Consistent Coding Style: Maintain a consistent coding style throughout the codebase.
-        // - Use of Modern C++ Features: Leverage modern C++ features where appropriate.
-        // - Memory Management: Ensure all dynamically allocated memory is properly managed.
-
         /**
          * @class BatteryWin
-         * @brief Specific implementation of BatteryBase for Windows systems.
+         * @brief Derived class for retrieving battery information on Windows systems.
          *
-         * This class inherits from BatteryBase and provides the specific implementations required to retrieve battery information on
-         * Windows systems.
+         * This class uses Windows Management Instrumentation (WMI) to retrieve battery information.
          */
         class BatteryWin : public BatteryBase< BatteryWin >
         {
-            using BASE = BatteryBase< BatteryWin >;
-
-            friend BASE;
+            using BASE = BatteryBase< BatteryWin >;    ///< Type alias for the base class.
+            friend BASE;                               ///< Make base class a friend to allow access to private constructor.
 
             /**
-             * @brief Default constructor for BatteryWin.
+             * @brief Private constructor to control object creation.
              */
             explicit BatteryWin() = default;
 
         private:
             /**
-             * @brief Retrieves information of all available batteries.
-             *
-             * This method queries the WMI interface to obtain a list of all available batteries and their information.
-             *
-             * @return A vector of BatteryWin objects, each representing a battery.
+             * @brief Retrieves all battery information on the system using WMI.
+             * @return BatteryWin instance filled with battery information.
              */
             static BatteryWin getAllBatteries()
             {
-                BatteryWin batteries;
+                BatteryWin batteries;    // Create an instance to store battery information.
 
                 using namespace WMI;
-                auto info = wmiInterface.query< BatteryInfo::NAME,
-                                                BatteryInfo::CHEMISTRY,
-                                                BatteryInfo::HEALTH,
-                                                BatteryInfo::STATUS,
+
+                // Query battery information using WMI.
+                auto info = wmiInterface.query< BatteryInfo::NAME, BatteryInfo::CHEMISTRY, BatteryInfo::HEALTH, BatteryInfo::STATUS,
                                                 BatteryInfo::CAPACITY >();
 
+                // Iterate over the retrieved information and populate the BatteryWin instance.
                 for (const auto& battery : info) {
-                    auto item = BASE::BatteryItem {};
+                    auto item = BASE::BatteryItem {};    // Create a BatteryItem struct to store information.
 
+                    // Assign retrieved values to the corresponding members of BatteryItem.
                     item.model      = std::get< 0 >(battery);
                     item.technology = to_string(std::get< 1 >(battery));
                     item.health     = std::get< 2 >(battery);
                     item.status     = to_string(std::get< 3 >(battery));
                     item.capacity   = std::get< 4 >(battery);
 
-                    batteries.addItem(item);
+                    batteries.addItem(item);    // Add the filled BatteryItem to the BatteryWin instance.
                 }
 
-                return batteries;
+                return batteries;    // Return the filled BatteryWin instance.
             }
 
-            /**
-             * @brief Interface to the Windows Management Instrumentation (WMI).
-             */
-            static WMI::WMIInterface wmiInterface;
+            static WMI::WMIInterface wmiInterface;    ///< Static instance of WMIInterface for querying WMI.
         };
 
-        /**
-         * @brief Static instance of WMIInterface used to interact with the Windows Management Instrumentation (WMI).
-         */
+        // Initialize the static WMIInterface instance.
         WMI::WMIInterface BatteryWin::wmiInterface {};
     }    // namespace detail
 
-    /**
-     * @typedef Battery
-     * @brief Alias for the BatteryWin class, providing a convenient way to refer to it.
-     */
+    // Alias the BatteryWin class in the hwinfo namespace for easier access.
     using Battery = detail::BatteryWin;
 
 }    // namespace hwinfo

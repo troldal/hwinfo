@@ -33,61 +33,66 @@
     SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
+/**
+ * @file batteryBase.hpp
+ * @brief This file defines the CRTP base class for retrieving battery information on a PC.
+ */
+
 #pragma once
 
 #include <cstdint>
 #include <string>
 #include <vector>
 
+/**
+ * @namespace hwinfo::detail
+ * @brief The namespace for hardware information gathering classes and functions.
+ */
 namespace hwinfo::detail
 {
-
-    // `BatteryBase` Class
-    // 1. Encapsulation:
-    //    - The derived class (`BatteryWin`) can directly modify the base class attributes (`_vendor`, `_model`, `_serialNumber`,
-    //    `_technology`, `_health`). This is a design choice in CRTP, but you might still want to ensure that data integrity is maintained.
-    //
-    // 2. Error Handling:
-    //    - The methods in the base class do not handle or convey any errors. Depending on the usage, you might consider exceptions, error
-    //    codes, or `std::optional`/`std::variant` for error reporting.
-    //
-    // 3. Lack of Initialization:
-    //    - The attributes of the `BatteryBase` class are not initialized in the constructor, which might lead to undefined behavior if
-    //    accessed before being set.
-    //
-    // 4. Incomplete API:
-    //    - Depending on the intended functionality, the class might be missing some battery-related features (e.g., setting thresholds,
-    //    retrieving temperature, charge/discharge rates, etc.).
-
     /**
      * @class BatteryBase
-     * @brief Base class for battery information retrieval using the Curiously Recurring Template Pattern (CRTP).
+     * @brief CRTP base class for retrieving battery information on a PC.
+     * @tparam IMPL The type of the derived class.
      *
-     * @tparam IMPL The derived class type which should implement the battery retrieval logic.
+     * This class provides the common interface and data storage for battery information.
+     * The derived class should provide the implementation for retrieving the battery information.
      */
-    template < typename IMPL >
+    template< typename IMPL >
     class BatteryBase
     {
-        friend IMPL;
+        friend IMPL;    // Allow derived class to access private members.
 
+        /**
+         * @struct BatteryItem
+         * @brief Represents a single battery's information.
+         */
         struct BatteryItem
         {
-            std::string vendor {};
-            std::string model {};
-            std::string serialNumber {};
-            std::string technology {};
-            std::string health {};
-            std::string status {};
-            uint32_t    capacity { 0 };
+            std::string vendor {};          ///< Vendor of the battery.
+            std::string model {};           ///< Model of the battery.
+            std::string serialNumber {};    ///< Serial number of the battery.
+            std::string technology {};      ///< Battery technology type.
+            std::string health {};          ///< Health status of the battery.
+            std::string status {};          ///< Current status of the battery.
+            uint32_t    capacity { 0 };     ///< Capacity of the battery in milliwatt-hours (mWh).
         };
 
     public:
+        /**
+         * @brief Retrieves the list of batteries and their information.
+         * @return Constant reference to a vector of BatteryItem structs.
+         */
         [[nodiscard]]
         std::vector< BatteryItem > const& items() const
         {
             return _items;
         }
 
+        /**
+         * @brief Retrieves the count of batteries.
+         * @return The number of batteries.
+         */
         [[nodiscard]]
         size_t count() const
         {
@@ -95,44 +100,39 @@ namespace hwinfo::detail
         }
 
         /**
-         * @brief Retrieves all batteries.
-         *
-         * @return Vector containing all available batteries.
+         * @brief Factory function to create and retrieve battery information.
+         * @return An instance of the derived class with battery information filled.
          */
         [[nodiscard]]
-        static IMPL getBatteryInfo() { return IMPL::getAllBatteries(); }
+        static IMPL getBatteryInfo()
+        {
+            return IMPL::getAllBatteries();
+        }
 
     protected:
-        /**
-         * @brief Destructor.
-         */
-        ~BatteryBase() = default;
+        ~BatteryBase() = default;    ///< Defaulted virtual destructor for safe polymorphism.
 
     private:
-        /**
-         * @brief Constructor.
-         *
-         * @param id Identifier for the battery.
-         */
-        BatteryBase() = default;
+        BatteryBase() = default;    ///< Default constructor is private to ensure control of object creation.
 
+        /**
+         * @brief Adds a new battery item to the list.
+         * @param item The battery item to be added.
+         */
         void addItem(const BatteryItem& item) { _items.push_back(item); }
 
         /**
-         * @brief Provides access to the implementation-specific methods in the derived class.
-         *
-         * @return A reference to the derived class instance.
+         * @brief Provides non-const access to the derived class instance.
+         * @return Reference to the derived class instance.
          */
-        IMPL& impl() { return static_cast<IMPL&>( *this ); }
+        IMPL& impl() { return static_cast< IMPL& >(*this); }
 
         /**
-         * @brief Provides const access to the implementation-specific methods in the derived class.
-         *
-         * @return A const reference to the derived class instance.
+         * @brief Provides const access to the derived class instance.
+         * @return Constant reference to the derived class instance.
          */
-        IMPL const& impl() const { return static_cast<IMPL const&>( *this ); }
+        IMPL const& impl() const { return static_cast< IMPL const& >(*this); }
 
-        std::vector< BatteryItem > _items {};
+        std::vector< BatteryItem > _items {};    ///< Storage for the list of battery information.
     };
-}    // namespace hwinfo
-
+}    // namespace hwinfo::detail
