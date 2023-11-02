@@ -35,21 +35,38 @@
 
 #pragma once
 
+#include <iostream>
+#include <sstream>
 #include <string>
 
 namespace hwinfo
 {
+    /**
+     * @brief Enumeration representing different computer architectures.
+     */
     enum class Architecture {
-        x86,      // 32-bit
-        x64,      // 64-bit
-        arm,      // 32-bit
-        arm64,    // 64-bit
-        ia64,     // 64-bit
-        Unknown
+        x86,       ///< 32-bit x86 architecture
+        x64,       ///< 64-bit x86_64 architecture
+        arm,       ///< 32-bit ARM architecture
+        arm64,     ///< 64-bit ARM architecture
+        ia64,      ///< 64-bit Intel Itanium architecture
+        Unknown    ///< Unknown architecture
     };
 
-    enum class Endianness { Big, Little, Unknown };
+    /**
+     * @brief Enumeration representing endianness of the system.
+     */
+    enum class Endianness {
+        Big,       ///< Big-endian byte order
+        Little,    ///< Little-endian byte order
+        Unknown    ///< Unknown byte order
+    };
 
+    /**
+     * @brief Converts an Architecture enumeration value to a string representation.
+     * @param arch The architecture to convert.
+     * @return The string representation of the architecture.
+     */
     std::string to_string(Architecture arch)
     {
         switch (arch) {
@@ -68,6 +85,11 @@ namespace hwinfo
         }
     }
 
+    /**
+     * @brief Converts an Endianness enumeration value to a string representation.
+     * @param endianness The endianness to convert.
+     * @return The string representation of the endianness.
+     */
     std::string to_string(Endianness endianness)
     {
         switch (endianness) {
@@ -79,108 +101,149 @@ namespace hwinfo
                 return "Unknown";
         }
     }
-}    // namespace hwinfo
 
-namespace hwinfo::detail
-{
-    template< typename IMPL >
-    class OSBase
+    namespace detail
     {
-        friend IMPL;
-
-        struct OSItem
+        /**
+         * @brief Base class template for retrieving operating system information.
+         * @tparam IMPL The derived implementation class.
+         *
+         * This class follows the Curiously Recurring Template Pattern (CRTP) to
+         * allow for static polymorphism. It defines a common interface and some
+         * utility functions for interacting with operating system information.
+         */
+        template< typename IMPL >
+        class OSBase
         {
-            std::string fullName {};
-            std::string name {};
-            std::string version {};
-            std::string kernel {};
-            size_t       pointerSize { 0 };
-            Architecture arch       = Architecture::Unknown;
-            Endianness   endianness = Endianness::Unknown;
+            friend IMPL;
+
+            /**
+             * @brief Internal structure to hold operating system information.
+             */
+            struct OSItem
+            {
+                std::string  name {};           ///< The short name of the OS.
+                std::string  fullName {};       ///< The full name and version of the OS.
+                std::string  version {};        ///< The version number of the OS.
+                std::string  kernel {};         ///< The kernel version of the OS.
+                size_t       pointerSize {};    ///< The pointer size of the OS (in bits).
+                Architecture arch {};           ///< The architecture of the OS.
+                Endianness   endianness {};     ///< The endianness of the OS.
+            };
+
+        public:
+            /**
+             * @brief Gets the short name of the operating system.
+             * @return The short name of the OS.
+             */
+            std::string name() { return _item.name; }
+
+            /**
+             * @brief Gets the full name and version of the operating system.
+             * @return The full name and version of the OS.
+             */
+            std::string fullName() { return _item.fullName; }
+
+            /**
+             * @brief Gets the version number of the operating system.
+             * @return The version number of the OS.
+             */
+            std::string version() { return _item.version; }
+
+            /**
+             * @brief Gets the kernel version of the operating system.
+             * @return The kernel version of the OS.
+             */
+            std::string kernel() { return _item.kernel; }
+
+            /**
+             * @brief Gets the pointer size of the operating system in bits.
+             * @return The pointer size in bits.
+             */
+            size_t pointerSize() { return _item.pointerSize; }
+
+            /**
+             * @brief Gets the architecture of the operating system.
+             * @return The architecture enumeration value.
+             */
+            Architecture architecture() { return _item.arch; }
+
+            /**
+             * @brief Gets the endianness of the operating system.
+             * @return The endianness enumeration value.
+             */
+            Endianness endianness() { return _item.endianness; }
+
+            /**
+             * @brief Generates a report of the operating system information.
+             * @return A string containing the formatted OS information.
+             */
+            [[nodiscard]]
+            std::string report() const
+            {
+                std::stringstream ss;
+                ss << "OS Information:\n";
+                ss << "\tName: " << _item.name << "\n";
+                ss << "\tFull Name: " << _item.fullName << "\n";
+                ss << "\tVersion: " << _item.version << "\n";
+                ss << "\tKernel: " << _item.kernel << "\n";
+                ss << "\tPointer Size: " << _item.pointerSize << "\n";
+                ss << "\tArchitecture: " << to_string(_item.arch) << "\n";
+                ss << "\tEndianness: " << to_string(_item.endianness) << "\n\n";
+                return ss.str();
+            }
+
+            /**
+             * @brief Output stream operator overload for OSBase.
+             * @param os The output stream to write to.
+             * @param osBase The OSBase object to output.
+             * @return The output stream.
+             */
+            friend std::ostream& operator<<(std::ostream& os, const OSBase& osBase) { return os << osBase.report(); }
+
+            /**
+             * @brief Retrieves the operating system information.
+             * @return An instance of the derived implementation class.
+             */
+            static IMPL getOSInfo() { return IMPL::getAllOSs(); }
+
+        protected:
+            ~OSBase() = default;    ///< Defaulted virtual destructor for safe polymorphism.
+
+        private:
+            OSBase() = default;    ///< Default constructor is private to ensure control of object creation.
+
+            /**
+             * @brief Gets the pointer size of the operating system in bits.
+             * @return The pointer size in bits.
+             */
+            static size_t getPointerSize() { return sizeof(void*) * 8; }
+
+            /**
+             * @brief Determines the endianness of the operating system.
+             * @return The endianness enumeration value.
+             */
+            static Endianness getEndianness()
+            {
+                char16_t dummy = 0x0102;
+                return ((char*)&dummy)[0] == 0x01 ? Endianness::Big : Endianness::Little;
+            }
+
+            /**
+             * @brief Provides access to the derived implementation class.
+             * @return A reference to the derived class.
+             */
+            IMPL& impl() { return static_cast< IMPL& >(*this); }
+
+            /**
+             * @brief Provides const access to the derived implementation class.
+             * @return A const reference to the derived class.
+             */
+            IMPL const& impl() const { return static_cast< IMPL const& >(*this); }
+
+            OSItem _item {};    ///< Internal storage of OS information.
         };
 
-    public:
-        std::string fullName() { return IMPL::getFullName(); }
+    }    // namespace detail
 
-        std::string name() { return IMPL::getName(); }
-
-        std::string version() { return IMPL::getVersion(); }
-
-        std::string kernel() { return IMPL::getKernel(); }
-
-        Architecture architecture() { return _item.arch; }
-
-        size_t pointerSize() { return _item.pointerSize; }
-
-        [[nodiscard]]
-        bool isBigEndian() const
-        {
-            return _item._bigEndian;
-        }
-        [[nodiscard]]
-        bool isLittleEndian() const
-        {
-            return _item._littleEndian;
-        }
-
-        /**
-         * @brief Retrieves a string containing a report of the OS information.
-         * @return A string containing a report of the OS information.
-         */
-        [[nodiscard]]
-        std::string report() const
-        {
-            std::stringstream ss;
-            ss << "OS Information:\n";
-            ss << "\tFull Name: " << _item.fullName << "\n";
-            ss << "\tName: " << _item.name << "\n";
-            ss << "\tVersion: " << _item.version << "\n";
-            ss << "\tKernel: " << _item.kernel << "\n";
-            ss << "\tPointer Size: " << _item.pointerSize << "\n";
-            ss << "\tArchitecture: " << to_string(_item.arch) << "\n";
-            ss << "\tEndianness: " << to_string(_item.endianness) << "\n\n";
-            return ss.str();
-        }
-
-        /**
-         * @brief Overloaded ostream operator for printing the OS information.
-         * @param os The ostream object.
-         * @param osBase The OSBase object.
-         * @return A reference to the ostream object.
-         */
-        friend std::ostream& operator<<(std::ostream& os, const OSBase& osBase) { return os << osBase.report(); }
-
-        static IMPL getOSInfo() { return IMPL::getAllOSs(); }
-
-    protected:
-        ~OSBase() = default;
-
-    private:
-        OSBase() = default;
-
-        static size_t getPointerSize() { return sizeof(void*) * 8; }
-
-        static Endianness getEndianness()
-        {
-            char16_t dummy = 0x0102;
-            return ((char*)&dummy)[0] == 0x01 ? Endianness::Big : Endianness::Little;
-        }
-
-        /**
-         * @brief Provides access to the implementation-specific methods in the derived class.
-         *
-         * @return A reference to the derived class instance.
-         */
-        IMPL& impl() { return static_cast< IMPL& >(*this); }
-
-        /**
-         * @brief Provides const access to the implementation-specific methods in the derived class.
-         *
-         * @return A const reference to the derived class instance.
-         */
-        IMPL const& impl() const { return static_cast< IMPL const& >(*this); }
-
-        OSItem _item {};
-    };
-
-}    // namespace hwinfo::detail
+}    // namespace hwinfo
