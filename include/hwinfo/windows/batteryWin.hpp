@@ -72,7 +72,6 @@ namespace hwinfo
              */
             explicit BatteryWin() = default;
 
-        private:
             /**
              * @brief Retrieves all battery information on the system using WMI.
              * @return BatteryWin instance filled with battery information.

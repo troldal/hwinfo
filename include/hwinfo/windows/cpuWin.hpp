@@ -67,7 +67,6 @@ namespace hwinfo
              */
             CPUWin() = default;
 
-        private:
             /**
              * @brief Retrieves the current clock speed of a specific CPU thread.
              * @param thread_id The ID of the CPU thread.

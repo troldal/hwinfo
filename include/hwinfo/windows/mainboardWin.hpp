@@ -65,7 +65,6 @@ namespace hwinfo
              */
             MainBoardWin() = default;
 
-        private:
             /**
              * @brief Retrieves information about all baseboards (mainboards) in the system.
              *

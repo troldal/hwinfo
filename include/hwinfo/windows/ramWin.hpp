@@ -68,7 +68,6 @@ namespace hwinfo
              */
             RAMWin() = default;
 
-        private:
             /**
              * @brief Retrieves information about all RAM modules in the system.
              * @return A RAMWin instance populated with information about all RAM modules.

@@ -67,7 +67,6 @@ namespace hwinfo
              */
             DiskWin() = default;
 
-        private:
             /**
              * @brief Retrieves information about all disks on the system.
              * @return DiskWin An instance of DiskWin containing the information about all disks.

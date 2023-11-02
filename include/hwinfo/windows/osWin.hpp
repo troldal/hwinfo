@@ -1,15 +1,17 @@
 /*
 
-    88        88  I8,        8        ,8I  88                 ad88
-    88        88  `8b       d8b       d8'  88                d8"
-    88        88   "8,     ,8"8,     ,8"   88                88
-    88aaaaaaaa88    Y8     8P Y8     8P    88  8b,dPPYba,  MM88MMM  ,adPPYba,
-    88""""""""88    `8b   d8' `8b   d8'    88  88P'   `"8a   88    a8"     "8a
-    88        88     `8a a8'   `8a a8'     88  88       88   88    8b       d8
-    88        88      `8a8'     `8a8'      88  88       88   88    "8a,   ,a8"
-    88        88       `8'       `8'       88  88       88   88     `"YbbdP"'
+     ad88888ba                           88                 ad88
+    d8"     "8b                          88                d8"
+    Y8,                                  88                88
+    `Y8aaaaa,    8b       d8  ,adPPYba,  88  8b,dPPYba,  MM88MMM  ,adPPYba,
+      `"""""8b,  `8b     d8'  I8[    ""  88  88P'   `"8a   88    a8"     "8a
+            `8b   `8b   d8'    `"Y8ba,   88  88       88   88    8b       d8
+    Y8a     a8P    `8b,d8'    aa    ]8I  88  88       88   88    "8a,   ,a8"
+     "Y88888P"       Y88'     `"YbbdP"'  88  88       88   88     `"YbbdP"'
+                     d8'
+                    d8'
 
-    Based on the work of:
+    Based on hwinfo by:
     Leon Freist <freist@informatik.uni-freiburg.de>
 
     Copyright © 2022 Leon Freist
@@ -46,14 +48,44 @@ namespace hwinfo
     namespace detail
     {
 
+        /**
+         * @brief Implementation of OSBase for Windows operating systems.
+         */
         class OSWin : public OSBase< OSWin >
         {
             using BASE = OSBase< OSWin >;
             friend BASE;
 
+            /**
+             * @brief Default constructor.
+             */
             OSWin() = default;
 
-        private:
+            /**
+             * @brief Retrieve all operating system related information for Windows.
+             * @return An instance of OSWin with populated OSItem data.
+             */
+            static OSWin getAllOSs()
+            {
+                BASE::OSItem os;
+                os.fullName    = getFullName();
+                os.name        = "Windows";
+                os.version     = {};
+                os.kernel      = {};
+                os.arch        = getArch();
+                os.pointerSize = getPointerSize();
+                os.endianness  = getEndianness();
+
+                OSWin osw;
+                osw._item = os;
+
+                return osw;
+            }
+
+            /**
+             * @brief Determine the architecture of the Windows operating system.
+             * @return The architecture enumeration value.
+             */
             static Architecture getArch()
             {
                 SYSTEM_INFO si;
@@ -77,23 +109,11 @@ namespace hwinfo
                 }
             }
 
-            static OSWin getAllOSs()
-            {
-                BASE::OSItem os;
-                os.fullName      = getFullName();
-                os.name          = getName();
-                os.version       = getVersion();
-                os.kernel        = getKernel();
-                os.arch          = getArch();
-                os.pointerSize   = getPointerSize();
-                os.endianness    = getEndianness();
-
-                OSWin osw;
-                osw._item = os;
-
-                return osw;
-            }
-
+            /**
+             * @brief Retrieve the full name of the Windows operating system.
+             * @note This function needs to be implemented.
+             * @return The full name of the operating system.
+             */
             static std::string getFullName()
             {
                 static NTSTATUS(__stdcall * RtlGetVersion)(OUT PRTL_OSVERSIONINFOEXW lpVersionInformation) =
@@ -352,13 +372,6 @@ namespace hwinfo
                 os << " (build " << osvi.dwBuildNumber << ")";
                 return os.str();
             }
-
-            static std::string getName() { return "Windows"; }
-
-            static std::string getVersion() { return "<unknown>"; }
-
-            static std::string getKernel() { return "<unknown>"; }
-
         };
 
     }    // namespace detail

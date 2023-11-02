@@ -71,7 +71,6 @@ namespace hwinfo
              */
             GPUWin() = default;
 
-        private:
             /**
              * @brief Retrieves information about all GPUs on the system.
              * @return A GPUWin instance populated with information about all available GPUs.
