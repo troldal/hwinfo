@@ -64,7 +64,7 @@ namespace hwinfo::WMI
 
         /**
          * @struct SIZE
-         * @brief Encapsulates the Size property of Win32_DiskDrive.
+         * @brief Encapsulates the Size (in bytes) property of Win32_DiskDrive.
          */
         struct SIZE
         {

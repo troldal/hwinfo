@@ -78,7 +78,7 @@ namespace hwinfo::WMI
 
         /**
          * @struct CAPACITY
-         * @brief Encapsulates the Capacity property of Win32_PhysicalMemory.
+         * @brief Encapsulates the Capacity (in bytes) property of Win32_PhysicalMemory.
          */
         struct CAPACITY
         {

@@ -54,6 +54,29 @@ namespace hwinfo
             OSWin() = default;
 
         private:
+            static Architecture getArch()
+            {
+                SYSTEM_INFO si;
+                ZeroMemory(&si, sizeof(SYSTEM_INFO));
+
+                GetNativeSystemInfo(&si);
+
+                switch (si.wProcessorArchitecture) {
+                    case PROCESSOR_ARCHITECTURE_AMD64:
+                        return Architecture::x64;
+                    case PROCESSOR_ARCHITECTURE_ARM:
+                        return Architecture::arm;
+                    case PROCESSOR_ARCHITECTURE_ARM64:
+                        return Architecture::arm64;
+                    case PROCESSOR_ARCHITECTURE_IA64:
+                        return Architecture::ia64;
+                    case PROCESSOR_ARCHITECTURE_INTEL:
+                        return Architecture::x86;
+                    default:
+                        return Architecture::Unknown;
+                }
+            }
+
             static OSWin getAllOSs()
             {
                 BASE::OSItem os;
@@ -61,10 +84,9 @@ namespace hwinfo
                 os.name          = getName();
                 os.version       = getVersion();
                 os.kernel        = getKernel();
-                os._32bit        = getIs32bit();
-                os._64bit        = getIs64bit();
-                os._bigEndian    = getIsBigEndian();
-                os._littleEndian = getIsLittleEndian();
+                os.arch          = getArch();
+                os.pointerSize   = getPointerSize();
+                os.endianness    = getEndianness();
 
                 OSWin osw;
                 osw._item = os;
@@ -337,29 +359,6 @@ namespace hwinfo
 
             static std::string getKernel() { return "<unknown>"; }
 
-            static bool getIs64bit()
-            {
-                BOOL isWow64 = FALSE;
-                IsWow64Process(GetCurrentProcess(), &isWow64);
-
-                if (sizeof(void*) == 8 || isWow64) return true;
-                else
-                    return false;
-            }
-
-            static bool getIs32bit() { return !getIs64bit(); }
-
-            static bool getIsBigEndian()
-            {
-                char16_t dummy = 0x0102;
-                return ((char*)&dummy)[0] == 0x01;
-            }
-
-            static bool getIsLittleEndian()
-            {
-                char16_t dummy = 0x0102;
-                return ((char*)&dummy)[0] == 0x02;
-            }
         };
 
     }    // namespace detail

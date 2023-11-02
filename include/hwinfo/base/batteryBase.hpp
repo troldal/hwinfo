@@ -76,7 +76,7 @@ namespace hwinfo::detail
             std::string technology {};      ///< Battery technology type.
             std::string health {};          ///< Health status of the battery.
             std::string status {};          ///< Current status of the battery.
-            uint32_t    capacity { 0 };     ///< Capacity of the battery in milliwatt-hours (mWh).
+            uint32_t    capacity { 0 };     ///< Capacity of the battery in percent (%).
         };
 
     public:
@@ -84,6 +84,7 @@ namespace hwinfo::detail
          * @brief Retrieves the list of batteries and their information.
          * @return Constant reference to a vector of BatteryItem structs.
          */
+
         [[nodiscard]]
         std::vector< BatteryItem > const& items() const
         {

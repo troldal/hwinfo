@@ -37,6 +37,50 @@
 
 #include <string>
 
+namespace hwinfo
+{
+    enum class Architecture {
+        x86,      // 32-bit
+        x64,      // 64-bit
+        arm,      // 32-bit
+        arm64,    // 64-bit
+        ia64,     // 64-bit
+        Unknown
+    };
+
+    enum class Endianness { Big, Little, Unknown };
+
+    std::string to_string(Architecture arch)
+    {
+        switch (arch) {
+            case Architecture::x86:
+                return "x86";
+            case Architecture::x64:
+                return "x64";
+            case Architecture::arm:
+                return "arm";
+            case Architecture::arm64:
+                return "arm64";
+            case Architecture::ia64:
+                return "ia64";
+            default:
+                return "Unknown";
+        }
+    }
+
+    std::string to_string(Endianness endianness)
+    {
+        switch (endianness) {
+            case Endianness::Big:
+                return "Big";
+            case Endianness::Little:
+                return "Little";
+            default:
+                return "Unknown";
+        }
+    }
+}    // namespace hwinfo
+
 namespace hwinfo::detail
 {
     template< typename IMPL >
@@ -50,10 +94,9 @@ namespace hwinfo::detail
             std::string name {};
             std::string version {};
             std::string kernel {};
-            bool        _32bit        = false;
-            bool        _64bit        = false;
-            bool        _bigEndian    = false;
-            bool        _littleEndian = false;
+            size_t       pointerSize { 0 };
+            Architecture arch       = Architecture::Unknown;
+            Endianness   endianness = Endianness::Unknown;
         };
 
     public:
@@ -65,16 +108,10 @@ namespace hwinfo::detail
 
         std::string kernel() { return IMPL::getKernel(); }
 
-        [[nodiscard]]
-        bool is32bit() const
-        {
-            return _item._32bit;
-        }
-        [[nodiscard]]
-        bool is64bit() const
-        {
-            return _item._64bit;
-        }
+        Architecture architecture() { return _item.arch; }
+
+        size_t pointerSize() { return _item.pointerSize; }
+
         [[nodiscard]]
         bool isBigEndian() const
         {
@@ -86,6 +123,33 @@ namespace hwinfo::detail
             return _item._littleEndian;
         }
 
+        /**
+         * @brief Retrieves a string containing a report of the OS information.
+         * @return A string containing a report of the OS information.
+         */
+        [[nodiscard]]
+        std::string report() const
+        {
+            std::stringstream ss;
+            ss << "OS Information:\n";
+            ss << "\tFull Name: " << _item.fullName << "\n";
+            ss << "\tName: " << _item.name << "\n";
+            ss << "\tVersion: " << _item.version << "\n";
+            ss << "\tKernel: " << _item.kernel << "\n";
+            ss << "\tPointer Size: " << _item.pointerSize << "\n";
+            ss << "\tArchitecture: " << to_string(_item.arch) << "\n";
+            ss << "\tEndianness: " << to_string(_item.endianness) << "\n\n";
+            return ss.str();
+        }
+
+        /**
+         * @brief Overloaded ostream operator for printing the OS information.
+         * @param os The ostream object.
+         * @param osBase The OSBase object.
+         * @return A reference to the ostream object.
+         */
+        friend std::ostream& operator<<(std::ostream& os, const OSBase& osBase) { return os << osBase.report(); }
+
         static IMPL getOSInfo() { return IMPL::getAllOSs(); }
 
     protected:
@@ -93,6 +157,14 @@ namespace hwinfo::detail
 
     private:
         OSBase() = default;
+
+        static size_t getPointerSize() { return sizeof(void*) * 8; }
+
+        static Endianness getEndianness()
+        {
+            char16_t dummy = 0x0102;
+            return ((char*)&dummy)[0] == 0x01 ? Endianness::Big : Endianness::Little;
+        }
 
         /**
          * @brief Provides access to the implementation-specific methods in the derived class.

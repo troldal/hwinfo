@@ -64,7 +64,7 @@ namespace hwinfo::WMI
 
         /**
          * @struct ADAPTERRAM
-         * @brief Encapsulates the AdapterRAM property of Win32_VideoController.
+         * @brief Encapsulates the AdapterRAM (in bytes) property of Win32_VideoController.
          */
         struct ADAPTERRAM
         {

@@ -78,7 +78,7 @@ namespace hwinfo::WMI
 
         /**
          * @struct CLOCKSPEED
-         * @brief Encapsulates the MaxClockSpeed property of Win32_Processor.
+         * @brief Encapsulates the MaxClockSpeed (in MHz) property of Win32_Processor.
          */
         struct CLOCKSPEED
         {
@@ -92,7 +92,7 @@ namespace hwinfo::WMI
 
         /**
          * @struct L2CACHESIZE
-         * @brief Encapsulates the L2CacheSize property of Win32_Processor.
+         * @brief Encapsulates the L2CacheSize (in kilobytes) property of Win32_Processor.
          */
         struct L2CACHESIZE
         {
@@ -106,7 +106,7 @@ namespace hwinfo::WMI
 
         /**
          * @struct L3CACHESIZE
-         * @brief Encapsulates the L3CacheSize property of Win32_Processor.
+         * @brief Encapsulates the L3CacheSize (in kilobytes) property of Win32_Processor.
          */
         struct L3CACHESIZE
         {
