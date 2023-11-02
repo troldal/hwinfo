@@ -84,7 +84,10 @@ namespace hwinfo::detail
          * Each item in the vector represents information about a single GPU.
          */
         [[nodiscard]]
-        std::vector< GpuItem > const& items() const { return _items; }
+        std::vector< GpuItem > const& items() const
+        {
+            return _items;
+        }
 
         /**
          * @brief Retrieves the number of GPU items.
@@ -103,10 +106,33 @@ namespace hwinfo::detail
         [[nodiscard]]
         auto coreCount() const
         {
-            return std::accumulate(_items.begin(), _items.end(), uint32_t(0), [](uint32_t sum, const GpuItem& item) {
-                return sum + item.num_cores;
-            });
+            return std::accumulate(_items.begin(), _items.end(), uint32_t(0),
+                                   [](uint32_t sum, const GpuItem& item) { return sum + item.num_cores; });
         }
+
+        [[nodiscard]]
+        std::string report() const
+        {
+            std::stringstream reportStream;
+
+            reportStream << "Number of GPUs: " << count() << "\n\n";
+
+            size_t index = 1;
+            for (const auto& item : items()) {
+                reportStream << "GPU " << index++ << ":\n";
+                reportStream << "  Vendor: " << item.vendor << "\n";
+                reportStream << "  Name: " << item.name << "\n";
+                reportStream << "  Driver version: " << item.driverVersion << "\n";
+                reportStream << "  Memory: " << item.memory << " bytes\n";
+                reportStream << "  Frequency: " << item.frequency << " Hz\n";
+                reportStream << "  Number of cores: " << item.num_cores << "\n";
+                reportStream << "  ID: " << item.id << "\n\n";
+            }
+
+            return reportStream.str();
+        }
+
+        friend std::ostream& operator<<(std::ostream& os, const GPUBase& gpu) { return os << gpu.report(); }
 
         /**
          * @brief Creates an instance of the derived class and retrieves GPU information.

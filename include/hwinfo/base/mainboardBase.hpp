@@ -113,6 +113,22 @@ namespace hwinfo::detail
             return _item.serialNumber;
         }
 
+        [[nodiscard]]
+        std::string report() const
+        {
+            std::stringstream reportStream;
+
+            reportStream << "Mainboard Information:\n";
+            reportStream << "\tVendor: " << vendor() << "\n";
+            reportStream << "\tName: " << name() << "\n";
+            reportStream << "\tVersion: " << version() << "\n";
+            reportStream << "\tSerial Number: " << serialNumber() << "\n";
+
+            return reportStream.str();
+        }
+
+        friend std::ostream& operator<<(std::ostream& os, const MainBoardBase& mainboard) { return os << mainboard.report(); }
+
         /**
          * @brief Factory method to retrieve mainboard information.
          * @return An instance of the IMPL type, populated with mainboard information.

@@ -18,30 +18,9 @@ int main(int argc, char** argv)
     std::cout << std::endl << "Hardware Report:" << std::endl << std::endl;
     std::cout << "----------------------------------- CPU -----------------------------------" << std::endl;
     auto cpus = hwinfo::getCpuInfo();
-    for (const auto& cpu : cpus.items()) {
-        //        std::cout << "Socket " << cpu.id() << ":\n";
-        std::cout << std::left << std::setw(20) << " vendor:";
-        std::cout << cpu.vendor << std::endl;
-        std::cout << std::left << std::setw(20) << " model:";
-        std::cout << cpu.modelName << std::endl;
-        std::cout << std::left << std::setw(20) << " physical cores:";
-        std::cout << cpu.numPhysicalCores << std::endl;
-        std::cout << std::left << std::setw(20) << " logical cores:";
-        std::cout << cpu.numLogicalCores << std::endl;
-        std::cout << std::left << std::setw(20) << " max frequency:";
-        std::cout << cpu.maxClockSpeed << std::endl;
-        std::cout << std::left << std::setw(20) << " regular frequency:";
-        std::cout << cpu.regularClockSpeed << std::endl;
-        std::cout << std::left << std::setw(20) << " cache size (L1, L2, L3): ";
-        std::cout << cpu.L1CacheSize << ", " << cpu.L2CacheSize << ", " << cpu.L3CacheSize << std::endl;
-        auto threads_utility = cpus.threadsUtilisation();
-        auto threads_speed   = cpus.currentClockSpeed();
-        for (int thread_id = 0; thread_id < threads_utility.size(); ++thread_id) {
-            std::cout << std::left << std::setw(20) << "   Thread " + std::to_string(thread_id) + ": ";
-            std::cout << threads_speed[thread_id] << " MHz (" << threads_utility[thread_id] * 100 << "%)" << std::endl;
-        }
-        // std::cout << cpu.currentTemperature_Celsius() << std::endl;
-    }
+    if (!cpus.items().empty()) std::cout << cpus;
+    else
+        std::cout << "CPU info could not be retreived" << std::endl;
 
     hwinfo::OS os = hwinfo::getOSInfo();
     std::cout << "----------------------------------- OS ------------------------------------" << std::endl;
@@ -60,100 +39,29 @@ int main(int argc, char** argv)
 
     auto gpus = hwinfo::getGpuInfo();
     std::cout << "----------------------------------- GPU -----------------------------------" << std::endl;
-    for (auto& gpu : gpus.items()) {
-        //        std::cout << "GPU " << gpu.id() << ":\n";
-        std::cout << std::left << std::setw(20) << "  vendor:";
-        std::cout << gpu.vendor << std::endl;
-        std::cout << std::left << std::setw(20) << "  model:";
-        std::cout << gpu.name << std::endl;
-        std::cout << std::left << std::setw(20) << "  driverVersion:";
-        std::cout << gpu.driverVersion << std::endl;
-        std::cout << std::left << std::setw(20) << "  memory [MiB]:";
-        std::cout << static_cast< double >(gpu.memory) / 1024.0 / 1024.0 << std::endl;
-        std::cout << std::left << std::setw(20) << "  frequency:";
-        std::cout << gpu.frequency << std::endl;
-        std::cout << std::left << std::setw(20) << "  cores:";
-        std::cout << gpu.num_cores << std::endl;
-    }
+    if (!gpus.items().empty()) std::cout << gpus;
+    else
+        std::cout << "GPU info could not be retreived" << std::endl;
 
     auto ram = hwinfo::getRamInfo();
     std::cout << "----------------------------------- RAM -----------------------------------" << std::endl;
-
-    std::cout << std::left << std::setw(20) << "size [MiB]:";
-    std::cout << ram.totalMem() / 1024 / 1024 << std::endl;
-    std::cout << std::left << std::setw(20) << "free [MiB]:";
-    std::cout << ram.freeMem() / 1024 / 1024 << std::endl;
-
-    for (const auto& block : ram.items()) {
-        std::cout << std::left << std::setw(20) << "vendor:";
-        std::cout << block.vendor << std::endl;
-        std::cout << std::left << std::setw(20) << "model:";
-        std::cout << block.model << std::endl;
-        std::cout << std::left << std::setw(20) << "name:";
-        std::cout << block.name << std::endl;
-        std::cout << std::left << std::setw(20) << "serial-number:";
-        std::cout << block.serialNumber << std::endl;
-
-        std::cout << std::left << std::setw(20) << "  block:";
-        std::cout << block.totalMem / 1024 / 1024 << " MiB" << std::endl;
-    }
+    if (!ram.items().empty()) std::cout << ram;
+    else
+        std::cout << "RAM info could not be retreived" << std::endl;
 
     auto main_board = hwinfo::getBaseboardInfo();
     std::cout << "------------------------------- Main Board --------------------------------" << std::endl;
-    std::cout << std::left << std::setw(20) << "vendor:";
-    std::cout << main_board.vendor() << std::endl;
-    std::cout << std::left << std::setw(20) << "name:";
-    std::cout << main_board.name() << std::endl;
-    std::cout << std::left << std::setw(20) << "version:";
-    std::cout << main_board.version() << std::endl;
-    std::cout << std::left << std::setw(20) << "serial-number:";
-    std::cout << main_board.serialNumber() << std::endl;
+    std::cout << main_board;
 
-    hwinfo::Battery batteries = hwinfo::getBatteryInfo();
     std::cout << "------------------------------- Batteries ---------------------------------" << std::endl;
-    if (!batteries.items().empty()) {
-        int battery_counter = 0;
-        for (auto& battery : batteries.items()) {
-            std::cout << "Battery " << battery_counter++ << ":" << std::endl;
-            std::cout << std::left << std::setw(20) << "  vendor:";
-            std::cout << battery.vendor << std::endl;
-            std::cout << std::left << std::setw(20) << "  model:";
-            std::cout << battery.model << std::endl;
-            std::cout << std::left << std::setw(20) << "  serial-number:";
-            std::cout << battery.serialNumber << std::endl;
-            std::cout << std::left << std::setw(20) << "  technology:";
-            std::cout << battery.technology << std::endl;
-            std::cout << std::left << std::setw(20) << "  status:";
-            std::cout << battery.status << std::endl;
-            std::cout << std::left << std::setw(20) << "  health:";
-            std::cout << battery.health << std::endl;
-            std::cout << std::left << std::setw(20) << "  capacity:";
-            std::cout << battery.capacity << std::endl;
-        }
-        std::cout << "---------------------------------------------------------------------------" << std::endl;
-    }
-    else {
+    hwinfo::Battery batteries = hwinfo::getBatteryInfo();
+    if (!batteries.items().empty()) std::cout << batteries;
+    else
         std::cout << "No Batteries installed or detected" << std::endl;
-    }
 
-    hwinfo::Disk disks = hwinfo::getDiskInfo();
     std::cout << "--------------------------------- Disks -----------------------------------" << std::endl;
-    if (!disks.items().empty()) {
-        int disk_counter = 0;
-        for (const auto& disk : disks.items()) {
-            std::cout << "Disk " << disk_counter++ << ":" << std::endl;
-            std::cout << std::left << std::setw(20) << "  vendor:";
-            std::cout << disk.vendor << std::endl;
-            std::cout << std::left << std::setw(20) << "  model:";
-            std::cout << disk.model << std::endl;
-            std::cout << std::left << std::setw(20) << "  serial-number:";
-            std::cout << disk.serialNumber << std::endl;
-            std::cout << std::left << std::setw(20) << "  size:";
-            std::cout << disk.size << std::endl;
-        }
-        std::cout << "---------------------------------------------------------------------------" << std::endl;
-    }
-    else {
+    hwinfo::Disk disks = hwinfo::getDiskInfo();
+    if (!disks.items().empty()) std::cout << disks;
+    else
         std::cout << "No Disks installed or detected" << std::endl;
-    }
 }

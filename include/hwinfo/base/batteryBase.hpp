@@ -41,6 +41,7 @@
 #pragma once
 
 #include <cstdint>
+#include <sstream>
 #include <string>
 #include <vector>
 
@@ -98,6 +99,40 @@ namespace hwinfo::detail
         {
             return _items.size();
         }
+
+        /**
+         * @brief Generates a report of the battery information.
+         * @return A string containing the battery information.
+         */
+        [[nodiscard]]
+        std::string report() const
+        {
+            std::stringstream reportStream;
+
+            reportStream << "Number of batteries: " << count() << "\n\n";
+
+            size_t index = 1;
+            for (const auto& item : items()) {
+                reportStream << "Battery " << index << " Information:\n";
+                reportStream << "\tVendor: " << item.vendor << "\n";
+                reportStream << "\tModel: " << item.model << "\n";
+                reportStream << "\tSerial Number: " << item.serialNumber << "\n";
+                reportStream << "\tTechnology: " << item.technology << "\n";
+                reportStream << "\tStatus: " << item.status << "\n";
+                reportStream << "\tHealth: " << item.health << "\n";
+                reportStream << "\tCapacity: " << item.capacity << " %\n\n";
+                ++index;
+            }
+            return reportStream.str();
+        }
+
+        /**
+         * @brief Overloaded stream operator to print battery information.
+         * @param os The output stream to write to.
+         * @param batteryBase The BatteryBase instance to print.
+         * @return The output stream.
+         */
+        friend std::ostream& operator<<(std::ostream& os, const BatteryBase& batteryBase) { return os << batteryBase.report(); }
 
         /**
          * @brief Factory function to create and retrieve battery information.

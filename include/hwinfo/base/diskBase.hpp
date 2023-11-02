@@ -41,6 +41,7 @@
 
 #pragma once
 
+#include <cmath>
 #include <cstdint>
 #include <numeric>
 #include <string>
@@ -103,10 +104,40 @@ namespace hwinfo::detail
         [[nodiscard]]
         auto totalDiskSpace() const
         {
-            return std::accumulate(_items.begin(), _items.end(), int64_t(0), [](int64_t sum, const DiskItem& item) {
-                return sum + item.size;
-            });
+            return std::accumulate(_items.begin(), _items.end(), int64_t(0),
+                                   [](int64_t sum, const DiskItem& item) { return sum + item.size; });
         }
+
+        /**
+         * @brief Generates a report of the disk information.
+         * @return std::string A string containing the disk information.
+         */
+        [[nodiscard]]
+        std::string report() const
+        {
+            std::stringstream reportStream;
+
+            reportStream << "Number of disks: " << count() << std::endl;
+            reportStream << "Total disk space: " << totalDiskSpace() / std::pow(1024, 3) << " GB\n\n";
+
+            size_t index = 1;
+            for (const auto& disk : items()) {
+                reportStream << "Disk " << index++ << " Information:\n";
+                reportStream << "\tVendor: " << disk.vendor << "\n";
+                reportStream << "\tModel: " << disk.model << "\n";
+                reportStream << "\tSerial Number: " << disk.serialNumber << "\n";
+                reportStream << "\tSize: " << disk.size / std::pow(1024, 3) << " GB\n\n";
+            }
+            return reportStream.str();
+        }
+
+        /**
+         * @brief Overloaded stream operator to print the disk information.
+         * @param os The output stream to write to.
+         * @param diskBase The DiskBase object to print.
+         * @return std::ostream& The output stream.
+         */
+        friend std::ostream& operator<<(std::ostream& os, const DiskBase& diskBase) { return os << diskBase.report(); }
 
         /**
          * @brief Static function to retrieve disk information.

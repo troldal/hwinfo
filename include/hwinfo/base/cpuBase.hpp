@@ -174,6 +174,37 @@ namespace hwinfo::detail
         }
 
         /**
+         * @brief Generates a report of the CPU information.
+         * @return A string containing the CPU information.
+         */
+        [[nodiscard]]
+        std::string report() const
+        {
+            std::stringstream reportStream;
+            size_t            index = 1;
+            for (const auto& cpu : items()) {
+                reportStream << "CPU " << index++ << " Information:\n";
+                reportStream << "\tVendor: " << cpu.vendor << "\n";
+                reportStream << "\tModel: " << cpu.modelName << "\n";
+                reportStream << "\tClock Speed: " << cpu.maxClockSpeed << " MHz\n";
+                reportStream << "\tNumber of Cores: " << cpu.numPhysicalCores << "\n";
+                reportStream << "\tNumber of Threads: " << cpu.numLogicalCores << "\n";
+                reportStream << "\tL1 Cache Size: " << cpu.L1CacheSize << " KB\n";
+                reportStream << "\tL2 Cache Size: " << cpu.L2CacheSize << " KB\n";
+                reportStream << "\tL3 Cache Size: " << cpu.L3CacheSize << " KB\n\n";
+            }
+            return reportStream.str();
+        }
+
+        /**
+         * @brief Overloaded stream operator to print CPU information.
+         * @param os The output stream to write to.
+         * @param cpuBase The CPUBase instance to print.
+         * @return The output stream.
+         */
+        friend std::ostream& operator<<(std::ostream& os, const CPUBase& cpuBase) { return os << cpuBase.report(); }
+
+        /**
          * @brief Factory function to create and retrieve an instance of the derived class.
          * @return An instance of the derived class.
          */

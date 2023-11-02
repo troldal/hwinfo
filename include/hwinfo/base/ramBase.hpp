@@ -93,8 +93,7 @@ namespace hwinfo::detail
         int64_t totalMem() const
         {
             return std::accumulate(_items.begin(), _items.end(), uint64_t(0),
-                                   [](int64_t sum, const RamItem& item) { return sum + item.totalMem;
-            });
+                                   [](int64_t sum, const RamItem& item) { return sum + item.totalMem; });
         }
 
         /**
@@ -106,6 +105,31 @@ namespace hwinfo::detail
         {
             return _freeRam;
         }
+
+        [[nodiscard]]
+        std::string report() const
+        {
+            std::stringstream reportStream;
+
+            reportStream << "Number of RAM modules: " << count() << "\n\n";
+
+            size_t index = 1;
+            for (const auto& item : items()) {
+                reportStream << "RAM Module " << index++ << ":\n";
+                reportStream << "\tVendor: " << item.vendor << "\n";
+                reportStream << "\tName: " << item.name << "\n";
+                reportStream << "\tModel: " << item.model << "\n";
+                reportStream << "\tSerial Number: " << item.serialNumber << "\n";
+                reportStream << "\tTotal Memory: " << item.totalMem << " bytes\n\n";
+            }
+
+            reportStream << "Total Memory: " << totalMem() << " bytes\n";
+            reportStream << "Free Memory: " << freeMem() << " bytes\n";
+
+            return reportStream.str();
+        }
+
+        friend std::ostream& operator<<(std::ostream& os, const RAMBase& ram) { return os << ram.report(); }
 
         /**
          * @brief Retrieves RAM information.
