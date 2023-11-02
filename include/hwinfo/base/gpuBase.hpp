@@ -110,6 +110,10 @@ namespace hwinfo::detail
                                    [](uint32_t sum, const GpuItem& item) { return sum + item.num_cores; });
         }
 
+        /**
+         * @brief Calculates the total memory capacity of all GPUs.
+         * @return The total memory capacity in bytes.
+         */
         [[nodiscard]]
         std::string report() const
         {
@@ -132,6 +136,12 @@ namespace hwinfo::detail
             return reportStream.str();
         }
 
+        /**
+         * @brief Overloaded stream operator to print the GPU information.
+         * @param os The output stream to write to.
+         * @param gpu The GPU information to print.
+         * @return A reference to the output stream.
+         */
         friend std::ostream& operator<<(std::ostream& os, const GPUBase& gpu) { return os << gpu.report(); }
 
         /**

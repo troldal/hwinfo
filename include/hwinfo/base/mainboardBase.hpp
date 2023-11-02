@@ -113,6 +113,10 @@ namespace hwinfo::detail
             return _item.serialNumber;
         }
 
+        /**
+         * @brief Generates a report of the mainboard information.
+         * @return A string containing the mainboard information.
+         */
         [[nodiscard]]
         std::string report() const
         {
@@ -127,6 +131,12 @@ namespace hwinfo::detail
             return reportStream.str();
         }
 
+        /**
+         * @brief Overloaded stream operator to print the mainboard information.
+         * @param os The output stream to write to.
+         * @param mainboard The mainboard object to print.
+         * @return A reference to the output stream.
+         */
         friend std::ostream& operator<<(std::ostream& os, const MainBoardBase& mainboard) { return os << mainboard.report(); }
 
         /**

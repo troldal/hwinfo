@@ -106,6 +106,10 @@ namespace hwinfo::detail
             return _freeRam;
         }
 
+        /**
+         * @brief Generates a report of the RAM information.
+         * @return A string containing the RAM information.
+         */
         [[nodiscard]]
         std::string report() const
         {
@@ -129,6 +133,12 @@ namespace hwinfo::detail
             return reportStream.str();
         }
 
+        /**
+         * @brief Overloaded stream operator to print the RAM information.
+         * @param os The output stream to write to.
+         * @param ram The RAM information to print.
+         * @return A reference to the output stream.
+         */
         friend std::ostream& operator<<(std::ostream& os, const RAMBase& ram) { return os << ram.report(); }
 
         /**
