@@ -26,18 +26,6 @@ int main(int argc, char** argv)
     std::cout << "----------------------------------- OS ------------------------------------" << std::endl;
     std::cout << os;
 
-    //    std::cout << std::left << std::setw(20) << "Operating System:";
-    //    std::cout << os.fullName() << std::endl;
-    //    std::cout << std::left << std::setw(20) << "short name:";
-    //    std::cout << os.name() << std::endl;
-    //    std::cout << std::left << std::setw(20) << "version:";
-    //    std::cout << os.version() << std::endl;
-    //    std::cout << std::left << std::setw(20) << "kernel:";
-    //    std::cout << os.kernel() << std::endl;
-    //    std::cout << std::left << std::setw(20) << "architecture:";
-    //    std::cout << (os.is32bit() ? "32 bit" : "64 bit") << std::endl;
-    //    std::cout << std::left << std::setw(20) << "endianess:";
-    //    std::cout << (os.isLittleEndian() ? "little endian" : "big endian") << std::endl;
 
     auto gpus = hwinfo::getGpuInfo();
     std::cout << "----------------------------------- GPU -----------------------------------" << std::endl;

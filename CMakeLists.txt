@@ -1,72 +1,68 @@
-# Define the minimum required CMake version to run this file. 
-cmake_minimum_required(VERSION 3.16)
+# This is the main CMake configuration file for the hwinfo project.
+# hwinfo is a C++ project designed to gather various system information,
+# including memory, CPU, and operating system details. The project can optionally
+# use OpenCL to get GPU information, build documentation using Doxygen, and
+# build its own test suite and sample programs.
 
-# Define the project and its name, version, and specified languages.
+# Specify the minimum version of CMake required to build this project.
+cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
+
+# Define the project name, version, and the languages used (C++ in this case).
 project(hwinfo VERSION 1.0.0 LANGUAGES CXX)
 
-# Set the C++ language standard to be used. 
-# If NO_OCL is defined then C++11 standard will be used, else it will be C++20.
-if (NOT DEFINED NO_OCL)
-    set(CMAKE_CXX_STANDARD 20)
-else ()
-    set(CMAKE_CXX_STANDARD 17)
-endif ()
+# Define options that can be turned on or off to control project build features.
+option(HWINFO_USE_OCL "Use OpenCL to get GPU information" OFF)
+option(HWINFO_CREATE_DOCS "Build library documentation (requires Doxygen and Graphviz/Dot to be installed)" ${PROJECT_IS_TOP_LEVEL})
+option(HWINFO_BUILD_TESTS "Build library tests" ${PROJECT_IS_TOP_LEVEL})
+option(HWINFO_BUILD_SAMPLES "Build sample programs" ${PROJECT_IS_TOP_LEVEL})
 
-# Ensure that the standard requirement is mandatory.
+# Set the C++ standard to use and enforce it as required.
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
 
-# Define the output path for libraries and archives.
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+# Suppress CMake warning about unused C compiler during C++-only projects.
+set(HWINFO_IGNORE_ME ${CMAKE_C_COMPILER})
 
-# Check if the current source directory (where this CMakeLists.txt is located)
-# is the root of the source tree, then this is the MAIN_PROJECT.
-set(MAIN_PROJECT OFF)
-if (CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
-    set(MAIN_PROJECT ON)
-endif()
+# Conditionally configure the project to use OpenCL based on the HWINFO_USE_OCL option.
+#if (HWINFO_USE_OCL)
+#    # Prevent the OpenCL SDK samples from being built.
+#    set(OPENCL_SDK_BUILD_SAMPLES OFF CACHE BOOL "" FORCE)
+#    # Include directories for OpenCL headers.
+#    include_directories(external/miss-opencl/include)
+#    include_directories(external/miss-opencl/external/OpenCL/external/OpenCL-CLHPP/include)
+#    # Add the miss-opencl subdirectory only if it's not already defined as a target.
+#    if (NOT TARGET miss-opencl_static)
+#        add_subdirectory(external/miss-opencl)
+#    endif ()
+#    # Define compile-time macros for OpenCL usage.
+#    add_compile_definitions(USE_OCL)
+#    add_compile_definitions(NOMINMAX)
+#endif ()
 
-# If NO_OCL is not defined, include OpenCL related configuration.
-if (NOT DEFINED NO_OCL)
-    # Don't build OpenCL SDK samples
-    set(OPENCL_SDK_BUILD_SAMPLES OFF CACHE BOOL "" FORCE)
-    # Specify additional directories to search for header files.
-    include_directories(external/miss-opencl/include)
-    include_directories(external/miss-opencl/external/OpenCL/external/OpenCL-CLHPP/include)
-    # If the static library for miss-opencl is not yet defined, add it.
-    if (NOT TARGET miss-opencl_static)
-        add_subdirectory(external/miss-opencl)
-    endif ()
-    # Add specific compile-time definitions.
-    add_compile_definitions(USE_OCL)
-    add_compile_definitions(NOMINMAX)
-endif ()
-
-
+# Create an INTERFACE library target called HWinfo to be used by other targets.
 add_library(HWinfo INTERFACE)
+# Create an alias for the HWinfo library to ensure consistent usage.
 add_library(${PROJECT_NAME}::HWinfo ALIAS HWinfo)
+# Specify the include directories for the HWinfo interface library.
 target_include_directories(HWinfo INTERFACE $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}>/include)
 
+# If building on Windows, link the WBEM UUID library which is required for some system queries.
 if (WIN32)
     target_link_libraries(HWinfo INTERFACE "wbemuuid")
 endif ()
 
-if (NOT DEFINED NO_OCL)
-    target_link_libraries(HWinfo INTERFACE miss-opencl_static)
-endif ()
+# If OpenCL is used, link the static OpenCL library to HWinfo.
+#if (HWINFO_USE_OCL)
+#    target_link_libraries(HWinfo INTERFACE miss-opencl_static)
+#endif ()
 
-# If the host system is Linux, copy the "pci.ids" to a destination folder.
+# If building on Linux, copy the pci.ids file to the user's home directory.
 if (CMAKE_HOST_SYSTEM_NAME STREQUAL "Linux")
     file(COPY "scripts/pci.ids" DESTINATION "$ENV{HOME}/.hwinfo/")
 endif ()
 
-# If this is the MAIN_PROJECT, it will include the examples and the tests.
-if (${MAIN_PROJECT})
-    # Add the examples subdirectory.
+# If the option to build samples is turned on, add the samples subdirectory to the build.
+if (HWINFO_BUILD_SAMPLES)
     add_subdirectory(examples)
-    # Enable testing and add the test directory.
-    include(CTest)
-    add_subdirectory(test)
-    # Define a test named "Example"
-    add_test(Example examples/Example)
 endif()

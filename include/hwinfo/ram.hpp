@@ -47,5 +47,6 @@
 
 namespace hwinfo
 {
+
     RAM getRamInfo() { return RAM::getRamInfo(); }
 }    // namespace hwinfo
