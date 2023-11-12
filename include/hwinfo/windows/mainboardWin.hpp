@@ -94,10 +94,10 @@ namespace hwinfo
                 return boards;
             }
 
-            static WMI::WMIInterface wmiInterface;    ///< Static instance of the WMI interface for querying system information.
+            inline static WMI::WMIInterface wmiInterface {};    ///< Static instance of the WMI interface for querying system information.
         };
 
-        WMI::WMIInterface MainBoardWin::wmiInterface {};    ///< Definition of the static WMI interface instance.
+        //        WMI::WMIInterface MainBoardWin::wmiInterface {};    ///< Definition of the static WMI interface instance.
 
     }    // namespace detail
 

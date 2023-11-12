@@ -118,10 +118,10 @@ namespace hwinfo
                 return gpus;    // Return the instance populated with GPU information.
             }
 
-            static WMI::WMIInterface wmiInterface;    ///< Static instance of the WMI interface for querying system information.
+            inline static WMI::WMIInterface wmiInterface {};    ///< Static instance of the WMI interface for querying system information.
         };
 
-        WMI::WMIInterface GPUWin::wmiInterface {};    ///< Definition of the static WMI interface instance.
+        //        WMI::WMIInterface GPUWin::wmiInterface {};    ///< Definition of the static WMI interface instance.
 
     }    // namespace detail
 

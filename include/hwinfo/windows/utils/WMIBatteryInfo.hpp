@@ -143,7 +143,7 @@ namespace hwinfo::WMI
      * @param chemistry The battery chemistry.
      * @return A string representation of the battery chemistry.
      */
-    std::string to_string(const BatteryInfo::Chemistry& chemistry)
+    inline std::string to_string(const BatteryInfo::Chemistry& chemistry)
     {
         switch (chemistry) {
             case BatteryInfo::Chemistry::Other:
@@ -172,7 +172,7 @@ namespace hwinfo::WMI
      * @param status The battery status.
      * @return A string representation of the battery status.
      */
-    std::string to_string(const BatteryInfo::Status& status)
+    inline std::string to_string(const BatteryInfo::Status& status)
     {
         switch (status) {
             case BatteryInfo::Status::Discharging:

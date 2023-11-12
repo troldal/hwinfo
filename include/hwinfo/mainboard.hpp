@@ -47,5 +47,5 @@
 
 namespace hwinfo
 {
-    MainBoard getBaseboardInfo() { return MainBoard::getBaseboardInfo(); }
+    inline MainBoard getBaseboardInfo() { return MainBoard::getBaseboardInfo(); }
 }    // namespace hwinfo

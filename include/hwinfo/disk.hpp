@@ -47,5 +47,5 @@
 
 namespace hwinfo
 {
-    Disk getDiskInfo() { return Disk::getDiskInfo(); }
+    inline Disk getDiskInfo() { return Disk::getDiskInfo(); }
 }    // namespace hwinfo

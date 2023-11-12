@@ -47,5 +47,5 @@
 
 namespace hwinfo
 {
-    OS getOSInfo() { return OS::getOSInfo(); }
+    inline OS getOSInfo() { return OS::getOSInfo(); }
 }    // namespace hwinfo

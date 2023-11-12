@@ -47,5 +47,5 @@
 
 namespace hwinfo
 {
-    GPU getGpuInfo() { return GPU::getGpuInfo(); }
+    inline GPU getGpuInfo() { return GPU::getGpuInfo(); }
 }    // namespace hwinfo

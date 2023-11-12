@@ -97,10 +97,10 @@ namespace hwinfo
                 return disks;    ///< Return the instance of DiskWin containing the disk information.
             }
 
-            static WMI::WMIInterface wmiInterface;    ///< Static instance of WMIInterface for querying WMI.
+            inline static WMI::WMIInterface wmiInterface {};    ///< Static instance of WMIInterface for querying WMI.
         };
 
-        WMI::WMIInterface DiskWin::wmiInterface {};    ///< Initialization of the static WMIInterface member.
+        //        WMI::WMIInterface DiskWin::wmiInterface {};    ///< Initialization of the static WMIInterface member.
 
     }    // namespace detail
 

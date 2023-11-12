@@ -183,7 +183,7 @@ inline std::string wstring_to_std_string(const std::wstring& ws) {
   return result_text;
 }
 
-std::wstring NarrowStringToWideString(const std::string& narrowString)
+inline std::wstring NarrowStringToWideString(const std::string& narrowString)
 {
   // First, find the length of the result string.
   int len = MultiByteToWideChar(CP_UTF8, 0, narrowString.c_str(), -1, nullptr, 0);
@@ -204,13 +204,13 @@ std::wstring NarrowStringToWideString(const std::string& narrowString)
   return wideString;
 }
 
-int main()
-{
-  std::string  narrowString = "Hello, World!";
-  std::wstring wideString   = NarrowStringToWideString(narrowString);
-  std::wcout << wideString << std::endl;    // Output: Hello, World!
-  return 0;
-}
+// int main()
+//{
+//   std::string  narrowString = "Hello, World!";
+//   std::wstring wideString   = NarrowStringToWideString(narrowString);
+//   std::wcout << wideString << std::endl;    // Output: Hello, World!
+//   return 0;
+// }
 
 /**
  * Replace the std::string::starts_with function only available in C++20 and above.

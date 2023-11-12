@@ -103,11 +103,11 @@ namespace hwinfo
                 return batteries;    // Return the filled BatteryWin instance.
             }
 
-            static WMI::WMIInterface wmiInterface;    ///< Static instance of WMIInterface for querying WMI.
+            inline static WMI::WMIInterface wmiInterface {};    ///< Static instance of WMIInterface for querying WMI.
         };
 
         // Initialize the static WMIInterface instance.
-        WMI::WMIInterface BatteryWin::wmiInterface {};
+        //        WMI::WMIInterface BatteryWin::wmiInterface {};
     }    // namespace detail
 
     // Alias the BatteryWin class in the hwinfo namespace for easier access.

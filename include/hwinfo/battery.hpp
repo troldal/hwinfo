@@ -47,5 +47,5 @@
 
 namespace hwinfo
 {
-    Battery getBatteryInfo() { return Battery::getBatteryInfo(); }
+    inline Battery getBatteryInfo() { return Battery::getBatteryInfo(); }
 }    // namespace hwinfo

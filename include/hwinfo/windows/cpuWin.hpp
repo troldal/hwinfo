@@ -199,11 +199,11 @@ namespace hwinfo
                 return cpus;    // Returning the populated CPUWin instance.
             }
 
-            static WMI::WMIInterface wmiInterface;    ///< Static instance of WMIInterface for querying WMI.
+            inline static WMI::WMIInterface wmiInterface {};    ///< Static instance of WMIInterface for querying WMI.
         };
 
         // Initialize the static WMIInterface instance.
-        WMI::WMIInterface CPUWin::wmiInterface {};
+        //        WMI::WMIInterface CPUWin::wmiInterface {};
 
     }    // namespace detail
 

@@ -47,5 +47,5 @@
 
 namespace hwinfo
 {
-    CPU getCpuInfo() { return CPU::getCpuInfo(); }
+    inline CPU getCpuInfo() { return CPU::getCpuInfo(); }
 }    // namespace hwinfo

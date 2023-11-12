@@ -104,10 +104,10 @@ namespace hwinfo
                 return ram_blocks;
             }
 
-            static WMI::WMIInterface wmiInterface;    ///< Static instance of the WMI interface for querying system information.
+            inline static WMI::WMIInterface wmiInterface {};    ///< Static instance of the WMI interface for querying system information.
         };
 
-        WMI::WMIInterface RAMWin::wmiInterface {};    ///< Definition of the static WMI interface instance.
+        //        WMI::WMIInterface RAMWin::wmiInterface {};    ///< Definition of the static WMI interface instance.
 
     }    // namespace detail
 

@@ -69,7 +69,7 @@ namespace hwinfo
      * @param arch The architecture to convert.
      * @return The string representation of the architecture.
      */
-    std::string to_string(Architecture arch)
+    inline std::string to_string(Architecture arch)
     {
         switch (arch) {
             case Architecture::x86:
@@ -92,7 +92,7 @@ namespace hwinfo
      * @param endianness The endianness to convert.
      * @return The string representation of the endianness.
      */
-    std::string to_string(Endianness endianness)
+    inline static std::string to_string(Endianness endianness)
     {
         switch (endianness) {
             case Endianness::Big:
